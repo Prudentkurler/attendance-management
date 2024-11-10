@@ -1,0 +1,57 @@
+ [] handle icons focus on lg screen
+ [] view archives and unarchive items
+ [] fix admin form submitting on the 3rd step
+ [] unit fees default zero values
+ [] admin roles and permission logic not fully functional
+ 
+ *** FEATURE UPDATES ***
+
+[***] If the Agent clicks on Renew Account it must take him to the client subscription page where the agent can renew by paying for the client online.
+
+
+[x]⁠ ⁠Dashboard: https://akwaaba-africa-1.web.app/dashboard  Start date - End Date
+
+[x]⁠ ⁠Admin Form: why didn't use the enable/disable button for the role access as in the design i sent you.
+
+[x] On the table the status column must display either Limited or Unlimited -  https://akwaaba-africa-1.web.app/dashboard/admin
+ 
+[x]⁠ ⁠Activity logs : Start Date - End Date https://akwaaba-africa-1.web.app/dashboard/admin/activity-logs
+
+[x]⁠ ⁠Manage clients : Start Date- End Date https://akwaaba-africa-1.web.app/dashboard/clients
+
+[x]⁠ ⁠Manage Clients- Client account registration form we left out applicant's image upload
+
+[x]⁠ ⁠Client User Packed: Remove filters and keep only the search bar. Check the capitalization of the page name, https://akwaaba-africa-1.web.app/dashboard/clients/users-package
+
+[x]⁠ ⁠Manage Subscription : Start Date - End Date https://akwaaba-africa-1.web.app/dashboard/subscription. Note, on the form, after selecting the recurring invoice period display option to select start date and end date ( autofill )
+
+[x] One-Time Activation Fee: The form must have a only a SAVE button https://akwaaba-africa-1.web.app/dashboard/subscription/one-time-activation-fee
+ 
+[x]⁠ ⁠One-Time Activation : the table must have the following columns: client, memb. Size, Activation Fee, Date/Time,  Action ( Edit, Deactivate ).
+
+[x] No the form, after selecting the Free Trial period, display Start Date -End Date [Autofill]  https://akwaaba-africa-1.web.app/dashboard/subscription/one-time-activation
+
+[x] Agent Commission : Display the Credit Available on the top of the table in boxes like the dashboard statistics: https://akwaaba-africa-1.web.app/dashboard/agents-commission
+
+[x]⁠ ⁠Desktop Data Sync : there some fields on the form which I omitted. I will send you the updated form in a document - https://akwaaba-africa-1.web.app/dashboard/desktop-data-sync12.
+
+[x] Change the table columns headers to this color #212d40
+
+[]⁠ ⁠Login page- provide forgotten password https://akwaaba-africa-1.web.app/
+
+[]⁠ ⁠Provide Reset Passord on the admin edit profile page https://akwaaba-africa-1.web.app/dashboard/profile
+
+[x] make all date filters date range filter- Start Date - End Date
+
+[x] Provide an option for the Agent to copy his unique Client Account registration url [ Copy Register Client Link ]. This link will register the client under the agent. Example www.akwaabahr.com/client/register/agent-ID 
+
+
+[] The select client must display  only the Agent's client list.   
+
+[x] Display the Add Client button on the Agent Commission page but it must be linked to the agent's Commission table so that any client the agent registers must display on the agent's Commission table. 
+
+[x]⁠  ⁠Agent can't edit Onetime activation unit fee for a client. 
+
+[]  ⁠Provide a Pay Now under the Action column options on the Agent Commission page for only  Super Admin' account.
+
+[]⁠  ⁠Add  Registered by and Registered On ( Date/Time) to the table columns https://akwaaba-africa-1.web.app/dashboard/clients
