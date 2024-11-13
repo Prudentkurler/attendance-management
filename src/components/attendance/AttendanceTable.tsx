@@ -22,7 +22,7 @@ function isAbsent(startDate: string | null, endDate: string | null): boolean {
 }
 
 const AttendanceTable = () => {
-  const [filteredData, setFilteredData] = React.useState(AttendeesData);
+  const [filteredData, setFilteredData] = React.useState<Attendee[]>(AttendeesData);
   const [country, setCountry] = React.useState<string | undefined>(undefined);
   const [branch, setBranch] = React.useState<string | undefined>(undefined);
   const [region, setRegion] = React.useState<string | undefined>(undefined);
@@ -143,7 +143,7 @@ const AttendanceTable = () => {
           </Card>
         </div>
         
-        {/*Advanced filter*/}
+        {/* Advanced filter */}
         <Card className="rounded-md">
           <Button className="flex gap-2 items-center bg-blue-700" onClick={handleAdvancedFilterOpen}>
             <FaSliders className="text-white text-md"/>
@@ -154,7 +154,6 @@ const AttendanceTable = () => {
 
       {showAdvancedFilter && (
         <div className="filters items-center flex flex-wrap gap-3 space-y-2 py-2">
-          {/* Filters for Country, Branch, Region, Group, Subgroup, Schedule, Status */}
           {[["Country", uniqueCountries, country, setCountry],
             ["Branch", uniqueBranches, branch, setBranch],
             ["Region", uniqueRegions, region, setRegion],
@@ -163,12 +162,16 @@ const AttendanceTable = () => {
             ["Schedule", uniqueSchedules, schedule, setSchedule],
             ["Status", uniqueStatuses, status, setStatus]
           ].map(([label, options, value, setValue]) => (
-            <Select key={label as string} onValueChange={(v: string) => setValue(v)} value={value}>
+            <Select
+              key={label as string}
+              onValueChange={(v) => (setValue as React.Dispatch<React.SetStateAction<string | undefined>>)(v)}
+              value={value}
+            >
               <SelectTrigger className="w-36">
                 <SelectValue placeholder={`Select ${label}`} />
               </SelectTrigger>
               <SelectContent>
-                {options.map((option) => (
+                {(options as string[]).map((option) => (
                   <SelectItem key={option} value={option}>
                     {option}
                   </SelectItem>
@@ -202,24 +205,20 @@ const AttendanceTable = () => {
             </label>
           </div>
 
-          {/* Clear Filter Button */}
-          <Button
-            variant='destructive'
-            onClick={clearFilters}
-            size='sm'
-          >
+          {/* Clear Filters */}
+          <Button onClick={clearFilters} className="flex items-center gap-2 bg-blue-700">
             Clear Filters
           </Button>
         </div>
       )}
 
-      {/* DataTable with row-based conditional styling */}
       <DataTable
         columns={baseColumns}
         data={filteredData}
-        rowClassName={(row) => getRowStyle(row.status)}
+       
       />
     </div>
   );
 };
+
 export default AttendanceTable;

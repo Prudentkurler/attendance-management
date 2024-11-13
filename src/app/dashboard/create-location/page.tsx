@@ -70,7 +70,7 @@ export default function CreateLocationForm() {
                 <div className="space-y-4">
                   <FormItem>
                     <FormLabel>Country</FormLabel>
-                    <Select>
+                    <Select value="">
                       <SelectTrigger>
                         <span>Select a country</span>
                       </SelectTrigger>
