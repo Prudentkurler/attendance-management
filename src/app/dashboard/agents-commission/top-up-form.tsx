@@ -125,7 +125,7 @@ export default function AgentCreditTopUpForm() {
                   Select service type
                 </FormLabel>
 
-                <Select
+                <Select value=''
                   onValueChange={field.onChange}
                   defaultValue={field.value}
                 >
@@ -157,7 +157,7 @@ export default function AgentCreditTopUpForm() {
                 <FormLabel className="text-ds-foreground">
                   Select service package
                 </FormLabel>
-                <Select
+                <Select value=''
                   onValueChange={field.onChange}
                   defaultValue={field.value}
                 >

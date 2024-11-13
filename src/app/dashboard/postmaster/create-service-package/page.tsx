@@ -64,7 +64,7 @@ function CreateServicePackage() {
                       <FormLabel className="text-ds-foreground">
                         Select service type
                       </FormLabel>
-                      <Select
+                      <Select value=''
                         onValueChange={field.onChange}
                         defaultValue={field.value}
                       >

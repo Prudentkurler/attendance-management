@@ -27,12 +27,7 @@ import AttendanceTable from "@/components/attendance/AttendanceTable";
 
 
 const Page = ()=>{
-    const [selectedPeriod, setSelectedPeriod] = useState<string>('Today');
 
-    interface CurrentData {
-        period: string;
-        attendees: Attendee[];
-    }
     
   
     const [currentDate, setCurrentDate] = useState('');
@@ -69,20 +64,12 @@ const Page = ()=>{
         return () => clearInterval(intervalId); 
     }, []);
 
-    const handlePeriodSelection = (period: string) => {
-        setSelectedPeriod(period);
-      };
+ 
 
       const REFERENCE_START_TIME = new Date();
 REFERENCE_START_TIME.setHours(7, 0, 0, 0); // 9:00 AM
 
-interface Attendee {
-    start_date: string;
-    end_date: string;
-    name: string;
-    country: string;
-    [key: string]: any; // Add other properties as needed
-}
+
 
 
 
@@ -267,10 +254,11 @@ interface Attendee {
             {/*Table section*/}
 
             <div>
-             <StatsTable onPeriodSelect={handlePeriodSelection}/>  
+             <StatsTable />  
             </div>
 
             <Card className="mt-20 md:mt-6">
+
                 <AttendanceTable/>
             </Card>
            

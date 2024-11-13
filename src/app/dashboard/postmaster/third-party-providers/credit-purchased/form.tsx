@@ -80,7 +80,7 @@ export default function CreditPurchasedForm() {
                 <FormLabel className="text-ds-foreground">
                   Select provider
                 </FormLabel>
-                <Select
+                <Select value=''
                   onValueChange={field.onChange}
                   defaultValue={field.value}
                 >

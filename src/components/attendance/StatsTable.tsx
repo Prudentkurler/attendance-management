@@ -11,11 +11,9 @@ import {
 import { absentees, attendees, lateComers } from './AttendanceData';
 import { DataTable } from '../ui/data-table';
 
-interface StatsTableProps {
-  onPeriodSelect: (period: string) => void;
-}
 
-const StatsTable: React.FC<StatsTableProps> = ({ onPeriodSelect }) => {
+
+const StatsTable: React.FC = () => {
   const data = [
     {
       period: 'Today',
@@ -50,7 +48,7 @@ const StatsTable: React.FC<StatsTableProps> = ({ onPeriodSelect }) => {
       cell: ({ getValue }) => (
         <span
           className="hover:cursor-pointer hover:bg-blue-100"
-          onClick={() => onPeriodSelect(getValue() as string)}
+          
         >
           {getValue() as string}
         </span>

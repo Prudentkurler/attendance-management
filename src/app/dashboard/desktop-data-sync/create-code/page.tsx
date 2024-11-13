@@ -113,7 +113,7 @@ function AccessSyncCodeForm() {
                 <FormLabel className="text-ds-foreground">
                   Assign data sync module
                 </FormLabel>
-                <Select
+                <Select value=''
                   onValueChange={field.onChange}
                   defaultValue={field.value}
                 >
@@ -286,7 +286,7 @@ function AccessSyncCodeForm() {
                 <FormLabel className="text-ds-foreground">
                   Payment status
                 </FormLabel>
-                <Select
+                <Select value=''
                   onValueChange={field.onChange}
                   defaultValue={field.value}
                 >

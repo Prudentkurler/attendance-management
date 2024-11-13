@@ -71,7 +71,7 @@ const BasicInfo = ({ control }: BasicInfoProps) => {
               <FormLabel className="text-ds-foreground">
                 Is organization registered
               </FormLabel>
-              <Select onValueChange={field.onChange}>
+              <Select value='' onValueChange={field.onChange}>
                 <SelectTrigger>
                   <SelectValue
                     placeholder={field.value}
@@ -97,7 +97,7 @@ const BasicInfo = ({ control }: BasicInfoProps) => {
               <FormLabel className="text-ds-foreground">
                 Account category
               </FormLabel>
-              <Select onValueChange={field.onChange}>
+              <Select value='' onValueChange={field.onChange}>
                 <SelectTrigger>
                   <SelectValue
                     placeholder={field.value}
@@ -124,7 +124,7 @@ const BasicInfo = ({ control }: BasicInfoProps) => {
               <FormLabel className="text-ds-foreground">
                 Select Membership / users size
               </FormLabel>
-              <Select onValueChange={field.onChange}>
+              <Select value='' onValueChange={field.onChange}>
                 <SelectTrigger>
                   <SelectValue placeholder={field.value} />
                 </SelectTrigger>

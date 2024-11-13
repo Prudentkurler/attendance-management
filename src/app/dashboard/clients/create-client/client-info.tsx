@@ -95,7 +95,7 @@ function ClientInfo({ control }: BasicInfoProps) {
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-ds-foreground">Gender</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select value='' onValueChange={field.onChange} defaultValue={field.value}>
                 <SelectTrigger>
                   <SelectValue placeholder={field.value} />
                 </SelectTrigger>

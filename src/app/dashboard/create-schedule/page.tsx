@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Select, SelectTrigger, SelectContent, SelectItem } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Form, FormItem, FormLabel, FormControl, FormMessage, FormDescription, FormField } from "@/components/ui/form";
+import { Form, FormItem, FormLabel, FormControl, FormMessage, FormDescription } from "@/components/ui/form";
 import { DataTable } from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
@@ -138,7 +138,7 @@ export default function CreateLocationPage() {
                 <Input type="number" {...form.register("longitude", { required: true })} placeholder="Longitude" />
               </FormControl>
             </div>
-            <FormDescription>Click 'Generate Coordinates' to autofill based on map location</FormDescription>
+            <FormDescription>Click Generate Coordinates to autofill based on map location</FormDescription>
           </FormItem>
 
           <FormItem>

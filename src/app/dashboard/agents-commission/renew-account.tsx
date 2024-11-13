@@ -146,7 +146,7 @@ function RenewAccountForm() {
                 <FormLabel className="text-ds-foreground">
                   Select membership size
                 </FormLabel>
-                <Select
+                <Select value=''
                   onValueChange={field.onChange}
                   defaultValue={field.value}
                 >
@@ -299,7 +299,7 @@ function RenewAccountForm() {
               </FormLabel>
 
               {!isCustomInputVisible && (
-                <Select
+                <Select value=''
                   onValueChange={(value) => {
                     if (value === "other") {
                       setIsCustomInputVisible(true);

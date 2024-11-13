@@ -355,7 +355,7 @@ export default function ManageClients() {
             </div>
 
             {/* select filter */}
-            <Select>
+            <Select value=''>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>

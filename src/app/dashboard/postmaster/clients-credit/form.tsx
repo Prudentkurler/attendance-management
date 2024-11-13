@@ -107,7 +107,7 @@ export default function ClientCreditTopUpForm() {
                 <FormLabel className="text-ds-foreground">
                   Client type
                 </FormLabel>
-                <Select
+                <Select value=''
                   onValueChange={field.onChange}
                   defaultValue={field.value}
                 >
@@ -160,7 +160,7 @@ export default function ClientCreditTopUpForm() {
                   Select service type
                 </FormLabel>
 
-                <Select
+                <Select value=''
                   onValueChange={field.onChange}
                   defaultValue={field.value}
                 >
@@ -192,7 +192,7 @@ export default function ClientCreditTopUpForm() {
                 <FormLabel className="text-ds-foreground">
                   Select service package
                 </FormLabel>
-                <Select
+                <Select value=''
                   onValueChange={field.onChange}
                   defaultValue={field.value}
                 >

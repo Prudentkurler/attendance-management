@@ -249,7 +249,7 @@ export default function ViewAdmins() {
               />
             </div>
 
-            <Select>
+            <Select value=''>
               <SelectTrigger className="w-[150px]">
                 <SelectValue placeholder="Filter" />
               </SelectTrigger>

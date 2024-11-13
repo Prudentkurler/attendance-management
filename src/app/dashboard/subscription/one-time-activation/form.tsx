@@ -131,7 +131,7 @@ export default function SetActivationFeeForm() {
                 Membership size
               </FormLabel>
 
-              <Select onValueChange={field.onChange}>
+              <Select value='' onValueChange={field.onChange}>
                 <SelectTrigger>
                   <SelectValue
                     placeholder={field.value}
@@ -289,7 +289,7 @@ export default function SetActivationFeeForm() {
                 Free trial duration
               </FormLabel>
 
-              <Select onValueChange={field.onChange}>
+              <Select value='' onValueChange={field.onChange}>
                 <SelectTrigger>
                   <SelectValue
                     placeholder={field.value}

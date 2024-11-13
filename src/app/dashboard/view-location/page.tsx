@@ -66,7 +66,7 @@ const columns: ColumnDef<typeof sampleLocationData[0]>[] = [
   {
     accessorKey: "action",
     header: "Action",
-    cell: (info) => (
+    cell: () => (
       <div className="flex gap-2">
         <Button variant="secondary" size="sm">
           Edit

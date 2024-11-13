@@ -172,7 +172,7 @@ export default function CreditBalance() {
             </div>
 
             {/* select filter */}
-            <Select>
+            <Select value=''>
               <SelectTrigger className="w-[180px]">
                 <SelectValue
                   placeholder="Select service provider"

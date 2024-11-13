@@ -102,7 +102,7 @@ function CreateServiceModuleFee() {
                 <FormLabel className="text-ds-foreground">
                   Select service module
                 </FormLabel>
-                <Select
+                <Select value=''
                   onValueChange={field.onChange}
                   defaultValue={field.value}
                 >
@@ -130,7 +130,7 @@ function CreateServiceModuleFee() {
                 <FormLabel className="text-ds-foreground">
                   Select membership size
                 </FormLabel>
-                <Select
+                <Select value=''
                   onValueChange={field.onChange}
                   defaultValue={field.value}
                 >

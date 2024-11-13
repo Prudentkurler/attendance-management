@@ -107,7 +107,7 @@ export default function ViewClientCredits() {
               </DialogContent>
             </Dialog>
 
-            <Select>
+            <Select value=''>
               <SelectTrigger className="w-[150px]">
                 <SelectValue placeholder="Client type" />
               </SelectTrigger>

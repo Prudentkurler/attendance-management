@@ -147,7 +147,7 @@ export default function CreditPurchased() {
               />
             </div>
 
-            <Select>
+            <Select value=''>
               <SelectTrigger className="w-[180px]">
                 <SelectValue
                   placeholder="Select service provider"

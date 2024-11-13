@@ -47,7 +47,7 @@ function AdminInfo({ control, setValue }: TFormProps) {
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-ds-foreground">Admin type</FormLabel>
-              <Select
+              <Select value=''
                 onValueChange={(value: string) => {
                   field.onChange(value);
                   handleAdminTypeChange(value);
@@ -78,7 +78,7 @@ function AdminInfo({ control, setValue }: TFormProps) {
                   Assign client
                 </FormLabel>
 
-                <Select
+                <Select value=''
                   onValueChange={field.onChange}
                   defaultValue={field.value[0]}
                 >
@@ -108,7 +108,7 @@ function AdminInfo({ control, setValue }: TFormProps) {
                   <FormLabel className="text-ds-foreground">
                     Commission type
                   </FormLabel>
-                  <Select
+                  <Select value=''
                     onValueChange={(value: string) => {
                       field.onChange(value);
                     }}

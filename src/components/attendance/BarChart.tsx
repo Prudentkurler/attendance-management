@@ -11,7 +11,7 @@ import {
 } from 'chart.js';
 import data from './ChartData';
 import { FaSliders } from 'react-icons/fa6';
-import { set } from 'lodash';
+
 
 ChartJS.register(
   CategoryScale,

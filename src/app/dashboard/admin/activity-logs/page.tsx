@@ -181,7 +181,7 @@ export default function AdminActivityLogs() {
             </div>
 
             {/* select filter */}
-            <Select>
+            <Select value=''>
               <SelectTrigger className="w-[180px]">
                 <SelectValue
                   placeholder="Select admin type"

@@ -195,7 +195,7 @@ export default function ViewServiceModules() {
             </Dialog>
           </CardTitle>
 
-          <Select>
+          <Select value=''>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Filter" className="capitalize" />
             </SelectTrigger>

@@ -138,7 +138,7 @@ export default function OneTimeActivationFee() {
               />
             </div>
 
-            <Select>
+            <Select value=''>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Filter" />
               </SelectTrigger>

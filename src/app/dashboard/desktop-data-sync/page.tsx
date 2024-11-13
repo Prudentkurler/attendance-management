@@ -311,7 +311,7 @@ export default function DesktopSyncAccessCode() {
             </div>
 
             {/* select option */}
-            <Select>
+            <Select value=''>
               <SelectTrigger className="max-w-[200px]">
                 <SelectValue placeholder="Select client" />
               </SelectTrigger>
@@ -324,7 +324,7 @@ export default function DesktopSyncAccessCode() {
             </Select>
 
             {/* select option */}
-            <Select>
+            <Select value=''>
               <SelectTrigger className="max-w-[200px]">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>

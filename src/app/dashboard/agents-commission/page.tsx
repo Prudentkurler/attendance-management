@@ -94,7 +94,7 @@ export default function AgentsCommission() {
       cell: ({ row }) => {
         if (isSuperAdmin)
           return (
-            <Select onValueChange={() => {}} defaultValue="">
+            <Select value='' onValueChange={() => {}} defaultValue="">
               <SelectTrigger>
                 <SelectValue placeholder="" />
               </SelectTrigger>
@@ -292,7 +292,7 @@ export default function AgentsCommission() {
               />
             </div>
 
-            <Select onValueChange={() => {}}>
+            <Select value='' onValueChange={() => {}}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue
                   placeholder="Select agent"

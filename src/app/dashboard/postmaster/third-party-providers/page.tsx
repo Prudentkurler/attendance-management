@@ -147,7 +147,7 @@ export default function ViewThirdPartyProviders() {
             </div>
 
             {/* select filter */}
-            <Select>
+            <Select  value=''>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Filter" className="capitalize" />
               </SelectTrigger>

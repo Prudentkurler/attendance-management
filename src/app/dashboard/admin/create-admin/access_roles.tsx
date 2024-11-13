@@ -155,7 +155,7 @@ function AccessRoles({ control, setValue, watch }: TFormProps) {
                 Access role type
               </FormLabel>
 
-              <Select
+              <Select value=''
                 onValueChange={(value: string) => {
                   field.onChange(value);
                 }}
@@ -284,7 +284,7 @@ function AccessRoles({ control, setValue, watch }: TFormProps) {
 
                       {/* Subcategories and Permissions */}
                       {menu.subCategories.length > 0 && (
-                        <Select>
+                        <Select value=''>
                           <SelectTrigger>
                             <SelectValue placeholder="Submenus & Permissions" />
                           </SelectTrigger>

@@ -10,16 +10,9 @@ import { Button } from "../ui/button";
 import { Card } from "../ui/card";
 import { FaSliders } from "react-icons/fa6";
 
-// Helper functions for latecomers and absentees
-function isLate(startDate: string | null): boolean {
-  if (!startDate) return false;
-  const startTime = new Date(startDate);
-  return startTime.getUTCHours() > 9;
-}
 
-function isAbsent(startDate: string | null, endDate: string | null): boolean {
-  return !startDate || !endDate;
-}
+
+
 
 const AttendanceTable = () => {
   const [filteredData, setFilteredData] = React.useState<Attendee[]>(AttendeesData);
@@ -79,19 +72,8 @@ const AttendanceTable = () => {
     setFilteredData(filtered);
   }, [country, branch, region, group, subgroup, schedule, status, nameSearch, genderFilter, selectedDate]);
 
-  // Define the row background color based on the status
-  const getRowStyle = (status: string) => {
-    switch (status) {
-      case "Absent":
-        return "bg-red-100";
-      case "Late Check-ins":
-        return "bg-yellow-100";
-      case "Early Check-ins":
-        return "bg-green-100";
-      default:
-        return "";
-    }
-  };
+
+
 
   // Reset filters function
   const clearFilters = () => {

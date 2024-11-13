@@ -110,7 +110,7 @@ export default function SetActivationFeeForm() {
                 Membership size
               </FormLabel>
 
-              <Select onValueChange={field.onChange}>
+              <Select value='' onValueChange={field.onChange}>
                 <SelectTrigger>
                   <SelectValue
                     placeholder={field.value}
