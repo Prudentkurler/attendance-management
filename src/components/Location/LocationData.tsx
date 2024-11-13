@@ -1,9 +1,29 @@
 // sampleLocationData.ts
+export interface LocationHeader {
+    id: string;
+    
+   
+    locationName: string;
+    branch: string;
+    country: string;
+    latitude: string;
+    longitude: string;
+    wifiId: string;
+    bluetoothDeviceId: string;
+    radius: string;
+    lastUpdated: string;
+    locationType: string;
+    updatedBy: string;
+    action:string;
+
+}
+
+
 
 export interface Location {
     id: string;
     country: string;
-    name: string; // Add this line
+  
     branch: string;
     locationName: string;
     latitude: string;
@@ -20,7 +40,7 @@ export interface Location {
     {
       id: "1",
       country: "USA",
-      name: "New York Office",
+   
       branch: "New York",
       locationName: "NYC Office",
       latitude: "40.712776",
@@ -35,7 +55,7 @@ export interface Location {
     {
       id: "2",
       country: "Canada",
-      name: "Toronto Office",
+    
       branch: "Toronto",
       locationName: "Toronto Office",
       latitude: "43.651070",
@@ -49,7 +69,7 @@ export interface Location {
     },
     {
       id: "3",
-      name: "Berlin Office",
+     
       branch: "Berlin",
       country: "Germany",
       locationName: "Berlin Office",
@@ -64,7 +84,7 @@ export interface Location {
     },
     {
       id: "4",
-      name: "London Office",
+      
       branch: "London",
       country: "UK",
       locationName: "London Office",
@@ -79,7 +99,7 @@ export interface Location {
     },
     {
       id: "5",
-      name: "Sydney Office",
+    
       branch: "Sydney",
       country: "Australia",
       locationName: "Sydney Office",

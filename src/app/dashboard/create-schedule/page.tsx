@@ -1,8 +1,11 @@
+import LocationTable from '@/components/Location/LocationTable'
 import React from 'react'
 
 const page = () => {
   return (
-    <div>page</div>
+    <div>
+      <LocationTable/>
+    </div>
   )
 }
 

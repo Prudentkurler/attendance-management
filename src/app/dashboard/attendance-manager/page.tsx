@@ -13,18 +13,28 @@ import { IoTrendingDown } from "react-icons/io5";
 import { IoTrendingUp } from "react-icons/io5";
 import { BsMoon } from "react-icons/bs";
 import { TiCloudStorageOutline } from "react-icons/ti";
-import MonthlyComparisonChart from "@/components/attendance/LineChart";
-import data from '@/components/attendance/ChartData';
-import AttendanceBarChart from "@/components/attendance/BarChart";
-import AttendanceTable from "@/components/attendance/AttendanceTable";
 import LineChart from "@/components/attendance/LineChart";
 import BarChart from "@/components/attendance/BarChart";
 import StatsTable from "@/components/attendance/StatsTable";
+import { Card, CardContent } from "@/components/ui/card";
+import AttendanceTable from "@/components/attendance/AttendanceTable";
 
-const page = ()=>{
+
+
+
+
+
+
+
+const Page = ()=>{
     const [selectedPeriod, setSelectedPeriod] = useState<string>('Today');
-    const [filter, setFilter] = useState<'month' | 'week' | 'day'>('month');
-    const currendata = data[filter] as unknown as { attendees: Attendee[] };
+
+    interface CurrentData {
+        period: string;
+        attendees: Attendee[];
+    }
+    
+  
     const [currentDate, setCurrentDate] = useState('');
     const updateCurrentDate = () => {
         const date = new Date();
@@ -69,25 +79,13 @@ REFERENCE_START_TIME.setHours(7, 0, 0, 0); // 9:00 AM
 interface Attendee {
     start_date: string;
     end_date: string;
+    name: string;
+    country: string;
     [key: string]: any; // Add other properties as needed
 }
 
-interface AttendeeWithStatus extends Attendee {
-    status: 'absent' | 'late' | 'onTime';
-    bgColor: 'lightcoral' | 'lightorange' | 'white';
-}
 
-const dataWithStatus: AttendeeWithStatus[] = currendata.attendees.map((attendee: Attendee) => {
-    const startDate = new Date(attendee.start_date);
-    const isLate = startDate > REFERENCE_START_TIME;
-    const isAbsent = !attendee.start_date || !attendee.end_date;
 
-    return {
-        ...attendee,
-        status: isAbsent ? 'absent' : isLate ? 'late' : 'onTime',
-        bgColor: isAbsent ? 'lightcoral' : isLate ? 'lightorange' : 'white'
-    };
-});
     return(
 
         <div className="py-4 md:px-8 px-4 flex flex-col gap-8">
@@ -103,14 +101,14 @@ const dataWithStatus: AttendeeWithStatus[] = currendata.attendees.map((attendee:
 
             {/*Attendance Manager filters*/}
             <div className="flex gap-4 ">
-                <div className="flex gap-2 items-center rounded-md  shadow-lg p-2 hover:cursor-pointer">
+                <Card className="flex gap-2 items-center rounded-md   p-2 hover:cursor-pointer">
                     <LuFilter className="text-gray-500 text-sm"/>
                     <p className="text-sm text-gray-900">Filter</p>
-                </div>
-                <div className="flex gap-2  items-center shadow-lg rounded-md p-2">
+                </Card>
+                <Card className="flex gap-2  items-center  rounded-md p-2">
                     <BiSort className="text-gray-500 text-sm"/>
                     <p className="text-gray-900 text-sm">Sort</p>
-                </div>
+                </Card>
             </div>
 
             {/*stats section*/}
@@ -118,17 +116,17 @@ const dataWithStatus: AttendeeWithStatus[] = currendata.attendees.map((attendee:
             <div className="flex flex-col md:flex-row gap-3 w-full  items-center">
 
                 {/*one*/}
-                <div className="w-full md:w-1/3  h-[240px] flex gap-3 items-center justify-center rounded-lg shadow-lg">
+                <Card className="w-full md:w-1/3  h-[240px] flex gap-3 items-center justify-center rounded-lg ">
                   <FiSun className="text-6xl text-gray-400"/>
                   <div className="flex flex-col gap-1">
                     <p className="text-4xl text-gray-400 mt-8 font-semibold">8:02:09 AM</p>
                     <p className="text-md text-indigo-950 font-semibold">{currentDate}</p>
                   </div>
-                </div>
+                </Card>
                 
                 {/*two*/}
                 <div className=" w-full md:w-1/4 flex gap-4 flex-col ">
-                    <div className="w-full h-[50%] rounded-lg shadow-lg p-5 ">
+                <Card className="w-full  h-[50%] rounded-lg  p-5">
                         <div className="flex justify-between items-center w-full">
                             <p className="text-3xl text-indigo-950 ">425</p>
                             <div className="p-3 rounded-full flex items-center justify-center bg-blue-100">
@@ -143,8 +141,8 @@ const dataWithStatus: AttendeeWithStatus[] = currendata.attendees.map((attendee:
                            
                             <p className="text-gray-800 text-sm opacity-80">2 new Employees added</p>
                         </div>
-                    </div>
-                    <div className="w-full  h-[50%] rounded-lg shadow-lg p-5">
+                    </Card>
+                    <Card className="w-full  h-[50%] rounded-lg  p-5">
                         <div className="flex justify-between items-center w-full">
                             <p className="text-3xl text-indigo-950 ">62</p>
                             <div className="p-3 rounded-full flex items-center justify-center bg-blue-100">
@@ -159,7 +157,7 @@ const dataWithStatus: AttendeeWithStatus[] = currendata.attendees.map((attendee:
                            
                             <p className="text-gray-800 text-sm opacity-80">3% increase than yesterday</p>
                         </div>
-                    </div>
+                    </Card>
 
                  
                 </div>
@@ -167,7 +165,7 @@ const dataWithStatus: AttendeeWithStatus[] = currendata.attendees.map((attendee:
                 {/*three*/}
 
                 <div className=" w-full md:w-1/4 flex gap-4 flex-col ">
-                    <div className="w-full h-[50%] rounded-lg shadow-lg p-5 ">
+                <Card className="w-full  h-[50%] rounded-lg  p-5">
                         <div className="flex justify-between items-center w-full">
                             <p className="text-3xl text-indigo-950 ">360</p>
                             <div className="p-3 rounded-full flex items-center justify-center bg-blue-100">
@@ -182,8 +180,8 @@ const dataWithStatus: AttendeeWithStatus[] = currendata.attendees.map((attendee:
                            
                             <p className="text-gray-800 text-sm opacity-80">10% less yesterday</p>
                         </div>
-                    </div>
-                    <div className="w-full  h-[50%] rounded-lg shadow-lg p-5">
+                    </Card>
+                    <Card className="w-full  h-[50%] rounded-lg  p-5">
                         <div className="flex justify-between items-center w-full">
                             <p className="text-3xl text-indigo-950 ">6</p>
                             <div className="p-3 rounded-full flex items-center justify-center bg-blue-100">
@@ -198,7 +196,7 @@ const dataWithStatus: AttendeeWithStatus[] = currendata.attendees.map((attendee:
                            
                             <p className="text-gray-800 text-sm opacity-80">3% increase than yesterday</p>
                         </div>
-                    </div>
+                    </Card>
 
                  
                 </div>
@@ -207,7 +205,7 @@ const dataWithStatus: AttendeeWithStatus[] = currendata.attendees.map((attendee:
                 {/*four*/}
 
                 <div className="w-full md:w-1/4 flex gap-4 flex-col ">
-                    <div className="w-full h-[50%] rounded-lg shadow-lg p-5 ">
+                <Card className="w-full  h-[50%] rounded-lg  p-5">
                         <div className="flex justify-between items-center w-full">
                             <p className="text-3xl text-indigo-950 ">30</p>
                             <div className="p-3 rounded-full flex items-center justify-center bg-blue-100">
@@ -222,8 +220,10 @@ const dataWithStatus: AttendeeWithStatus[] = currendata.attendees.map((attendee:
                            
                             <p className="text-gray-800 text-sm opacity-80">3% increase than yesterday</p>
                         </div>
-                    </div>
-                    <div className="w-full  h-[50%] rounded-lg shadow-lg p-5">
+                    </Card>
+                    <Card className="w-full  h-[50%] rounded-lg  p-5">
+
+                  
                         <div className="flex justify-between items-center w-full">
                             <p className="text-3xl text-indigo-950 ">42</p>
                             <div className="p-3 rounded-full flex items-center justify-center bg-blue-100">
@@ -238,7 +238,7 @@ const dataWithStatus: AttendeeWithStatus[] = currendata.attendees.map((attendee:
                            
                             <p className="text-gray-800 text-sm opacity-80">2% increase than yesterday</p>
                         </div>
-                    </div>
+                        </Card>
 
                  
                 </div>
@@ -248,26 +248,34 @@ const dataWithStatus: AttendeeWithStatus[] = currendata.attendees.map((attendee:
             {/*Attendance Chart*/}
 
             <div className="w-full h-[400px] flex  flex-col md:flex-row gap-4 mt-8 ">
-                <div className="md:w-[60%] w-full shadow-lg rounded-lg p-2">
-                <LineChart/>
-                </div>
-                <div className="md:w-[40%] w-full h-[320px] md:h-full shadow-lg rounded-lg p-4">
+               
+                <Card className="md:w-[60%] w-full shadow-lg rounded-lg p-2">
+                    <CardContent className="w-full h-full">
+
+                    <LineChart/>
+                    </CardContent>
+                </Card>
+                <Card className="md:w-[40%] w-full h-[320px] md:h-full  p-4">
+                    <CardContent className="w-full h-full">
+
                     <BarChart/>
-                </div>
+                    </CardContent>
+                </Card>
+                
             </div>
 
             {/*Table section*/}
 
             <div>
-                <StatsTable onPeriodSelect={handlePeriodSelection}/>
+             <StatsTable onPeriodSelect={handlePeriodSelection}/>  
             </div>
 
-            <div className="mt-20 md:mt-6">
-                <AttendanceTable selectedPeriod={selectedPeriod}/>
-            </div>
+            <Card className="mt-20 md:mt-6">
+                <AttendanceTable/>
+            </Card>
            
         </div>
     )
 }
 
-export default page;
+export default Page;

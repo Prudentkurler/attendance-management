@@ -1,54 +1,78 @@
+"use client";
+
 import React from 'react';
+import {
+  ColumnDef,
+
+} from "@tanstack/react-table";
+
+
+
 import { absentees, attendees, lateComers } from './AttendanceData';
+import { DataTable } from '../ui/data-table';
 
 interface StatsTableProps {
   onPeriodSelect: (period: string) => void;
 }
 
 const StatsTable: React.FC<StatsTableProps> = ({ onPeriodSelect }) => {
+  const data = [
+    {
+      period: 'Today',
+      attendees: attendees.Today,
+      lateComers: lateComers.Today,
+      absentees: absentees.Today,
+    },
+    {
+      period: 'Yesterday',
+      attendees: attendees.Yesterday,
+      lateComers: lateComers.Yesterday,
+      absentees: absentees.Yesterday,
+    },
+    {
+      period: 'Week',
+      attendees: attendees.week,
+      lateComers: lateComers.week,
+      absentees: absentees.week,
+    },
+    {
+      period: 'Month',
+      attendees: attendees.month,
+      lateComers: lateComers.month,
+      absentees: absentees.month,
+    },
+  ];
+
+  const columns: ColumnDef<typeof data[0]>[] = [
+    {
+      header: 'Period',
+      accessorKey: 'period',
+      cell: ({ getValue }) => (
+        <span
+          className="hover:cursor-pointer hover:bg-blue-100"
+          onClick={() => onPeriodSelect(getValue() as string)}
+        >
+          {getValue() as string}
+        </span>
+      ),
+    },
+    {
+      header: 'Attendees',
+      accessorKey: 'attendees',
+    },
+    {
+      header: 'Late Comers',
+      accessorKey: 'lateComers',
+    },
+    {
+      header: 'Absentees',
+      accessorKey: 'absentees',
+    },
+  ];
+
   return (
-    <div className='w-full overflow-x-scroll shadow-md mt-8'>
-      <table className='p-3 w-full'>
-        <thead className='w-full py-2 bg-gray-300'>
-          <tr className='border-y-2 p-4 text-[11px]  md:text-sm border-gray-300 mt-3 text-gray-900 font-serif'>
-            <th>Period</th>
-            <th>Attendees</th>
-            <th>Late Comers</th>
-            <th>Absentees</th>
-           
-          </tr>
-        </thead>
-        <tbody>
-          <tr className='border-y-2 text-center hover:cursor-pointer hover:bg-blue-100' onClick={() => onPeriodSelect('Today')}>
-            <td>Today</td>
-            <td>{attendees.Today}</td>
-            <td>{lateComers.Today}</td>
-            <td>{absentees.Today}</td>
-          
-          </tr>
-          <tr  className='border-y-2  text-center hover:cursor-pointer hover:bg-blue-100 ' onClick={() => onPeriodSelect('Yesterday')}>
-            <td>Yesterday</td>
-            <td>{attendees.Yesterday}</td>
-            <td>{lateComers.Yesterday}</td>
-            <td>{absentees.Yesterday}</td>
-       
-          </tr>
-          <tr  className='border-y-2 text-center  hover:cursor-pointer hover:bg-blue-100 'onClick={() => onPeriodSelect('Week')}>
-            <td>Week</td>
-            <td>{attendees.week}</td>
-            <td>{lateComers.week}</td>
-            <td>{absentees.week}</td>
-      
-          </tr>
-          <tr  className='border-y-2 text-center  hover:cursor-pointer hover:bg-blue-100 ' onClick={() => onPeriodSelect('Month')}>
-            <td>Month</td>
-            <td>{attendees.month}</td>
-            <td>{lateComers.month}</td>
-            <td>{absentees.month}</td>
-          
-          </tr>
-        </tbody>
-      </table>
+    <div className='w-full overflow-x-auto shadow-md mt-8'>
+      <DataTable columns={columns} data={data} />
     </div>
   );
 };

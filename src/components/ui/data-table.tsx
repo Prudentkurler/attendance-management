@@ -40,7 +40,9 @@ export function DataTable<TData, TValue>({
               {headerGroup.headers.map((header, index) => (
                 <TableHead
                   key={header.id}
-                  className={`bg-[#212d40] text-left leading-3 text-background ${index === 0 ? "sticky left-0 z-10" : ""}`}
+                  className={`bg-[#212d40] text-left leading-3 text-background ${
+                    index === 0 ? "sticky left-0 z-10 bg-[#212d40]" : ""
+                  }`}
                 >
                   {header.isPlaceholder
                     ? null
@@ -64,7 +66,9 @@ export function DataTable<TData, TValue>({
                 {row.getVisibleCells().map((cell, index) => (
                   <TableCell
                     key={cell.id}
-                    className={`pr-0 text-left ${index === 0 ? "sticky left-0 bg-white" : ""}`}
+                    className={`pr-0 text-left ${
+                      index === 0 ? "sticky left-0 z-10 bg-white" : ""
+                    }`}
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
