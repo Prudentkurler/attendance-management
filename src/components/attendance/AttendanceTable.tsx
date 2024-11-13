@@ -147,7 +147,7 @@ const AttendanceTable = () => {
             <Select
               key={label as string}
               onValueChange={(v) => (setValue as React.Dispatch<React.SetStateAction<string>>)(v)}
-              value={value}
+              value={value as any}
             >
               <SelectTrigger className="w-36">
                 <SelectValue placeholder={`Select ${label}`} />
