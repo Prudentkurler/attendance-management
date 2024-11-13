@@ -45,7 +45,7 @@ const AttendanceTable = () => {
   const uniqueSchedules = Array.from(new Set(AttendeesData.map(a => a.schedule)));
   const uniqueStatuses = ["Attendee", "Absentee", "Late Check-ins", "Early Check-ins"];
 
-  React.useEffect(() => {
+ React.useEffect(() => {
     const filtered = AttendeesData.filter((attendee) => {
       const matchesCountry = country ? attendee.country === country : true;
       const matchesBranch = branch ? attendee.branch === branch : true;
@@ -146,7 +146,7 @@ const AttendanceTable = () => {
           ].map(([label, options, value, setValue]) => (
             <Select
               key={label as string}
-              onValueChange={(v) => (setValue as React.Dispatch<React.SetStateAction<string | undefined>>)(v)}
+              onValueChange={(v) => (setValue as React.Dispatch<React.SetStateAction<string>>)(v)}
               value={value}
             >
               <SelectTrigger className="w-36">
