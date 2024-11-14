@@ -19,18 +19,18 @@ export interface Attendee {
 
 export const columns: ColumnDef<Attendee, any>[] = [
     { header: "Name", accessorKey: "name" },
-    { header: "Period", accessorKey: "period" },
-    { header: "Start Date", accessorKey: "start_date" },
-    { header: "End Date", accessorKey: "end_date" },
-    { header: "Schedule", accessorKey: "schedule" },
+    { header: "Status", accessorKey: "status" },
     { header: "Country", accessorKey: "country" },
     { header: "Region", accessorKey: "region" },
     { header: "Branch", accessorKey: "branch" },
     { header: "Category", accessorKey: "category" },
     { header: "Group", accessorKey: "group" },
-    { header: "Status", accessorKey: "status" },
     { header: "Subgroup", accessorKey: "subgroup" },
     { header: "Gender", accessorKey: "gender" },
+    { header: "Period", accessorKey: "period" },
+    { header: "Start Date", accessorKey: "start_date" },
+    { header: "End Date", accessorKey: "end_date" },
+    { header: "Schedule", accessorKey: "schedule" },
     { header: "ID", accessorKey: "id" },
     // New column for status
 ];
