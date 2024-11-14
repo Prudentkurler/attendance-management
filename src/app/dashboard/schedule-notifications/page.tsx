@@ -1,6 +1,9 @@
+
+"use client"
 // pages/schedule-notifications.tsx
 import React, { useState } from 'react';
-import { FilterSection, ActionButton } from '../components';
+import { ActionButton } from '@/components/ActionButtons';
+import { FilterSection } from '@/components/FilterSection';
 
 interface NotificationTemplate {
   id: string;
@@ -18,7 +21,7 @@ interface ActivityLog {
   medium: 'SMS' | 'Voice' | 'Email';
 }
 
-export default function ScheduleNotificationsPage() {
+const  page = ()=> {
   const [medium, setMedium] = useState<'SMS' | 'Voice' | 'Email'>('SMS');
   const [alertType, setAlertType] = useState<'Recurring' | 'Non-recurring'>('Recurring');
   const [selectedTemplate, setSelectedTemplate] = useState<NotificationTemplate | null>(null);
@@ -194,3 +197,5 @@ export default function ScheduleNotificationsPage() {
     </div>
   );
 }
+
+export default page

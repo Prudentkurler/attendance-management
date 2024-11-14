@@ -1,6 +1,14 @@
+"use client"
+
 // pages/attendance-history.tsx
 import React, { useState } from 'react';
-import { FilterSection, SearchInput, ActionButton, DataTable, DateRangePicker } from '../components';
+import { ColumnDef } from '@tanstack/react-table';
+
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { DataTable } from '@/components/ui/data-table';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card } from '@/components/ui/card';
 
 interface AttendanceReport {
   id: string;
@@ -32,77 +40,77 @@ export default function AttendanceHistoryPage() {
   const [breakdowns, setBreakdowns] = useState<DailyBreakdown[]>([]);
   const [selectedReport, setSelectedReport] = useState<string | null>(null);
 
-  const summaryColumns = [
+  const summaryColumns: ColumnDef<AttendanceReport, unknown>[] = [
     {
-      key: 'user',
-      title: 'User',
-      render: (report: AttendanceReport) => (
+      accessorKey: 'user',
+      header: 'User',
+      cell: ({ row }) => (
         <div className="flex items-center">
           <img
-            src={report.userImage}
-            alt={report.userName}
+            src={row.original.userImage}
+            alt={row.original.userName}
             className="h-8 w-8 rounded-full mr-2"
           />
           <div>
-            <div className="font-medium">{report.userName}</div>
-            <div className="text-sm text-gray-500">{report.userId}</div>
+            <div className="font-medium">{row.original.userName}</div>
+            <div className="text-sm text-gray-500">{row.original.userId}</div>
           </div>
         </div>
       ),
     },
     {
-      key: 'clockEvents',
-      title: 'Clock Events',
-      render: (report: AttendanceReport) => (
+      accessorKey: 'clockEvents',
+      header: 'Clock Events',
+      cell: ({ row }) => (
         <div>
-          <div>In: {report.totalClockIns} (Admin: {report.adminClockIns})</div>
-          <div>Out: {report.totalClockOuts} (Admin: {report.adminClockOuts})</div>
+          <div>In: {row.original.totalClockIns} (Admin: {row.original.adminClockIns})</div>
+          <div>Out: {row.original.totalClockOuts} (Admin: {row.original.adminClockOuts})</div>
         </div>
       ),
     },
     {
-      key: 'hours',
-      title: 'Hours',
-      render: (report: AttendanceReport) => (
+      accessorKey: 'hours',
+      header: 'Hours',
+      cell: ({ row }) => (
         <div>
-          <div>Total: {report.totalHours}h</div>
-          <div>OT: {report.overtimeHours}h</div>
-          <div>Late: {report.lateHours}h</div>
+          <div>Total: {row.original.totalHours}h</div>
+          <div>OT: {row.original.overtimeHours}h</div>
+          <div>Late: {row.original.lateHours}h</div>
         </div>
       ),
     },
     {
-      key: 'validation',
-      title: 'Validation',
-      render: (report: AttendanceReport) => (
+      accessorKey: 'validation',
+      header: 'Validation',
+      cell: ({ row }) => (
         <div className="flex items-center">
           <span
             className={`px-2 py-1 rounded-full text-sm ${
-              report.validated
+              row.original.validated
                 ? 'bg-green-100 text-green-800'
                 : 'bg-yellow-100 text-yellow-800'
             }`}
           >
-            {report.validated ? 'Validated' : 'Pending'}
+            {row.original.validated ? 'Validated' : 'Pending'}
           </span>
         </div>
       ),
     },
     {
-      key: 'actions',
-      title: 'Actions',
-      render: (report: AttendanceReport) => (
+      accessorKey: 'actions',
+      header: 'Actions',
+      cell: ({ row }) => (
         <div className="flex space-x-2">
-          <button
-            className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-            onClick={() => handleViewBreakdown(report.id)}
+          <Button
+           size='lg'
+            onClick={() => handleViewBreakdown(row.original.id)}
           >
             View Details
-          </button>
-          {!report.validated && (
+          </Button>
+          {!row.original.validated && (
             <button
               className="px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700"
-              onClick={() => handleValidate(report.id)}
+              onClick={() => handleValidate(row.original.id)}
             >
               Validate
             </button>
@@ -112,46 +120,46 @@ export default function AttendanceHistoryPage() {
     },
   ];
 
-  const breakdownColumns = [
+  const breakdownColumns: ColumnDef<DailyBreakdown, unknown>[] = [
     {
-      key: 'date',
-      title: 'Date',
-      render: (date: Date) => date.toLocaleDateString(),
+      accessorKey: 'date',
+      header: 'Date',
+      cell: ({ row }) => row.original.date.toLocaleDateString(),
     },
     {
-      key: 'clockIn',
-      title: 'Clock In',
-      render: (date: Date) => date.toLocaleTimeString(),
+      accessorKey: 'clockIn',
+      header: 'Clock In',
+      cell: ({ row }) => row.original.clockIn.toLocaleTimeString(),
     },
     {
-      key: 'clockOut',
-      title: 'Clock Out',
-      render: (date: Date) => date.toLocaleTimeString(),
+      accessorKey: 'clockOut',
+      header: 'Clock Out',
+      cell: ({ row }) => row.original.clockOut.toLocaleTimeString(),
     },
     {
-      key: 'clockSource',
-      title: 'Source',
-      render: (source: 'Self' | 'Admin') => (
+      accessorKey: 'clockSource',
+      header: 'Source',
+      cell: ({ row }) => (
         <span
           className={`px-2 py-1 rounded-full text-sm ${
-            source === 'Self'
+            row.original.clockSource === 'Self'
               ? 'bg-blue-100 text-blue-800'
               : 'bg-purple-100 text-purple-800'
           }`}
         >
-          {source}
+          {row.original.clockSource}
         </span>
       ),
     },
     {
-      key: 'hours',
-      title: 'Hours',
-      render: (hours: number) => `${hours}h`,
+      accessorKey: 'hours',
+      header: 'Hours',
+      cell: ({ row }) => `${row.original.hours}h`,
     },
     {
-      key: 'status',
-      title: 'Status',
-      render: (status: string) => (
+      accessorKey: 'status',
+      header: 'Status',
+      cell: ({ row }) => (
         <span
           className={`px-2 py-1 rounded-full text-sm ${
             status === 'On Time'
@@ -187,72 +195,98 @@ export default function AttendanceHistoryPage() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Attendance History</h1>
         <div className="flex space-x-4">
-          <button
-            className={`px-4 py-2 rounded-md ${
+          <Button
+            className={` ${
               viewType === 'summary'
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-200 text-gray-700'
+                ? 'bg-ds-primary text-white'
+                : 'bg-ds-foreground text-white'
             }`}
             onClick={() => setViewType('summary')}
           >
             Summary
-          </button>
-          <button
-            className={`px-4 py-2 rounded-md ${
+          </Button>
+
+          <Button
+            className={` ${
               viewType === 'breakdown'
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-200 text-gray-700'
+              ? 'bg-ds-primary text-white'
+                : 'bg-ds-foreground text-white'
             }`}
             onClick={() => setViewType('breakdown')}
           >
             Breakdown
-          </button>
+          </Button>
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-        <FilterSection onFilterChange={() => {}} />
+      <Card className='p-3'>
 
-        <div className="flex flex-wrap gap-4 mt-4">
-          <select className="px-3 py-2 border rounded-md">
-            <option value="">User Type</option>
-            {/* Add user type options */}
-          </select>
+      <div className="bg-white  rounded-lg mb-3">
+      
 
-          <select className="px-3 py-2 border rounded-md">
-            <option value="">Schedule</option>
-            {/* Add schedule options */}
-          </select>
+        <div className="flex  gap-4 ">
+          <Select value=''>
+            <SelectTrigger className='w-36'>
+              <SelectValue placeholder='User type'>
 
-          <DateRangePicker
-            startDate={new Date()}
-            endDate={new Date()}
-            onStartDateChange={() => {}}
-            onEndDateChange={() => {}}
-          />
+              </SelectValue>
+              </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="userType">User Type</SelectItem>
+              {/* Add user type options */}
+            </SelectContent>
+         
+          </Select>
+          <Select value=''>
+            <SelectTrigger className='w-36'>
+              <SelectValue placeholder='User type'>
 
-          <SearchInput
-            onSearch={() => {}}
+              </SelectValue>
+              </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="userType">Scheduls</SelectItem>
+              {/* Add user type options */}
+            </SelectContent>
+         
+          </Select>
+
+        
+
+          <Input type='date' placeholder='Start Date' />
+          <Input type='date' placeholder='End Date' />
+
+          <Input
+            onChange={() => {}}
             placeholder="Search by name or ID..."
           />
         </div>
 
-        <div className="flex justify-end mt-4">
-          <ActionButton
-            label="Export Report"
-            onClick={handleExport}
-            variant="primary"
-          />
-        </div>
+       
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-        <DataTable
-          columns={viewType === 'summary' ? summaryColumns : breakdownColumns}
-          data={viewType === 'summary' ? reports : breakdowns}
-          onRowClick={() => {}}
-        />
+      <div className="bg-white rounded-lg overflow-hidden">
+        {viewType === 'summary' ? (
+          <DataTable<AttendanceReport, unknown>
+            columns={summaryColumns}
+            data={reports}
+          />
+        ) : (
+          <DataTable<DailyBreakdown, unknown>
+            columns={breakdownColumns}
+            data={breakdowns}
+          />
+        )}
+
+      <div className="flex justify-end mt-3 ">
+          <Button
+            onClick={handleExport}
+            variant="destructive"
+          >
+            Export Report
+          </Button>
+        </div>
       </div>
+      </Card>
     </div>
   );
 }

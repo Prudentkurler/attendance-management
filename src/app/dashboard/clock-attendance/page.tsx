@@ -1,7 +1,10 @@
+"use client"
+
 // pages/clock-attendance.tsx
 import React, { useState } from 'react';
-import { FilterSection, SearchInput, ActionButton, DataTable, DateRangePicker } from '../components';
+
 import { ClockEvent, User, Location } from '../types';
+import { FilterSection } from '@/components/FilterSection';
 
 interface AttendanceRecord {
   id: string;
@@ -13,7 +16,7 @@ interface AttendanceRecord {
   status: 'present' | 'absent' | 'late';
 }
 
-export default function ClockAttendancePage() {
+export default function Page() {
   const [view, setView] = useState<'list' | 'clocked'>('list');
   const [records, setRecords] = useState<AttendanceRecord[]>([]);
   const [selectedRecords, setSelectedRecords] = useState<string[]>([]);
@@ -230,3 +233,10 @@ export default function ClockAttendancePage() {
           <select className="px-3 py-2 border rounded-md">
             <option value="">Schedule</option>
             {/* Add schedule options */}
+            </select>
+            </div>
+            </div>
+            </div>
+  )
+}
+

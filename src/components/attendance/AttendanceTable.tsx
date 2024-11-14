@@ -92,7 +92,7 @@ const AttendanceTable = () => {
   return (
     <div className="p-4">
       <div className="w-full flex items-center justify-between py-3">
-        <h1 className="text-2xl font-semibold text-blue-700">Attendance Table</h1>
+        <h1 className="text-2xl">Attendance Table</h1>
         
         {/* Name Search Filter */}
         <Input
@@ -127,9 +127,9 @@ const AttendanceTable = () => {
         
         {/* Advanced filter */}
         <Card className="rounded-md">
-          <Button className="flex gap-2 items-center bg-blue-700" onClick={handleAdvancedFilterOpen}>
+          <Button className="flex gap-2 items-center bg-ds-primary" onClick={handleAdvancedFilterOpen}>
             <FaSliders className="text-white text-md"/>
-            <h4>Advanced Filter</h4>
+            <h5>Advanced Filter</h5>
           </Button>
         </Card>
       </div>
