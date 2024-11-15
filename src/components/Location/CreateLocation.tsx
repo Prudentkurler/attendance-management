@@ -26,7 +26,6 @@ import {
 } from "@/schemas/third-party-provider-schema";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
 
 export default function CreateLocation() {
   const form = useForm<ThirdPartyProviderSchema>({
@@ -36,7 +35,7 @@ export default function CreateLocation() {
   });
 
   const { control, handleSubmit, setValue } = form;
-  
+
   // Auto-generate latitude, longitude, and radius
   const autoGenerateLocation = () => {
     if (navigator.geolocation) {
@@ -61,8 +60,6 @@ export default function CreateLocation() {
     console.log(values);
   };
 
-
-
   return (
     <Form {...form}>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 px-4">
@@ -74,7 +71,10 @@ export default function CreateLocation() {
             <FormItem>
               <FormLabel>Country</FormLabel>
               <FormControl>
-                <Select value={field.value} onValueChange={field.onChange}>
+                <Select
+                  value={field.value}
+                  onValueChange={(value) => field.onChange(value)}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select Country" />
                   </SelectTrigger>
@@ -97,7 +97,10 @@ export default function CreateLocation() {
             <FormItem>
               <FormLabel>Branch</FormLabel>
               <FormControl>
-                <Select value={field.value} onValueChange={field.onChange}>
+                <Select
+                  value={field.value}
+                  onValueChange={(value) => field.onChange(value)}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select Branch" />
                   </SelectTrigger>
@@ -213,9 +216,8 @@ export default function CreateLocation() {
         />
 
         <Button
-     
-        type="submit"
-        className="w-full rounded-lg bg-ds-primary px-8 py-2 text-ds-foreground hover:bg-ds-primary-dark"
+          type="submit"
+          className="w-full rounded-lg bg-ds-primary px-8 py-2 text-ds-foreground hover:bg-ds-primary-dark"
         >
           Save
         </Button>

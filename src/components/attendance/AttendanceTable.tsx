@@ -9,6 +9,8 @@ import { Calendar } from "@/components/ui/calendar"; // Adjust the path as neede
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
 import { FaSliders } from "react-icons/fa6";
+import { Dialog, DialogContent } from "../ui/dialog";
+import { DialogTrigger } from "@radix-ui/react-dialog";
 
 
 
@@ -26,12 +28,10 @@ const AttendanceTable = () => {
   const [nameSearch, setNameSearch] = React.useState<string>("");
   const [genderFilter, setGenderFilter] = React.useState<string | undefined>("All");
   const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(undefined);
-  const [showCalendar, setShowCalendar] = React.useState(false);
+ 
   const [showAdvancedFilter, setShowAdvancedFilter] = React.useState(false);
 
-  const handleDateOpen = () => {
-    setShowCalendar(!showCalendar);
-  };
+
   const handleAdvancedFilterOpen = () => {
     setShowAdvancedFilter(!showAdvancedFilter);
   };
@@ -105,23 +105,31 @@ const AttendanceTable = () => {
 
         {/* Date Filter with Calendar */}
         <div className="flex flex-col gap-2">
-          <Card className="flex flex-col gap-1 relative rounded-md">
-            <Button
-              variant="ghost"
-              size="default"
-              onClick={handleDateOpen}
-              className="w-36"
-            >
-              Date Picker
+
+
+          <Card className="flex flex-col gap-1 rounded-md">
+          <Dialog>
+          <DialogTrigger asChild>
+            <Button size="lg" variant="ghost" >
+          
+            <p>Date Picker</p>
             </Button>
-            {showCalendar && (
-              <Calendar
-                className="absolute top-10 z-10 rounded-md border border-gray-200 shadow-lg"
-                mode="single"
-                selected={selectedDate}
-                onSelect={setSelectedDate}
-              />
-            )}
+          </DialogTrigger>
+          <DialogContent className="p-6 rounded-md bg-white shadow-md w-full max-w-md">
+            <Calendar 
+            mode="single"
+            selected={selectedDate}
+            onSelect={(value) => {
+              setSelectedDate(value);
+            }}
+            />
+           
+          </DialogContent>
+        </Dialog>
+          
+             
+        
+          
           </Card>
         </div>
         

@@ -206,7 +206,7 @@ export const menuItems = [
       },
       {
         Icon: Icons.SystemHealth,
-        label: "Create Location",
+        label: "Location",
         href: "/dashboard/location",
         visible: ["", ""],
         isAccordion: false,

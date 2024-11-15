@@ -16,7 +16,7 @@ import {
 import { Dialog, DialogContent, DialogTrigger, DialogClose } from "../ui/dialog";
 import { CSVLink } from "react-csv";
 import { Input } from "../ui/input";
-import { Form } from "../ui/form";
+
 
 // Define columns for DataTable
 
@@ -24,7 +24,7 @@ import { Form } from "../ui/form";
 const handleDelete = ()=>{
     console.log('Data deleted')
 }
-const  handleEditSave = (index: number, updatedData: any)=> {
+const  handleEditSave = ()=> {
     throw new Error("Function not implemented.");
 }
 const columns: ColumnDef<typeof sampleLocationData[0]>[] = [
@@ -95,7 +95,7 @@ const columns: ColumnDef<typeof sampleLocationData[0]>[] = [
             </Button>
           </DialogTrigger>
           <DialogContent className="p-6 rounded-md bg-white shadow-md w-full max-w-md">
-            <EditForm initialData={row.original} onSave={({updatedData}:any) => handleEditSave(row.index, updatedData)} />
+            <EditForm initialData={row.original} onSave={({updatedData}:any) => handleEditSave()} />
             <Button
               variant="destructive"
               size="sm"
@@ -157,6 +157,7 @@ const ViewLocationTable = () => {
   const [selectLocationName, setLocationName] = useState('');
   const [selectLocationType, setLocationType] = useState('');
   const [selectLastUpdated, setLastUpdated] = useState('');
+  setData(data);
 
   // Filter data based on selected filters
   const filterData = data.filter((choice) => {
