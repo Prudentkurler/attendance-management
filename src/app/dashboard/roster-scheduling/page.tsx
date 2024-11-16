@@ -58,7 +58,7 @@ interface RosterCell {
   status: 'assigned' | 'leave' | 'excuse' | 'unassigned';
 }
 
-export default function RosterSchedulingPage() {
+export default function Page() {
   const [viewType, setViewType] = useState<'weekly' | 'monthly'>('weekly');
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
