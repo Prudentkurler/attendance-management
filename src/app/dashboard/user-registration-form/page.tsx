@@ -257,7 +257,7 @@ const handleBulkUpload = (file: File) => {
                 control={form.control}
                 name="personalDetails.disability"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="flex gap-2 mb-3 items-center">
                     <FormLabel>Disability</FormLabel>
                     <FormControl>
                       <Checkbox checked={field.value} onCheckedChange={field.onChange} />

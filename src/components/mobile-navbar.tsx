@@ -107,7 +107,7 @@ export default function MobileNavbar({
                                 {subCategories?.map((link) => {
                                   return (
                                     <li
-                                      key={link.id}
+                                      key={'id' in link ? link.id : link.label}
                                       className="leading-0 flex items-center gap-2"
                                     >
                                       <Link

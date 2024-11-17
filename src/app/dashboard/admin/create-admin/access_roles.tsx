@@ -291,7 +291,7 @@ function AccessRoles({ control, setValue, watch }: TFormProps) {
 
                           <SelectContent>
                             {menu.subCategories.map((subMenu) => (
-                              <div key={subMenu.id} className="my-4 space-y-2">
+                              <div key={subMenu.label} className="my-4 space-y-2">
                                 <FormField
                                   control={control}
                                   name="selected_menus"

@@ -18,7 +18,7 @@ interface DeviceRequestTableProps {
   branchFilter: string;
   statusFilter: string;
   selectedRequests: number[];
-  setSelectedRequests: (selected: number[]) => void;
+  setSelectedRequests: React.Dispatch<React.SetStateAction<number[]>>; // Allow functional updates
   onOpenModal: (request: DeviceRequest) => void;
 }
 
@@ -39,7 +39,9 @@ const columns = (
     cell: ({ row }) => (
       <Checkbox
         checked={selectedRequests.includes(row.original.id)}
-        onCheckedChange={(isChecked) => handleCheckboxChange(row.original.id, !!isChecked)}
+        onCheckedChange={(isChecked) =>
+          handleCheckboxChange(row.original.id, !!isChecked)
+        }
         aria-label="Select row"
       />
     ),
@@ -101,8 +103,8 @@ export default function DeviceRequestTable({
 
   // Handle selection for individual checkboxes
   const handleCheckboxChange = (id: number, isChecked: boolean) => {
-    setSelectedRequests(prevSelected =>
-      isChecked ? [...prevSelected, id] : prevSelected.filter(reqId => reqId !== id)
+    setSelectedRequests((prevSelected) =>
+      isChecked ? [...prevSelected, id] : prevSelected.filter((reqId) => reqId !== id)
     );
   };
 

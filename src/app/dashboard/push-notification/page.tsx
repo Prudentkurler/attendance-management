@@ -1,5 +1,7 @@
 'use client'
 
+import { Button } from '@/components/ui/button'
+import Link from 'next/link'
 import { useState } from 'react'
 
 type NotificationType = 'SMS' | 'Email' | 'In-app'
@@ -224,6 +226,12 @@ export default function PushNotification() {
           </tbody>
         </table>
       </div>
+
+            <Link href='/dashboard/view-notifications'>
+      <Button  variant='default' className='bg-ds-primary text-ds-foreground mt-6'>
+        View Notification
+      </Button>
+      </Link>
     </div>
   )
 }

@@ -19,7 +19,7 @@ export interface DeviceAssignment {
   }
   
 
-export default function page() {
+const Page :React.FC  = ()=> {
   const [branchFilter, setBranchFilter] = useState("");
   const [adminFilter, setAdminFilter] = useState("");
   const [assignments, setAssignments] = useState<DeviceAssignment[]>([]);
@@ -80,3 +80,5 @@ const handleAssign = (newAssignment: DeviceAssignment) => {
     </div>
   );
 }
+
+export default Page

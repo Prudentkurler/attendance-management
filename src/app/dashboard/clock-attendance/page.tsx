@@ -7,6 +7,7 @@ import { DataTable } from '@/components/ui/data-table';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card } from '@/components/ui/card';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
+import Image from 'next/image';
 
 type User = {
   id: string;
@@ -155,10 +156,12 @@ export default function ClockAttendance() {
       header: 'Image/Name',
       cell: ({ row }: { row: any }) => (
         <div className="flex items-center">
-          <img
+          <Image
             src={row.original.image}
             alt={row.original.name}
             className="w-8 h-8 rounded-full mr-2"
+            width={32}
+            height={32}
           />
           {row.original.name}
         </div>
