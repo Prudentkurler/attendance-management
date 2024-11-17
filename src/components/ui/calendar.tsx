@@ -57,12 +57,8 @@ function Calendar({
         day_hidden: "invisible",
         ...classNames,
       }}
-      components={{
-        IconLeft: () => <ChevronLeftIcon className="h-4 w-4" />,
-        IconRight: () => (
-          <ChevronRightIcon className="h-4 w-4" />
-        ),
-      }}
+      fromMonth={new Date(2021, 0)}
+      toMonth={new Date(2021, 11)}
       {...props}
     />
   );

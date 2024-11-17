@@ -3,7 +3,7 @@
 // pages/attendance-history.tsx
 import React, { useState } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
-
+import Image from 'next/image';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/ui/data-table';
@@ -36,8 +36,8 @@ interface DailyBreakdown {
 
 export default function AttendanceHistoryPage() {
   const [viewType, setViewType] = useState<'summary' | 'breakdown'>('summary');
-  const [reports, setReports] = useState<AttendanceReport[]>([]);
-  const [breakdowns, setBreakdowns] = useState<DailyBreakdown[]>([]);
+  const [reports] = useState<AttendanceReport[]>([]);
+  const [breakdowns] = useState<DailyBreakdown[]>([]);
   const [selectedReport, setSelectedReport] = useState<string | null>(null);
 
   const summaryColumns: ColumnDef<AttendanceReport, unknown>[] = [
@@ -46,7 +46,7 @@ export default function AttendanceHistoryPage() {
       header: 'User',
       cell: ({ row }) => (
         <div className="flex items-center">
-          <img
+          <Image
             src={row.original.userImage}
             alt={row.original.userName}
             className="h-8 w-8 rounded-full mr-2"
@@ -159,7 +159,7 @@ export default function AttendanceHistoryPage() {
     {
       accessorKey: 'status',
       header: 'Status',
-      cell: ({ row }) => (
+      cell: () => (
         <span
           className={`px-2 py-1 rounded-full text-sm ${
             status === 'On Time'

@@ -165,7 +165,7 @@ export default function ViewApproveDeviceRequests() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-4">
       <h2 className="text-2xl font-semibold">View/Approve Device Requests</h2>
 
       {/* Filters */}
