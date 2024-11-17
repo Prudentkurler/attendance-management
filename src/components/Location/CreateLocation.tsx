@@ -8,7 +8,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-
 import {
   Select,
   SelectContent,
@@ -16,7 +15,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -26,6 +24,7 @@ import {
 } from "@/schemas/third-party-provider-schema";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
 
 export default function CreateLocation() {
   const form = useForm<ThirdPartyProviderSchema>({
@@ -36,28 +35,38 @@ export default function CreateLocation() {
 
   const { control, handleSubmit, setValue } = form;
 
-  // Auto-generate latitude, longitude, and radius
-  const autoGenerateLocation = () => {
-    if (navigator.geolocation) {
+  // UseEffect for Auto-Generate Location
+  useEffect(() => {
+    if (typeof window !== "undefined" && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
           setValue("latitude", latitude);
           setValue("longitude", longitude);
-          setValue("radius", 0.02); // Default radius value, you can adjust this
+          setValue("radius", 0.02);
         },
-        (error) => {
-          console.error("Geolocation error:", error);
-          alert("Failed to retrieve location. Please enable location services.");
-        }
+        (error) => console.error("Geolocation error:", error)
       );
-    } else {
-      alert("Geolocation is not supported by this browser.");
     }
-  };
+  }, [setValue]);
 
   const onSubmit: SubmitHandler<ThirdPartyProviderSchema> = async (values) => {
-    console.log(values);
+    console.log("Form values submitted:", values);
+  };
+
+  const autoGenerateLocation = () => {
+    console.log("Auto-generating location...");
+    if (typeof window !== "undefined" && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setValue("latitude", latitude);
+          setValue("longitude", longitude);
+          setValue("radius", 0.02);
+        },
+        (error) => console.error("Geolocation error:", error)
+      );
+    }
   };
 
   return (

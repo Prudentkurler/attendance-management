@@ -1,20 +1,26 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { DataTable } from '@/components/ui/data-table';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Card } from '@/components/ui/card';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 
 type User = {
-  id: string
-  name: string
-  image: string
-  clockInTime?: string
-  clockOutTime?: string
-  location: 'Known' | 'Unknown'
-  lastSeen: string
-  clockedBy?: string
-}
+  id: string;
+  name: string;
+  image: string;
+  clockInTime?: string;
+  clockOutTime?: string;
+  location: 'Known' | 'Unknown';
+  lastSeen: string;
+  clockedBy?: string;
+};
 
 export default function ClockAttendance() {
-  const [activeTab, setActiveTab] = useState<'clockList' | 'clockedList'>('clockList')
+  const [activeTab, setActiveTab] = useState<'clockList' | 'clockedList'>('clockList');
   const [filters, setFilters] = useState({
     userType: '',
     country: '',
@@ -30,225 +36,229 @@ export default function ClockAttendance() {
     startDate: '',
     endDate: '',
     setTime: '',
-  })
-  const [users, setUsers] = useState<User[]>([
-    { id: '1', name: 'Helena Abbey', image: '/placeholder.svg?height=50&width=50', location: 'Known', lastSeen: '2024-05-15 09:00' },
-    { id: '2', name: 'Daniel Ababio', image: '/placeholder.svg?height=50&width=50', location: 'Unknown', lastSeen: '2024-05-15 08:45' },
-  ])
-  const [selectedUsers, setSelectedUsers] = useState<string[]>([])
-  const [clockReason, setClockReason] = useState('')
+  });
+  const [users, setUsers] = useState<User[]>([]);
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+  const [clockReason, setClockReason] = useState('');
 
-  const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
-    setFilters(prev => ({ ...prev, [e.target.name]: e.target.value }))
-  }
+  // Initialize users on mount
+  useEffect(() => {
+    setUsers([
+      {
+        id: '1',
+        name: 'Helena Abbey',
+        image: '/placeholder.svg?height=50&width=50',
+        location: 'Known',
+        lastSeen: '2024-05-15 09:00',
+      },
+      {
+        id: '2',
+        name: 'Daniel Ababio',
+        image: '/placeholder.svg?height=50&width=50',
+        location: 'Unknown',
+        lastSeen: '2024-05-15 08:45',
+      },
+    ]);
+  }, []);
+
+  const handleFilterChange = (name: string, value: string) => {
+    setFilters((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const clearFilters = () => {
+    setFilters({
+      userType: '',
+      country: '',
+      branch: '',
+      category: '',
+      group: '',
+      subgroup: '',
+      location: '',
+      gender: '',
+      clockType: '',
+      schedule: '',
+      status: '',
+      startDate: '',
+      endDate: '',
+      setTime: '',
+    });
+  };
 
   const handleUserSelect = (userId: string) => {
-    setSelectedUsers(prev => 
-      prev.includes(userId) ? prev.filter(id => id !== userId) : [...prev, userId]
-    )
-  }
+    setSelectedUsers((prev) =>
+      prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId]
+    );
+  };
 
-  const handleBulkAction = (action: 'in' | 'out' | 'cancel') => {
+  const handleCheckAll = () => {
+    if (selectedUsers.length === users.length) {
+      setSelectedUsers([]); // Uncheck all
+    } else {
+      setSelectedUsers(users.map((user) => user.id)); // Check all
+    }
+  };
+
+  const handleBulkAction = (action: 'in' | 'out') => {
     if (selectedUsers.length === 0) {
-      alert('Please select users first')
-      return
+      alert('Please select users first');
+      return;
     }
     if (!clockReason) {
-      alert('Please provide a reason for the action')
-      return
+      alert('Please provide a reason for the action');
+      return;
     }
-    // Implement bulk action logic here
-    console.log(`Bulk ${action} for users:`, selectedUsers, 'Reason:', clockReason)
-    // Reset selections and reason after action
-    setSelectedUsers([])
-    setClockReason('')
-  }
+    console.log(`Bulk ${action} for users:`, selectedUsers, 'Reason:', clockReason);
+    setSelectedUsers([]);
+    setClockReason('');
+  };
 
-  const handleIndividualClock = (userId: string, action: 'in' | 'out') => {
-    if (!clockReason) {
-      alert('Please provide a reason for clocking')
-      return
-    }
-    // Implement individual clock logic here
-    console.log(`Clock ${action} for user:`, userId, 'Reason:', clockReason)
-    setClockReason('')
-  }
+  const handleExportCSV = () => {
+    const csvContent =
+      'data:text/csv;charset=utf-8,' +
+      ['ID,Name,Location,Last Seen,Clock In Time,Clock Out Time']
+        .concat(
+          users.map(
+            (user) =>
+              `${user.id},${user.name},${user.location},${user.lastSeen},${user.clockInTime || ''},${
+                user.clockOutTime || ''
+              }`
+          )
+        )
+        .join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', 'users.csv');
+    document.body.appendChild(link); // Required for FF
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const columns = [
+    {
+      accessorKey: 'Select',
+      header: () => (
+        <Checkbox
+          checked={selectedUsers.length === users.length}
+          onCheckedChange={handleCheckAll}
+        />
+      ),
+      cell: ({ row }: { row: any }) => (
+        <Checkbox
+          checked={selectedUsers.includes(row.original.id)}
+          onCheckedChange={() => handleUserSelect(row.original.id)}
+        />
+      ),
+    },
+    {
+      accessorKey: 'name',
+      header: 'Image/Name',
+      cell: ({ row }: { row: any }) => (
+        <div className="flex items-center">
+          <img
+            src={row.original.image}
+            alt={row.original.name}
+            className="w-8 h-8 rounded-full mr-2"
+          />
+          {row.original.name}
+        </div>
+      ),
+    },
+    { accessorKey: 'clockInTime', header: 'IN', cell: ({ row }: { row: any }) => row.original.clockInTime || '-' },
+    { accessorKey: 'clockOutTime', header: 'OUT', cell: ({ row }: { row: any }) => row.original.clockOutTime || '-' },
+    { accessorKey: 'location', header: 'Location' },
+    { accessorKey: 'lastSeen', header: 'Last Seen' },
+    {
+      accessorKey: 'action',
+      header: 'Action',
+      cell: ({ row }: { row: any }) => (
+        activeTab === 'clockList' ? (
+          <Button onClick={() => console.log('Clock IN', row.original.id)} >
+            Clock IN
+          </Button>
+        ) : (
+          <Button onClick={() => console.log('Clock OUT', row.original.id)} className="bg-red-500 text-white">
+            Clock OUT
+          </Button>
+        )
+      ),
+    },
+  ];
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <Card className="p-4 max-w-6xl gap-6 flex flex-col mx-auto">
       <h1 className="text-2xl font-bold mb-6">Clock Attendance</h1>
 
-      <div className="mb-4">
-        <button
-          className={`mr-2 px-2 py-1 text-sm font-semibold rounded h-9 ${activeTab === 'clockList' ? 'bg-[#E54334] text-white' : 'bg-[#999999] text-white'}`}
+      {/* Tabs */}
+      <div className="mb-4 flex space-x-4">
+        <Button
+          className={`px-4 py-2 text-sm font-semibold rounded-lg ${
+            activeTab === 'clockList' ? 'bg-red-500 text-white' : 'bg-gray-400 text-white'
+          }`}
           onClick={() => setActiveTab('clockList')}
         >
           Clock List
-        </button>
-        <button
-          className={`px-2 py-1 text-sm font-semibold rounded h-9 ${activeTab === 'clockedList' ? 'bg-[#E54334] text-white' : 'bg-[#999999] text-white'}`}
+        </Button>
+        <Button
+          className={`px-4 py-2 text-sm font-semibold rounded-lg ${
+            activeTab === 'clockedList' ? 'bg-red-500 text-white' : 'bg-gray-400 text-white'
+          }`}
           onClick={() => setActiveTab('clockedList')}
         >
           Clocked List
-        </button>
+        </Button>
       </div>
 
-      <div className="grid grid-cols-3 gap-4 mb-4">
-        <select name="userType" onChange={handleFilterChange} className="border p-2 rounded text-sm">
-          <option value="">Select User Type</option>
-          <option value="All">All</option>
-          <option value="Individuals">Individuals</option>
-          <option value="Organizations">Organizations</option>
-        </select>
-        <select name="country" onChange={handleFilterChange} className="border p-2 rounded text-sm">
-          <option value="">Select Country</option>
-          {/* Add country options */}
-        </select>
-        <select name="branch" onChange={handleFilterChange} className="border p-2 rounded text-sm">
-          <option value="">Select Branch</option>
-          {/* Add branch options */}
-        </select>
-        <select name="category" onChange={handleFilterChange} className="border p-2 rounded text-sm">
-          <option value="">Select Category</option>
-          {/* Add category options */}
-        </select>
-        <select name="group" onChange={handleFilterChange} className="border p-2 rounded text-sm">
-          <option value="">Select Group</option>
-          {/* Add group options */}
-        </select>
-        <select name="subgroup" onChange={handleFilterChange} className="border p-2 rounded text-sm">
-          <option value="">Select Subgroup</option>
-          {/* Add subgroup options */}
-        </select>
-        <input
-          type="text"
-          name="search"
-          placeholder="Search User [Name/ID]"
-          onChange={handleFilterChange}
-          className="border p-2 rounded text-sm"
-        />
-        <select name="location" onChange={handleFilterChange} className="border p-2 rounded text-sm">
-          <option value="">Select Location</option>
-          <option value="All">All</option>
-          <option value="Known">Known</option>
-          <option value="Unknown">Unknown</option>
-        </select>
-        <select name="gender" onChange={handleFilterChange} className="border p-2 rounded text-sm">
-          <option value="">Select Gender</option>
-          <option value="Male">Male</option>
-          <option value="Female">Female</option>
-        </select>
+      {/* Filters */}
+      <div className="flex gap-4 mb-6">
+        <Select onValueChange={(value) => handleFilterChange('userType', value)}>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Select User Type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="Users">All Users</SelectItem>
+            <SelectItem value="Individuals">Individuals</SelectItem>
+            <SelectItem value="Organizations">Organizations</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select onValueChange={(value) => handleFilterChange('country', value)}>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Select Country" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="USA">USA</SelectItem>
+            <SelectItem value="Ghana">Ghana</SelectItem>
+          </SelectContent>
+        </Select>
+        <Button onClick={clearFilters} variant="outline" className="w-full">
+          Clear Filters
+        </Button>
       </div>
 
-      <div className="mb-4 flex justify-end">
-        <button className="bg-[#006994] text-white px-2 py-1 text-sm font-semibold rounded h-9 mr-2">More Filters</button>
-        <button className="bg-[#004D1B] text-white px-2 py-1 text-sm font-semibold rounded h-9">Filter</button>
-      </div>
-
-      <div className="mb-4">
-        <label className="flex items-center">
-          <input
-            type="checkbox"
-            checked={selectedUsers.length === users.length}
-            onChange={() => setSelectedUsers(selectedUsers.length === users.length ? [] : users.map(u => u.id))}
-            className="mr-2"
-          />
-          <span className="text-sm">Check All</span>
-        </label>
-      </div>
-
-      <div className="mb-4 flex justify-end">
-        <input
-          type="text"
+      {/* Bulk Actions */}
+      <div className="flex items-center gap-4 mb-6">
+        <Input
           value={clockReason}
           onChange={(e) => setClockReason(e.target.value)}
-          placeholder="State reason for clocking"
-          className="border p-2 rounded mr-2 text-sm"
+          placeholder="Reason for clocking"
+          className="w-full"
         />
-        {activeTab === 'clockList' ? (
-          <button
-            onClick={() => handleBulkAction('in')}
-            className="bg-[#004D1B] text-white px-2 py-1 text-sm font-semibold rounded h-9 mr-2"
-          >
-            Bulk IN
-          </button>
-        ) : (
-          <>
-            <button
-              onClick={() => handleBulkAction('out')}
-              className="bg-[#E54334] text-white px-2 py-1 text-sm font-semibold rounded h-9 mr-2"
-            >
-              Bulk OUT
-            </button>
-            <button
-              onClick={() => handleBulkAction('cancel')}
-              className="bg-[#999999] text-white px-2 py-1 text-sm font-semibold rounded h-9 mr-2"
-            >
-              Bulk Cancel
-            </button>
-          </>
-        )}
-        <button className="bg-[#006994] text-white px-2 py-1 text-sm font-semibold rounded h-9">Download</button>
+        <Button onClick={() => handleBulkAction('in')}>
+          Bulk IN
+        </Button>
+        <Button onClick={() => handleBulkAction('out')} className="bg-red-500 text-white">
+          Bulk OUT
+        </Button>
       </div>
 
-      <table className="w-full border-collapse">
-        <thead>
-          <tr className="bg-[#212D40] text-white h-10">
-            <th className="border p-2 text-md font-semibold">Select</th>
-            <th className="border p-2 text-md font-semibold">Image/Name</th>
-            <th className="border p-2 text-md font-semibold">IN</th>
-            <th className="border p-2 text-md font-semibold">OUT</th>
-            <th className="border p-2 text-md font-semibold">Location</th>
-            <th className="border p-2 text-md font-semibold">Last Seen</th>
-            <th className="border p-2 text-md font-semibold">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map(user => (
-            <tr key={user.id} className="bg-white">
-              <td className="border p-2 text-sm font-normal">
-                <input
-                  type="checkbox"
-                  checked={selectedUsers.includes(user.id)}
-                  onChange={() => handleUserSelect(user.id)}
-                />
-              </td>
-              <td className="border p-2 text-sm font-normal flex items-center">
-                <img src={user.image} alt={user.name} className="w-8 h-8 rounded-full mr-2" />
-                {user.name}
-              </td>
-              <td className="border p-2 text-sm font-normal">{user.clockInTime || '-'}</td>
-              <td className="border p-2 text-sm font-normal">{user.clockOutTime || '-'}</td>
-              <td className="border p-2 text-sm font-normal">
-                {user.location} <button className="text-[#006994]">View</button>
-              </td>
-              <td className="border p-2 text-sm font-normal">{user.lastSeen}</td>
-              <td className="border p-2 text-sm font-normal">
-                {activeTab === 'clockList' ? (
-                  <button
-                    onClick={() => handleIndividualClock(user.id, 'in')}
-                    className="bg-[#004D1B] text-white px-2 py-1 text-sm font-semibold rounded h-9"
-                  >
-                    Clock IN
-                  </button>
-                ) : (
-                  <>
-                    <button
-                      onClick={() => handleIndividualClock(user.id, 'out')}
-                      className="bg-[#E54334] text-white px-2 py-1 text-sm font-semibold rounded h-9 mr-1"
-                    >
-                      Clock OUT
-                    </button>
-                    <button className="bg-[#999999] text-white px-2 py-1 text-sm font-semibold rounded h-9">
-                      Cancel
-                    </button>
-                  </>
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  )
+      {/* Data Table */}
+      <DataTable columns={columns} data={users} />
+
+      <div className="flex justify-end mt-6">
+        <Button onClick={handleExportCSV} className="bg-ds-primary text-ds-foreground">
+          Export CSV
+        </Button>
+      </div>
+    </Card>
+  );
 }

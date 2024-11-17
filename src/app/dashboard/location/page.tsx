@@ -4,7 +4,7 @@ import { useState } from "react";
 import CreateLocation from "@/components/Location/CreateLocation";
 import { FaPlus } from "react-icons/fa6";
 import ViewLocationTable from "@/components/Location/ViewLocationTable";
-import { Dialog, DialogContent, DialogClose } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogClose, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
 const Page = () => {
@@ -33,8 +33,12 @@ const Page = () => {
 
           {/* Dialog for creating a new location */}
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTitle>
+           
+            </DialogTitle>
             <DialogContent className="p-6 rounded-md bg-white shadow-md w-full max-w-md">
-              <h4 className="text-lg font-semibold mb-4">Create Location</h4>
+
+            <h4 className="text-lg font-semibold mb-4">Create Location</h4>
               <CreateLocation />
               <DialogClose asChild>
                 <Button

@@ -16,6 +16,7 @@ import {
 import { Dialog, DialogContent, DialogTrigger, DialogClose } from "../ui/dialog";
 import { CSVLink } from "react-csv";
 import { Input } from "../ui/input";
+import { DialogTitle } from "@radix-ui/react-dialog";
 
 
 // Define columns for DataTable
@@ -89,6 +90,11 @@ const columns: ColumnDef<typeof sampleLocationData[0]>[] = [
     cell: ({ row }) => (
       <div className="relative flex gap-2">
         <Dialog>
+          
+          <DialogTitle>
+          
+          </DialogTitle>
+        
           <DialogTrigger asChild>
             <Button size="sm" variant="outline">
               ...
@@ -151,13 +157,13 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 
 // View Location Table Component
 const ViewLocationTable = () => {
-  const [data, setData] = useState(sampleLocationData);
+  const [data] = useState(sampleLocationData);
   const [selectCountry, setCountry] = useState('');
   const [selectedBranch, setBranch] = useState('');
   const [selectLocationName, setLocationName] = useState('');
   const [selectLocationType, setLocationType] = useState('');
   const [selectLastUpdated, setLastUpdated] = useState('');
-  setData(data);
+
 
   // Filter data based on selected filters
   const filterData = data.filter((choice) => {
