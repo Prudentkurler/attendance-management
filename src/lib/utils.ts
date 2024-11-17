@@ -233,7 +233,7 @@ export const menuItems = [
       {
         Icon: Icons.SystemHealth,
         label: " Schedule Notification",
-        href: "/dashboard/schedule-notifications",
+        href: "/dashboard/push-notification",
         visible: ["", ""],
         isAccordion: false,
         subCategories: [],

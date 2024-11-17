@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import { useState } from 'react'
 
@@ -75,10 +75,10 @@ export default function PushNotification() {
   }
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Push Notifications</h1>
+    <div className="mx-auto p-6">
+      <h1 className="text-3xl font-bold mb-6">Push Notifications</h1>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6 shadow-md p-2 rounded">
         <div>
           <h2 className="text-lg font-semibold mb-2">Choose Notification Types</h2>
           <div className="flex space-x-4">
@@ -197,17 +197,17 @@ export default function PushNotification() {
         </div>
       </form>
 
-      <div className="mt-8">
+      <div className="mt-8 shadow-md rounded p-2">
         <h2 className="text-xl font-bold mb-4">Notification Logs</h2>
         <table className="w-full border-collapse">
           <thead>
-            <tr className="bg-[#212D40] text-white h-10">
-              <th className="border p-2 text-md font-semibold">Notification Type</th>
-              <th className="border p-2 text-md font-semibold">Last Update</th>
-              <th className="border p-2 text-md font-semibold">Sent By</th>
-              <th className="border p-2 text-md font-semibold">Total Users</th>
-              <th className="border p-2 text-md font-semibold">Last Notification Sent</th>
-              <th className="border p-2 text-md font-semibold">Message Medium</th>
+            <tr className="bg-[#212D40] text-sm text-white h-4">
+              <th className="p-2 text-md font-semibold">Notification Type</th>
+              <th className="p-2 text-md font-semibold">Last Update</th>
+              <th className="p-2 text-md font-semibold">Sent By</th>
+              <th className="p-2 text-md font-semibold">Total Users</th>
+              <th className="p-2 text-md font-semibold">Last Notification Sent</th>
+              <th className="p-2 text-md font-semibold">Message Medium</th>
             </tr>
           </thead>
           <tbody>
