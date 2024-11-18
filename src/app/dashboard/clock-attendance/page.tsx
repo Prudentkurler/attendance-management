@@ -213,7 +213,7 @@ export default function ClockAttendance() {
       </div>
 
       {/* Filters */}
-      <div className="flex gap-4 mb-6">
+      <div className="flex gap-4 mb-6 overflow-auto">
         <Select onValueChange={(value) => handleFilterChange('userType', value)}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Select User Type" />
@@ -258,7 +258,7 @@ export default function ClockAttendance() {
       <DataTable columns={columns} data={users} />
 
       <div className="flex justify-end mt-6">
-        <Button onClick={handleExportCSV} className="bg-ds-primary text-ds-foreground">
+        <Button size='sm' onClick={handleExportCSV} className="bg-ds-primary text-ds-foreground">
           Export CSV
         </Button>
       </div>

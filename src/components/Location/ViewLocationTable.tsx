@@ -194,9 +194,9 @@ const ViewLocationTable = () => {
   const uniqueLastUpdated = Array.from(new Set(data.map((entry) => entry.lastUpdated)));
 
   return (
-    <Card className="mt-8 p-4">
+    <Card className="mt-8 p-4 w-full">
       {/* Filter Controls */}
-      <div className="mb-4 flex gap-4">
+      <div className="mb-4 flex gap-4 w-full flex-row flex-wrap lg:flex-nowrap overflow-auto">
         <Select value={selectCountry} onValueChange={(value) => setCountry(value)}>
           <SelectTrigger>
             <SelectValue placeholder="Select Country" />

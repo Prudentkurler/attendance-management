@@ -68,7 +68,7 @@ export default function MobileNavbar({
                     const { href, Icon, label, subCategories, isAccordion } =
                       item;
                     const matchingSubLink = subCategories?.find(
-                      (subLink) => pathname === subLink.href,
+                      (subLink: { href: string }) => pathname === subLink.href,
                     );
 
                     return (
@@ -104,7 +104,7 @@ export default function MobileNavbar({
 
                             <AccordionContent className="py-2 text-foreground">
                               <ul className="sub-links flex flex-col gap-2 pl-10">
-                                {subCategories?.map((link) => {
+                                {subCategories?.map((link: { id?: string; label: string; href: string }) => {
                                   return (
                                     <li
                                       key={'id' in link ? link.id : link.label}

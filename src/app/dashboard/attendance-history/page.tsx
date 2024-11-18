@@ -192,8 +192,8 @@ export default function AttendanceHistoryPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Attendance History</h1>
+      <div className="flex md:flex-row flex-col gap-4 justify-between items-center mb-6">
+        <h1 className="text-xl md:2xl font-bold">Attendance History</h1>
         <div className="flex space-x-4">
           <Button
             className={` ${
@@ -224,7 +224,7 @@ export default function AttendanceHistoryPage() {
       <div className="bg-white  rounded-lg mb-3">
       
 
-        <div className="flex  gap-4 ">
+        <div className="flex overflow-auto  gap-4 ">
           <Select value=''>
             <SelectTrigger className='w-36'>
               <SelectValue placeholder='User type'>
@@ -251,14 +251,18 @@ export default function AttendanceHistoryPage() {
           </Select>
 
         
+        <div>
 
+        </div>
           <Input type='date' placeholder='Start Date' />
           <Input type='date' placeholder='End Date' />
 
           <Input
+          className='w-[150px] md:w-auto'
             onChange={() => {}}
             placeholder="Search by name or ID..."
           />
+
         </div>
 
        
@@ -279,6 +283,7 @@ export default function AttendanceHistoryPage() {
 
       <div className="flex justify-end mt-3 ">
           <Button
+          size='sm'
             onClick={handleExport}
             variant="destructive"
           >

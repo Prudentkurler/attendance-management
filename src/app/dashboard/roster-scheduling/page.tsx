@@ -113,10 +113,10 @@ export default function RosterScheduling() {
       header: 'Action',
       cell: ({ row }: { row: any }) => (
         <div className="flex space-x-2">
-          <Button onClick={() => handleAssignedSchedule(row.original.id)} >
+          <Button size='sm' onClick={() => handleAssignedSchedule(row.original.id)} >
             Assigned
           </Button>
-          <Button onClick={() => handleUnassignedSchedule(row.original.id)} className="bg-red-500 text-white">
+          <Button size='sm' onClick={() => handleUnassignedSchedule(row.original.id)} className="bg-red-500 text-white">
             Unassigned
           </Button>
         </div>
@@ -129,7 +129,7 @@ export default function RosterScheduling() {
       <h1 className="text-2xl font-bold">Roster Scheduling</h1>
 
       {/* Filters */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="flex overflow-auto gap-4">
         <Select onValueChange={(value) => handleFilterChange('country', value)}>
           <SelectTrigger>
             <SelectValue placeholder="Select Country" />
@@ -163,7 +163,7 @@ export default function RosterScheduling() {
       </div>
 
       {/* Search */}
-      <div className="flex justify-between">
+      <div className="flex gap-3 flex-col md:flex-row justify-between">
         <Input
           placeholder="Search [Name/ID]"
           value={searchTerm}
@@ -172,7 +172,7 @@ export default function RosterScheduling() {
         />
         <div className="space-x-4">
           <Checkbox onCheckedChange={(checked) => setSelectedUsers(checked ? users.map((u) => u.id) : [])} />
-          <span>Select All Users</span>
+          <span className='text-sm'>Select All Users</span>
         </div>
       </div>
 
@@ -181,8 +181,8 @@ export default function RosterScheduling() {
 
       {/* Buttons */}
       <div className="flex justify-end space-x-4">
-        <Button variant="outline">Download Bulk Roster Template</Button>
-        <Button onClick={handleExportCSV} variant="default" className='bg-ds-primary text-ds-foreground'>
+        <Button variant="outline" className='hidden md:flex'>Download Bulk Roster Template</Button>
+        <Button size='sm' onClick={handleExportCSV} variant="default" className='bg-ds-primary text-ds-foreground'>
           Export CSV
         </Button>
 
