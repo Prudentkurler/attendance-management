@@ -1,8 +1,14 @@
 "use client";
 
-import { Button } from '@/components/ui/button'
-import Link from 'next/link'
 import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import Link from 'next/link'
 
 type NotificationType = 'SMS' | 'Email' | 'In-app'
 type UserType = 'Admin Users' | 'General Users' | 'Parents' | 'Absentees' | 'Attendees'
@@ -18,10 +24,15 @@ type NotificationLog = {
   medium: string
 }
 
-export default function PushNotification() {
+type Template = {
+  id: string
+  name: string
+  content: string
+}
+
+export default function NotificationsPage() {
   const [notificationTypes, setNotificationTypes] = useState<NotificationType[]>([])
   const [userTypes, setUserTypes] = useState<UserType[]>([])
-  const [isRecurring, setIsRecurring] = useState(false)
   const [formData, setFormData] = useState({
     country: '',
     branch: '',
@@ -33,6 +44,9 @@ export default function PushNotification() {
     recurringStatus: '',
     nonRecurringDate: '',
     deliveryTime: '',
+    startingDate: '',
+    template: '',
+    customMessage: '',
   })
   const [logs, setLogs] = useState<NotificationLog[]>([
     {
@@ -52,6 +66,23 @@ export default function PushNotification() {
       medium: 'Email',
     },
   ])
+  const [templates, setTemplates] = useState<Template[]>([
+    {
+      id: '1',
+      name: 'Attendance Reminder',
+      content: 'Hi [User Name], this is a reminder to clock in for your shift today.',
+    },
+    {
+      id: '2',
+      name: 'Schedule Update',
+      content: 'Hi [User Name], your schedule has been updated. Please check the app for details.',
+    },
+    {
+      id: '3',
+      name: 'Absence Notification',
+      content: 'Hi [Parent Name], [Student Name] was absent from school today.',
+    },
+  ])
 
   const handleNotificationTypeChange = (type: NotificationType) => {
     setNotificationTypes(prev => 
@@ -65,173 +96,229 @@ export default function PushNotification() {
     )
   }
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('Form submitted:', { notificationTypes, userTypes, isRecurring, ...formData })
+    console.log('Form submitted:', { notificationTypes, userTypes, ...formData })
     // Here you would typically send this data to your backend
+    // For demonstration, let's add a new log entry
+    const newLog: NotificationLog = {
+      type: formData.template || 'Custom Notification',
+      lastUpdate: new Date().toLocaleString(),
+      sentBy: 'Current Admin',
+      totalUsers: 100, // This would be calculated based on selected user types
+      lastSent: new Date().toLocaleString(),
+      medium: notificationTypes.join('/'),
+    }
+    setLogs(prev => [newLog, ...prev])
   }
 
   return (
-    <div className="mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">Push Notifications</h1>
+    <div className="container mx-auto p-6">
+      <h1 className="text-3xl font-bold mb-6">Notifications</h1>
 
-      <form onSubmit={handleSubmit} className="space-y-6 shadow-md p-2 rounded">
-        <div>
-          <h2 className="text-lg font-semibold mb-2">Choose Notification Types</h2>
-          <div className="flex space-x-4">
-            {(['SMS', 'Email', 'In-app'] as const).map(type => (
-              <label key={type} className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={notificationTypes.includes(type)}
-                  onChange={() => handleNotificationTypeChange(type)}
-                  className="mr-2"
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>Notification Setup</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <h2 className="text-lg font-semibold mb-2">Choose Notification Types</h2>
+              <div className="flex space-x-4">
+                {(['SMS', 'Email', 'In-app'] as const).map(type => (
+                  <div key={type} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`type-${type}`}
+                      checked={notificationTypes.includes(type)}
+                      onCheckedChange={() => handleNotificationTypeChange(type)}
+                    />
+                    <label htmlFor={`type-${type}`}>{type}</label>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <h2 className="text-lg font-semibold mb-2">Select User Type</h2>
+              <div className="flex flex-wrap gap-4">
+                {(['Admin Users', 'General Users', 'Parents', 'Absentees', 'Attendees'] as const).map(type => (
+                  <div key={type} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`user-${type}`}
+                      checked={userTypes.includes(type)}
+                      onCheckedChange={() => handleUserTypeChange(type)}
+                    />
+                    <label htmlFor={`user-${type}`}>{type}</label>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <Select name="country" onValueChange={(value) => handleInputChange({ target: { name: 'country', value } } as any)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Country" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="USA">USA</SelectItem>
+                  <SelectItem value="Ghana">Ghana</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select name="branch" onValueChange={(value) => handleInputChange({ target: { name: 'branch', value } } as any)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Branch" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="HQ">HQ</SelectItem>
+                  <SelectItem value="West Branch">West Branch</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select name="category" onValueChange={(value) => handleInputChange({ target: { name: 'category', value } } as any)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Management">Management</SelectItem>
+                  <SelectItem value="Staff">Staff</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select name="groupSubgroup" onValueChange={(value) => handleInputChange({ target: { name: 'groupSubgroup', value } } as any)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Group/Subgroup" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Group A">Group A</SelectItem>
+                  <SelectItem value="Subgroup B">Subgroup B</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select name="alertType" onValueChange={(value) => handleInputChange({ target: { name: 'alertType', value } } as any)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Alert Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Recurring">Recurring</SelectItem>
+                  <SelectItem value="Non-Recurring">Non-Recurring</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {formData.alertType === 'Recurring' && (
+                <Select name="recurringStatus" onValueChange={(value) => handleInputChange({ target: { name: 'recurringStatus', value } } as any)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select Recurring Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Daily">Daily</SelectItem>
+                    <SelectItem value="Monthly">Monthly</SelectItem>
+                    <SelectItem value="Quarterly">Quarterly</SelectItem>
+                    <SelectItem value="Annually">Annually</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+
+              {formData.alertType === 'Recurring' && (
+                <Input
+                  type="date"
+                  name="startingDate"
+                  placeholder="Starting Date"
+                  onChange={handleInputChange}
                 />
-                <span className="text-sm">{type}</span>
-              </label>
-            ))}
-          </div>
-        </div>
+              )}
 
-        <div>
-          <h2 className="text-lg font-semibold mb-2">Select User Type</h2>
-          <div className="flex flex-wrap gap-4">
-            {(['Admin Users', 'General Users', 'Parents', 'Absentees', 'Attendees'] as const).map(type => (
-              <label key={type} className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={userTypes.includes(type)}
-                  onChange={() => handleUserTypeChange(type)}
-                  className="mr-2"
+              {formData.alertType === 'Non-Recurring' && (
+                <Input
+                  type="date"
+                  name="nonRecurringDate"
+                  placeholder="Non-Recurring Date"
+                  onChange={handleInputChange}
                 />
-                <span className="text-sm">{type}</span>
-              </label>
-            ))}
-          </div>
-        </div>
+              )}
 
-        <div className="grid grid-cols-2 gap-4">
-          <select name="country" onChange={handleInputChange} className="border p-2 rounded text-sm">
-            <option value="">Select Country</option>
-            <option value="USA">USA</option>
-            <option value="Ghana">Ghana</option>
-          </select>
+              <Input
+                type="time"
+                name="deliveryTime"
+                placeholder="Delivery Time"
+                onChange={handleInputChange}
+              />
+            </div>
 
-          <select name="branch" onChange={handleInputChange} className="border p-2 rounded text-sm">
-            <option value="">Select Branch</option>
-            <option value="HQ">HQ</option>
-            <option value="West Branch">West Branch</option>
-          </select>
+            <div>
+              <h2 className="text-lg font-semibold mb-2">Message Template</h2>
+              <Select name="template" onValueChange={(value) => handleInputChange({ target: { name: 'template', value } } as any)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Template" />
+                </SelectTrigger>
+                <SelectContent>
+                  {templates.map(template => (
+                    <SelectItem key={template.id} value={template.id}>{template.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Textarea
+                name="customMessage"
+                placeholder="Custom message or edit template here"
+                className="mt-2"
+                value={formData.customMessage || templates.find(t => t.id === formData.template)?.content || ''}
+                onChange={handleInputChange}
+              />
+            </div>
 
-          <select name="category" onChange={handleInputChange} className="border p-2 rounded text-sm">
-            <option value="">Select Category</option>
-            <option value="Management">Management</option>
-            <option value="Staff">Staff</option>
-          </select>
+            <div className="flex justify-end">
+              <Button type="submit">
+                Submit
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
 
-          <select name="groupSubgroup" onChange={handleInputChange} className="border p-2 rounded text-sm">
-            <option value="">Select Group/Subgroup</option>
-            <option value="Group A">Group A</option>
-            <option value="Subgroup B">Subgroup B</option>
-          </select>
+      <Card>
+        <CardHeader>
+          <CardTitle>Notification Logs</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Notification Type</TableHead>
+                <TableHead>Last Update</TableHead>
+                <TableHead>Sent By</TableHead>
+                <TableHead>Total Users</TableHead>
+                <TableHead>Last Notification Sent</TableHead>
+                <TableHead>Message Medium</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {logs.map((log, index) => (
+                <TableRow key={index}>
+                  <TableCell>{log.type}</TableCell>
+                  <TableCell>{log.lastUpdate}</TableCell>
+                  <TableCell>{log.sentBy}</TableCell>
+                  <TableCell>{log.totalUsers}</TableCell>
+                  <TableCell>{log.lastSent}</TableCell>
+                  <TableCell>{log.medium}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
 
-          <select name="messageMedium" onChange={handleInputChange} className="border p-2 rounded text-sm">
-            <option value="">Select Message Medium</option>
-            <option value="SMS">SMS</option>
-            <option value="Email">Email</option>
-            <option value="Push Notification">Push Notification</option>
-          </select>
-
-          <select name="alertUserType" onChange={handleInputChange} className="border p-2 rounded text-sm">
-            <option value="">Select Alert User Type</option>
-            <option value="Admins">Admins</option>
-            <option value="Parents">Parents</option>
-            <option value="General Users">General Users</option>
-            <option value="Absentees">Absentees</option>
-            <option value="Attendees">Attendees</option>
-          </select>
-
-          <select name="alertType" onChange={handleInputChange} className="border p-2 rounded text-sm">
-            <option value="">Select Alert Type</option>
-            <option value="Recurring">Recurring</option>
-            <option value="Non-Recurring">Non-Recurring</option>
-          </select>
-
-          {formData.alertType === 'Recurring' && (
-            <select name="recurringStatus" onChange={handleInputChange} className="border p-2 rounded text-sm">
-              <option value="">Select Recurring Status</option>
-              <option value="Daily">Daily</option>
-              <option value="Monthly">Monthly</option>
-              <option value="Quarterly">Quarterly</option>
-              <option value="Annually">Annually</option>
-            </select>
-          )}
-
-          {formData.alertType === 'Non-Recurring' && (
-            <input
-              type="date"
-              name="nonRecurringDate"
-              onChange={handleInputChange}
-              className="border p-2 rounded text-sm"
-            />
-          )}
-
-          <input
-            type="time"
-            name="deliveryTime"
-            onChange={handleInputChange}
-            className="border p-2 rounded text-sm"
-          />
-        </div>
-
-        <div className="flex justify-end">
-          <button 
-            type="submit" 
-            className="bg-[#006994] text-white text-sm font-semibold px-2 py-1 rounded h-9"
-          >
-            Submit
-          </button>
-        </div>
-      </form>
-
-      <div className="mt-8 shadow-md rounded p-2">
-        <h2 className="text-xl font-bold mb-4">Notification Logs</h2>
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="bg-[#212D40] text-sm text-white h-4">
-              <th className="p-2 text-md font-semibold">Notification Type</th>
-              <th className="p-2 text-md font-semibold">Last Update</th>
-              <th className="p-2 text-md font-semibold">Sent By</th>
-              <th className="p-2 text-md font-semibold">Total Users</th>
-              <th className="p-2 text-md font-semibold">Last Notification Sent</th>
-              <th className="p-2 text-md font-semibold">Message Medium</th>
-            </tr>
-          </thead>
-          <tbody>
-            {logs.map((log, index) => (
-              <tr key={index} className="bg-white">
-                <td className="border p-2 text-sm font-normal">{log.type}</td>
-                <td className="border p-2 text-sm font-normal">{log.lastUpdate}</td>
-                <td className="border p-2 text-sm font-normal">{log.sentBy}</td>
-                <td className="border p-2 text-sm font-normal">{log.totalUsers}</td>
-                <td className="border p-2 text-sm font-normal">{log.lastSent}</td>
-                <td className="border p-2 text-sm font-normal">{log.medium}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="mt-6">
+        <Link href='/dashboard/view-notifications'>
+          <Button variant='default' className='bg-ds-primary text-ds-foreground'>
+            View Notifications
+          </Button>
+        </Link>
       </div>
-
-            <Link href='/dashboard/view-notifications'>
-      <Button  variant='default' className='bg-ds-primary text-ds-foreground mt-6'>
-        View Notification
-      </Button>
-      </Link>
     </div>
   )
 }
