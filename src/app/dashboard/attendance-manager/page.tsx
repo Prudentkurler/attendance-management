@@ -17,7 +17,7 @@ import LineChart from "@/components/attendance/LineChart";
 import BarChart from "@/components/attendance/BarChart";
 import StatsTable from "@/components/attendance/StatsTable";
 import { Card, CardContent } from "@/components/ui/card";
-import AttendanceTable from "@/components/attendance/AttendanceTable";
+
 
 
 
@@ -257,10 +257,7 @@ REFERENCE_START_TIME.setHours(7, 0, 0, 0); // 9:00 AM
              <StatsTable />  
             </div>
 
-            <Card className="mt-20 md:mt-6">
-
-                <AttendanceTable/>
-            </Card>
+          
            
         </div>
     )

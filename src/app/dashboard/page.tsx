@@ -1,204 +1,266 @@
-"use client";
-import React, { useState } from "react";
+"use client"
 
-import UserGrowth from "./chart-data/user-growth";
-import Metrics from "./chart-data/metrics";
-import ClientDistribution from "./chart-data/client-distribution";
+import { CgSearch } from "react-icons/cg";
+import { LuFilter } from "react-icons/lu";
+import { BiSort } from "react-icons/bi";
+import { FiSun } from "react-icons/fi";
+import { PiUsersFill } from "react-icons/pi";
+import { HiPlusCircle } from "react-icons/hi";
+import { useEffect, useState } from "react";
+import { MdOutlineWatchLater } from "react-icons/md";
+import { ImStopwatch } from "react-icons/im";
+import { IoTrendingDown } from "react-icons/io5";
+import { IoTrendingUp } from "react-icons/io5";
+import { BsMoon } from "react-icons/bs";
+import { TiCloudStorageOutline } from "react-icons/ti";
+import LineChart from "@/components/attendance/LineChart";
+import BarChart from "@/components/attendance/BarChart";
+import StatsTable from "@/components/attendance/StatsTable";
+import { Card, CardContent } from "@/components/ui/card";
 
-import { format } from "date-fns";
-import { Calendar as CalendarIcon } from "lucide-react";
-import { DateRange } from "react-day-picker";
 
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
-// import firebase from "../firebase";
-// import debounce from "lodash/debounce";
 
-export default function Dashboard() {
-  const [date, setDate] = useState<DateRange | undefined>(undefined);
 
-  // const [clientData, setClientData] = useState(null);
 
-  // const fetchAnalyticsData = useCallback(
-  //   debounce(() => {
-  //     const dbRef = firebase.database().ref("analytics");
-  //     dbRef.on("value", (snapshot) => {
-  //       const data = snapshot.val();
-  //       setClientData(data);
-  //       setLoading(false);
-  //     });
-  //   }, 300),
-  //   []
-  // );
 
-  // useEffect(() => {
-  //   fetchAnalyticsData();
-  //   return () => {
-  //     firebase.database().ref("analytics").off();
-  //   };
-  // }, [fetchAnalyticsData]);
 
-  const KPIs = [
-    { id: 1, value: 20, label: "TOTAL CLIENTS", moderate: 2, percentage: 2 },
-    {
-      id: 2,
-      value: 200,
-      label: "TOTAL CLIENTS USERS",
-      moderate: 10.2,
-      percentage: 2,
-    },
-    {
-      id: 3,
-      value: 20,
-      label: "TOTAL ACTIVE CLIENTS",
-      moderate: 10.2,
-      percentage: 2,
-    },
-    {
-      id: 4,
-      value: 20,
-      label: "TOTAL INACTIVE CLIENTS",
-      moderate: 10.2,
-      percentage: 2,
-    },
-    {
-      id: 5,
-      value: 40,
-      label: "TOTAL EXPIRY CLIENTS",
-      moderate: 10.2,
-      percentage: 2,
-    },
-    {
-      id: 6,
-      value: 67,
-      label: "TOTAL NON-EXPIRY CLIENTS",
-      moderate: 10.2,
-      percentage: 2,
-    },
-    {
-      id: 7,
-      value: 10,
-      label: "TOTAL ARCHIVED CLIENTS",
-      moderate: 10.2,
-      percentage: 2,
-    },
-    {
-      id: 8,
-      value: 20,
-      label: "TOTAL SUPER ADMIN USERS",
-      moderate: 10.2,
-      percentage: 2,
-    },
-  ];
 
-  return (
-    <div className="container space-y-6 rounded bg-background p-4">
-      <header className="flex flex-wrap items-center justify-between gap-4">
-        <h1>Main Dashboard</h1>
+const Page = ()=>{
 
-        <div className="flex flex-wrap items-center gap-4">
-          {/* date filter */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                id="date"
-                variant={"outline"}
-                className={cn(
-                  "justify-start bg-background py-[19px] text-left font-normal text-ds-foreground",
-                  !date && "text-muted-foreground",
-                )}
-              >
-                <CalendarIcon className="mr-2 size-4" />
-                {date?.from ? (
-                  date.to ? (
-                    <>
-                      {format(date.from, "LLL dd, y")} -{" "}
-                      {format(date.to, "LLL dd, y")}
-                    </>
-                  ) : (
-                    format(date.from, "LLL dd, y")
-                  )
-                ) : (
-                  <span>Date filter</span>
-                )}
-              </Button>
-            </PopoverTrigger>
+    
+  
+    const [currentDate, setCurrentDate] = useState('');
+    const updateCurrentDate = () => {
+        const date = new Date();
+        const monthNames = [
+          "January", "February", "March", "April", "May", "June",
+          "July", "August", "September", "October", "November", "December"
+        ];
+        const day = date.getDate();
+        const month = monthNames[date.getUTCMonth()];
+        const year = date.getFullYear();
 
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                initialFocus
-                mode="range"
-                selected={date}
-                onSelect={(value) => {
-                  setDate(value);
-                }}
-                numberOfMonths={1}
-              />
-            </PopoverContent>
-          </Popover>
+        if(day === 1){
+            setCurrentDate(`${day}st ${month} ${year}`);
+        }
+        else if(day === 2){
+            setCurrentDate(`${day}nd ${month} ${year}`);
+        }
+        else if(day === 3){
+            setCurrentDate(`${day}rd ${month} ${year}`);
+        }
+        else{
+            setCurrentDate(`${day}th ${month} ${year}`);
+        }
+        
+      };
+      
 
-          {/* select filter */}
-          <Select value=''>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
+    useEffect(() => {
+        updateCurrentDate(); 
+        const intervalId = setInterval(updateCurrentDate, 3600); 
 
-            <SelectContent>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="inactive">Inactive</SelectItem>
-              <SelectItem value="expiry">Expiry</SelectItem>
-              <SelectItem value="non-expiry">Non-Expiry</SelectItem>
-              <SelectItem value="self-host">Self-Host</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </header>
+        return () => clearInterval(intervalId); 
+    }, []);
 
-      <div className="space-y-10">
-        <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
-          {KPIs.map((item) => {
-            const { id, label, moderate, percentage, value } = item;
-            return (
-              <div key={id} className="kpi space-y-1 rounded-xl p-4 shadow">
-                <div className="">
-                  <h3 className="text-3xl text-ds-foreground">{value}</h3>
-                  <p className="text-sm font-semibold leading-5 text-ds-gray">
-                    {label}
-                  </p>
+ 
+
+      const REFERENCE_START_TIME = new Date();
+REFERENCE_START_TIME.setHours(7, 0, 0, 0); // 9:00 AM
+
+
+
+
+
+    return(
+
+        <div className="py-4 md:px-8 px-4 flex flex-col gap-8">
+            {/*Attendance Manager title and search bar*/}
+
+            <div className="flex justify-between items-center flex-col sm:flex-row gap-4">
+                <h3 className="font-semibold">Atendance Manager</h3>
+                <div className="flex relative">
+                    <CgSearch className="absolute top-3 left-2"/>
+                    <input type="text" placeholder="Search Database " className="py-1 px-4 border-2 pl-8 rounded-md placeholder:text-grey-300" />
+                </div>
+            </div>
+
+            {/*Attendance Manager filters*/}
+            <div className="flex gap-4 ">
+                <Card className="flex gap-2 items-center rounded-md   p-2 hover:cursor-pointer">
+                    <LuFilter className="text-gray-500 text-sm"/>
+                    <p className="text-sm text-gray-900">Filter</p>
+                </Card>
+                <Card className="flex gap-2  items-center  rounded-md p-2">
+                    <BiSort className="text-gray-500 text-sm"/>
+                    <p className="text-gray-900 text-sm">Sort</p>
+                </Card>
+            </div>
+
+            {/*stats section*/}
+
+            <div className="flex flex-col md:flex-row gap-3 w-full  items-center">
+
+                {/*one*/}
+                <Card className="w-full md:w-1/3  h-[240px] flex gap-3 items-center justify-center rounded-lg ">
+                  <FiSun className="text-6xl text-gray-400"/>
+                  <div className="flex flex-col gap-1">
+                    <p className="text-4xl text-gray-400 mt-8 font-semibold">8:02:09 AM</p>
+                    <p className="text-md text-indigo-950 font-semibold">{currentDate}</p>
+                  </div>
+                </Card>
+                
+                {/*two*/}
+                <div className=" w-full md:w-1/4 flex gap-4 flex-col ">
+                <Card className="w-full  h-[50%] rounded-lg  p-5">
+                        <div className="flex justify-between items-center w-full">
+                            <p className="text-3xl text-indigo-950 ">425</p>
+                            <div className="p-3 rounded-full flex items-center justify-center bg-blue-100">
+
+                                <PiUsersFill className="text-orange-400" />
+                            </div>
+                        </div>
+                        <p className="text-indigo-950 font-semibold text-md">Total Employees</p>
+                        <div className="flex gap-1 items-center">
+                            
+                                <HiPlusCircle className="text-black-100 bg-teal-100 rounded-full"/>
+                           
+                            <p className="text-gray-800 text-sm opacity-80">2 new Employees added</p>
+                        </div>
+                    </Card>
+                    <Card className="w-full  h-[50%] rounded-lg  p-5">
+                        <div className="flex justify-between items-center w-full">
+                            <p className="text-3xl text-indigo-950 ">62</p>
+                            <div className="p-3 rounded-full flex items-center justify-center bg-blue-100">
+
+                                <MdOutlineWatchLater className="text-orange-400" />
+                            </div>
+                        </div>
+                        <p className="text-indigo-950 font-semibold text-md">Late Arrival</p>
+                        <div className="flex gap-1 items-center">
+                            
+                                <IoTrendingDown className="text-black-100 p-1 bg-red-200 rounded-full"/>
+                           
+                            <p className="text-gray-800 text-sm opacity-80">3% increase than yesterday</p>
+                        </div>
+                    </Card>
+
+                 
                 </div>
 
-                <div className="flex items-center gap-4 text-sm text-[#7C8DB5]">
-                  <p className="leading-5">{moderate}</p>
-                  <p className="leading-5">
-                    {percentage} %<span className="pl-1"> this week</span>
-                  </p>
+                {/*three*/}
+
+                <div className=" w-full md:w-1/4 flex gap-4 flex-col ">
+                <Card className="w-full  h-[50%] rounded-lg  p-5">
+                        <div className="flex justify-between items-center w-full">
+                            <p className="text-3xl text-indigo-950 ">360</p>
+                            <div className="p-3 rounded-full flex items-center justify-center bg-blue-100">
+
+                                <ImStopwatch className="text-orange-400" />
+                            </div>
+                        </div>
+                        <p className="text-indigo-950 font-semibold text-md">On Time</p>
+                        <div className="flex gap-1 items-center">
+                            
+                                <IoTrendingUp className="text-black-100 bg-teal-100 rounded-full"/>
+                           
+                            <p className="text-gray-800 text-sm opacity-80">10% less yesterday</p>
+                        </div>
+                    </Card>
+                    <Card className="w-full  h-[50%] rounded-lg  p-5">
+                        <div className="flex justify-between items-center w-full">
+                            <p className="text-3xl text-indigo-950 ">6</p>
+                            <div className="p-3 rounded-full flex items-center justify-center bg-blue-100">
+
+                                <BsMoon className="text-orange-400" />
+                            </div>
+                        </div>
+                        <p className="text-indigo-950 font-semibold text-md">Early Departures</p>
+                        <div className="flex gap-1 items-center">
+                            
+                                <HiPlusCircle className="text-black-100 bg-teal-100 rounded-full"/>
+                           
+                            <p className="text-gray-800 text-sm opacity-80">3% increase than yesterday</p>
+                        </div>
+                    </Card>
+
+                 
                 </div>
-              </div>
-            );
-          })}
-        </div>
 
-        <div className="grid gap-4 lg:grid-cols-2">
-          <ClientDistribution />
-          <UserGrowth />
-        </div>
+                
+                {/*four*/}
 
-        <Metrics />
-      </div>
-    </div>
-  );
+                <div className="w-full md:w-1/4 flex gap-4 flex-col ">
+                <Card className="w-full  h-[50%] rounded-lg  p-5">
+                        <div className="flex justify-between items-center w-full">
+                            <p className="text-3xl text-indigo-950 ">30</p>
+                            <div className="p-3 rounded-full flex items-center justify-center bg-blue-100">
+
+                                <TiCloudStorageOutline className="text-orange-400" />
+                            </div>
+                        </div>
+                        <p className="text-indigo-950 font-semibold text-md">Absent</p>
+                        <div className="flex gap-1 items-center">
+                            
+                        <IoTrendingDown className="text-black-100 p-1 bg-red-200 rounded-full"/>
+                           
+                            <p className="text-gray-800 text-sm opacity-80">3% increase than yesterday</p>
+                        </div>
+                    </Card>
+                    <Card className="w-full  h-[50%] rounded-lg  p-5">
+
+                  
+                        <div className="flex justify-between items-center w-full">
+                            <p className="text-3xl text-indigo-950 ">42</p>
+                            <div className="p-3 rounded-full flex items-center justify-center bg-blue-100">
+
+                                <ImStopwatch className="text-orange-400" />
+                            </div>
+                        </div>
+                        <p className="text-indigo-950 font-semibold text-md">Time-Off</p>
+                        <div className="flex gap-1 items-center">
+                            
+                                <HiPlusCircle className="text-black-100 bg-blue-100 rounded-full"/>
+                           
+                            <p className="text-gray-800 text-sm opacity-80">2% increase than yesterday</p>
+                        </div>
+                        </Card>
+
+                 
+                </div>
+
+            </div>
+
+            {/*Attendance Chart*/}
+
+            <div className="w-full h-[400px] flex  flex-col md:flex-row gap-4 mt-8 mb-9 ">
+               
+                <Card className="md:w-[60%] w-full shadow-lg rounded-lg p-2">
+                    <CardContent className="w-full h-full">
+
+                    <LineChart/>
+                    </CardContent>
+                </Card>
+                <Card className="md:w-[40%] w-full h-[320px] md:h-full  p-4">
+                    <CardContent className="w-full h-full">
+
+                    <BarChart/>
+                    </CardContent>
+                </Card>
+                
+            </div>
+
+            {/*Table section*/}
+
+            <div className="mt-10 md:mt-3">
+             <StatsTable />  
+            </div>
+
+          
+           
+        </div>
+    )
 }
+
+export default Page;

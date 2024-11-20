@@ -13,7 +13,7 @@ const SchedulePage: React.FC = () => {
   };
 
   return (
-    <div className="container">
+    <div className="container w-full">
       <div className="w-full flex justify-between items-center">
         <h1 className="text-2xl font-bold mb-4">Create/Update Schedule</h1>
         <Button

@@ -27,12 +27,12 @@ export default function AssignDeviceForm({ onAssign }: AssignDeviceFormProps) {
   };
 
   return (
-    <Card className="flex  md:flex-row gap-3 justify-between items-center   p-4">
+    <Card className="flex w-full flex-col  md:flex-row gap-3 justify-between items-center   p-4">
 
       
 
       {/* Branch Selection */}
-      <div className="flex gap-4">
+      <div className="flex flex-col md:flex-row gap-4">
 
       <Select
         value={branch}
@@ -82,7 +82,7 @@ export default function AssignDeviceForm({ onAssign }: AssignDeviceFormProps) {
           </div>
 
       {/* Assign Button */}
-      <Button onClick={handleAssign} className="bg-ds-primary text-ds-foreground">
+      <Button  onClick={handleAssign} className="bg-ds-primary text-ds-foreground">
         Assign
       </Button>
     

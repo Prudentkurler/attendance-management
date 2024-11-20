@@ -16,7 +16,7 @@ import { DialogTrigger } from "@radix-ui/react-dialog";
 
 
 
-const AttendanceTable = () => {
+export default function AttendanceTable() {
   const [filteredData, setFilteredData] = React.useState<Attendee[]>(AttendeesData);
   const [country, setCountry] = React.useState<string | undefined>(undefined);
   const [branch, setBranch] = React.useState<string | undefined>(undefined);
@@ -211,4 +211,4 @@ const AttendanceTable = () => {
   );
 };
 
-export default AttendanceTable;
+

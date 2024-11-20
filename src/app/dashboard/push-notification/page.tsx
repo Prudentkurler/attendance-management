@@ -10,19 +10,33 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import Link from 'next/link'
 
-type NotificationType = 'SMS' | 'Email' | 'In-app'
-type UserType = 'Admin Users' | 'General Users' | 'Parents' | 'Absentees' | 'Attendees'
-type AlertType = 'Recurring' | 'Non-Recurring'
-type RecurringStatus = 'Daily' | 'Monthly' | 'Quarterly' | 'Annually'
+type NotificationType = "SMS" | "Email" | "In-app";
+type UserType =
+  | "Admin Users"
+  | "General Users"
+  | "Parents"
+  | "Absentees"
+  | "Attendees";
+type AlertType = "Recurring" | "Non-Recurring";
+type RecurringStatus = "Daily" | "Monthly" | "Quarterly" | "Annually";
 
 type NotificationLog = {
-  type: string
-  lastUpdate: string
-  sentBy: string
-  totalUsers: number
-  lastSent: string
-  medium: string
-}
+  type: string;
+  lastUpdate: string;
+  sentBy: string;
+  totalUsers: number;
+  lastSent: string;
+  medium: string;
+};
+
+const columns = [
+  { accessorKey: "type", header: "Notification Type" },
+  { accessorKey: "lastUpdate", header: "Last Update" },
+  { accessorKey: "sentBy", header: "Sent By" },
+  { accessorKey: "totalUsers", header: "Total Users" },
+  { accessorKey: "lastSent", header: "Last Notification Sent" },
+  { accessorKey: "medium", header: "Message Medium" },
+];
 
 type Template = {
   id: string
@@ -50,20 +64,20 @@ export default function NotificationsPage() {
   })
   const [logs, setLogs] = useState<NotificationLog[]>([
     {
-      type: 'Schedule Update',
-      lastUpdate: '2024-10-15 10:30',
-      sentBy: 'Admin 1',
+      type: "Schedule Update",
+      lastUpdate: "2024-10-15 10:30",
+      sentBy: "Admin 1",
       totalUsers: 120,
-      lastSent: '2024-10-15 10:30 AM',
-      medium: 'SMS/Email',
+      lastSent: "2024-10-15 10:30 AM",
+      medium: "SMS/Email",
     },
     {
-      type: 'Absence Reminder',
-      lastUpdate: '2024-10-14 09:00',
-      sentBy: 'Admin 2',
+      type: "Absence Reminder",
+      lastUpdate: "2024-10-14 09:00",
+      sentBy: "Admin 2",
       totalUsers: 80,
-      lastSent: '2024-10-14 09:00 AM',
-      medium: 'Email',
+      lastSent: "2024-10-14 09:00 AM",
+      medium: "Email",
     },
   ])
   const [templates, setTemplates] = useState<Template[]>([
@@ -85,16 +99,16 @@ export default function NotificationsPage() {
   ])
 
   const handleNotificationTypeChange = (type: NotificationType) => {
-    setNotificationTypes(prev => 
-      prev.includes(type) ? prev.filter(t => t !== type) : [...prev, type]
-    )
-  }
+    setNotificationTypes((prev) =>
+      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
+    );
+  };
 
   const handleUserTypeChange = (type: UserType) => {
-    setUserTypes(prev => 
-      prev.includes(type) ? prev.filter(t => t !== type) : [...prev, type]
-    )
-  }
+    setUserTypes((prev) =>
+      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
+    );
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -320,5 +334,5 @@ export default function NotificationsPage() {
         </Link>
       </div>
     </div>
-  )
+  );
 }

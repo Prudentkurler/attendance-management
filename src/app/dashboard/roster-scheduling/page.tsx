@@ -193,6 +193,20 @@ export default function RosterScheduling() {
         );
       },
     })),
+    {
+      accessorKey: 'action',
+      header: 'Action',
+      cell: ({ row }: { row: any }) => (
+        <div className="flex space-x-2">
+          <Button onClick={() => handleAssignSchedule(row.original.id)} >
+            Assigned
+          </Button>
+          <Button onClick={() => handleAssignSchedule(row.original.id)} className="bg-red-500 text-white">
+            Unassigned
+          </Button>
+        </div>
+      ),
+    },
   ];
 
   return (
@@ -200,7 +214,7 @@ export default function RosterScheduling() {
       <h1 className="text-2xl font-bold">Roster Scheduling</h1>
 
       {/* Filters */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="flex overflow-auto gap-4">
         <Select onValueChange={(value) => handleFilterChange('country', value)}>
           <SelectTrigger>
             <SelectValue placeholder="Select Country" />

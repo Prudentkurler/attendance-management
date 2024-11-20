@@ -486,7 +486,7 @@ export default function ClockAttendance() {
       </div>
 
       <div className="flex justify-end mt-6">
-        <Button onClick={handleExportCSV} className="bg-ds-primary text-ds-foreground">
+        <Button size='sm' onClick={handleExportCSV} className="bg-ds-primary text-ds-foreground">
           Export CSV
         </Button>
       </div>

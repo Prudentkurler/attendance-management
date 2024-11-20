@@ -166,15 +166,17 @@ export default function ViewApproveDeviceRequests() {
 
   return (
     <div className="space-y-6 p-4">
-      <h2 className="text-2xl font-semibold">View/Approve Device Requests</h2>
+      <h2 className="text-xl  md:text-2xl font-semibold">View/Approve Device Requests</h2>
 
       {/* Filters */}
-      <div className="flex gap-4 items-center">
+      <div className="flex gap-4 flex-col md:flex-row items-center">
         <Input
           placeholder="Search Name/ID"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
+        <div className="px-2 flex gap-3 overflow-auto items-center">
+
         <Select value={branchFilter} onValueChange={setBranchFilter}>
           <SelectTrigger>
             <SelectValue placeholder="Filter by Branch" />
@@ -199,6 +201,7 @@ export default function ViewApproveDeviceRequests() {
         <Button variant="destructive" onClick={clearFilters}>
           Clear
         </Button>
+        </div>
       </div>
 
       {/* Action Buttons */}

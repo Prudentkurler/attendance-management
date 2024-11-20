@@ -44,7 +44,7 @@ export default function Sidebar({ isSidebarExpanded }: SidebarExpandedProps) {
               >
                 {item.links.map(({ href, Icon, label, subCategories, isAccordion }, index) => {
                   const matchingSubLink = subCategories?.some(
-                    (subLink) => pathname === subLink.href
+                    (subLink: { href: string }) => pathname === subLink.href
                   );
 
                   return (
@@ -101,8 +101,8 @@ export default function Sidebar({ isSidebarExpanded }: SidebarExpandedProps) {
                                 }
                               )}
                             >
-                              {subCategories?.map((link, subIndex) => (
-                                <li key={'id' in link ? link.id : `${link.label}-${subIndex}`}>
+                              {subCategories?.map((link: { id?: string; label: string; href: string }, subIndex) => (
+                                <li key={link.id ? link.id : `${link.label}-${subIndex}`}>
                                   <Link
                                     href={link.href}
                                     className={cn(

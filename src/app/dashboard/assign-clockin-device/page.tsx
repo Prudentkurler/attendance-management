@@ -31,7 +31,7 @@ const handleAssign = (newAssignment: DeviceAssignment) => {
 
   return (
     <div className="space-y-6 mx-5">
-      <h2 className="text-2xl font-semibold">Assign Clocking Device</h2>
+      <h2 className="text-xl text-center md:text-left font-semibold">Assign Clocking Device</h2>
 
       {/* Assign Clocking Device Panel */}
       <AssignDeviceForm onAssign={handleAssign} />
@@ -40,12 +40,12 @@ const handleAssign = (newAssignment: DeviceAssignment) => {
 
 
       <Card className=" p-4 mt-8" >
-        <div className="flex gap-4 justify-between">
+        <div className="flex flex-col md:flex-row gap-4 justify-between">
 
-        <h3 className="text-xl font-semibold">View Assigned Devices</h3>
+        <h3 className="text-sm md:xl font-semibold">View Assigned Devices</h3>
 
         {/* Filters */}
-        <div className="flex w-[50%] justify-between items-center">
+        <div className="flex w-full md:w-[50%] justify-between items-center">
           <Select
             value={branchFilter}
             onValueChange={setBranchFilter}

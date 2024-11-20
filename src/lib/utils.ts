@@ -26,272 +26,103 @@ export const menuItems = [
   {
     id: 1,
     links: [
-      {
-        Icon: Icons.Dashboard,
-        label: "Dashboard",
-        href: "/dashboard",
-        visible: ["admin", "teacher", "student", "parent"],
-        isAccordion: false,
-        subCategories: [],
-      },
 
-      {
-        Icon: Icons.Admin,
-        label: "Admin",
-        href: "",
-        visible: ["", ""],
-        isAccordion: true,
-        subCategories: [
-          { id: 1, label: "Users", href: "/dashboard/admin" },
-
-          {
-            id: 2,
-            label: "activity logs",
-            href: "/dashboard/admin/activity-logs",
-          },
-        ],
-      },
-
-      {
-        Icon: Icons.Clients,
-        label: "Clients",
-        href: "/dashboard/clients",
-        visible: ["", ""],
-        isAccordion: true,
-        subCategories: [
-          {
-            id: 1,
-            label: "Manage clients",
-            href: "/dashboard/clients",
-          },
-
-          {
-            id: 2,
-            label: "Client users package",
-            href: "/dashboard/clients/users-package",
-          },
-        ],
-      },
-
-      {
-        Icon: Icons.Subscription,
-        label: "Subscription",
-        href: "/dashboard/subscription",
-        visible: [""],
-        isAccordion: true,
-        subCategories: [
-          {
-            id: 1,
-            label: "Manage subs.",
-            href: "/dashboard/subscription",
-          },
-          {
-            id: 2,
-            label: "One-time activation fee",
-            href: "/dashboard/subscription/one-time-activation-fee",
-          },
-
-          {
-            id: 3,
-            label: "One-time activation",
-            href: "/dashboard/subscription/one-time-activation",
-          },
-        ],
-      },
-
-      {
-        Icon: Icons.ServiceModule,
-        label: "Service modules",
-        href: "/dashboard/service-modules",
-        visible: ["admin", "teacher"],
-        isAccordion: false,
-        subCategories: [
-          {
-            id: 1,
-            label: "Manage service mdl.",
-            href: "/dashboard/create-service-modules",
-          },
-
-          {
-            id: 2,
-            label: "Create service mdl.",
-            href: "/dashboard/create-service-modules",
-          },
-        ],
-      },
-
-      {
-        Icon: Icons.PostMaster,
-        label: "Postmaster",
-        href: "",
-        visible: ["", ""],
-        isAccordion: true,
-        subCategories: [
-          {
-            id: 1,
-            label: "Create service package",
-            href: "/dashboard/postmaster/create-service-package",
-          },
-          {
-            id: 2,
-            label: "Set credit fee",
-            href: "/dashboard/postmaster/set-credit-fees",
-          },
-
-          {
-            id: 3,
-            label: "Create/View 3PPs",
-            href: "/dashboard/postmaster/third-party-providers",
-          },
-
-          {
-            id: 4,
-            label: "3PP credit purchased",
-            href: "/dashboard/postmaster/third-party-providers/credit-purchased",
-          },
-
-          {
-            id: 5,
-            label: "3PP credit balance",
-            href: "/dashboard/postmaster/third-party-providers/credit-balance",
-          },
-
-          {
-            id: 6,
-            label: "Client credit",
-            href: "/dashboard/postmaster/clients-credit",
-          },
-
-          {
-            id: 7,
-            label: "Custom credit top-up",
-            href: "/dashboard/postmaster/custom-credit-top-up",
-          },
-        ],
-      },
-
-      {
-        Icon: Icons.Commission,
-        label: "Agents commission",
-        href: "/dashboard/agents-commission",
-        visible: ["", "", "", ""],
-        isAccordion: false,
-        subCategories: [],
-      },
-
-      {
-        Icon: Icons.DestktopDataSync,
-        label: "Desktop data sync",
-        href: "/dashboard/desktop-data-sync",
-        visible: ["admin", "teacher", "student", "parent"],
-        isAccordion: false,
-        subCategories: [],
-      },
-
-      {
-        Icon: Icons.SystemHealth,
-        label: "System Health",
-        href: "/dashboard/system-health",
-        visible: ["", ""],
-        isAccordion: false,
-        subCategories: [],
-      },
-      {
-        Icon: Icons.SystemHealth,
-        label: "Attendance Manager",
-        href: "/dashboard",
-        visible: ["", ""],
-        isAccordion: true,
-        subCategories: [
-
-          {
-            Icon: Icons.SystemHealth,
-            label: "Dashboard Analytics",
-            href: "/dashboard/attendance-manager",
-            visible: ["", ""],
-            isAccordion: false,
-            subCategories: [],
-          },
+    
+        {
+          Icon: Icons.Dashboard,
+          label: "Dashboard Analytics",
+          href: "/dashboard",
+          visible: ["", ""],
+          isAccordion: false,
+          subCategories: [],
+        },
+        {
+          Icon: Icons.SystemHealth,
+          label: "Summary Analytics",
+          href: "/dashboard/summary-analytics",
+          visible: ["", ""],
+          isAccordion: false,
+          subCategories: [],
+        },
+   
+        {
+          Icon: Icons.Eye,
+          label: "Clocking Location",
+          href: "/dashboard/location",
+          visible: ["", ""],
+          isAccordion: false,
+          subCategories: [],
+        },
+        
+        {
+          Icon: Icons.ServiceModule,
+          label: "Create Schedule",
+          href: "/dashboard/schedule",
+          visible: ["", ""],
+          isAccordion: false,
+          subCategories: [],
+        },
+        
+        {
+          Icon: Icons.ServiceModule,
+          label: "Roster Schedule",
+          href: "/dashboard/roster-scheduling",
+          visible: ["", ""],
+          isAccordion: false,
+          subCategories: [],
+        },
+        {
+          Icon: Icons.Notification,
+          label: " Push Notification",
+          href: "/dashboard/push-notification",
+          visible: ["", ""],
+          isAccordion: false,
+          subCategories: [],
+        },
      
-          {
-            Icon: Icons.SystemHealth,
-            label: "Location",
-            href: "/dashboard/location",
-            visible: ["", ""],
-            isAccordion: false,
-            subCategories: [],
-          },
-          
-          {
-            Icon: Icons.SystemHealth,
-            label: "Create Schedule",
-            href: "/dashboard/schedule",
-            visible: ["", ""],
-            isAccordion: false,
-            subCategories: [],
-          },
-          
-          {
-            Icon: Icons.SystemHealth,
-            label: "Roster Schedule",
-            href: "/dashboard/roster-scheduling",
-            visible: ["", ""],
-            isAccordion: false,
-            subCategories: [],
-          },
-          {
-            Icon: Icons.SystemHealth,
-            label: " Push Notification",
-            href: "/dashboard/push-notification",
-            visible: ["", ""],
-            isAccordion: false,
-            subCategories: [],
-          },
-       
-          {
-            Icon: Icons.SystemHealth,
-            label: " Clock Attendance",
-            href: "/dashboard/clock-attendance",
-            visible: ["", ""],
-            isAccordion: false,
-            subCategories: [],
-          },
-          {
-            Icon: Icons.SystemHealth,
-            label: " Assign Device ",
-            href: "/dashboard/assign-clockin-device",
-            visible: ["", ""],
-            isAccordion: false,
-            subCategories: [],
-          },
-          {
-            Icon: Icons.SystemHealth,
-            label: " Approve Device ",
-            href: "/dashboard/device-request-approval",
-            visible: ["", ""],
-            isAccordion: false,
-            subCategories: [],
-          },
-          
-          {
-            Icon: Icons.SystemHealth,
-            label: " Attendance History",
-            href: "/dashboard/attendance-history",
-            visible: ["", ""],
-            isAccordion: false,
-            subCategories: [],
-          },
-          {
-            Icon: Icons.SystemHealth,
-            label: " Register user",
-            href: "/dashboard/user-registration-form",
-            visible: ["", ""],
-            isAccordion: false,
-            subCategories: [],
-          },
+        {
+          Icon: Icons.Clients,
+          label: " Clock Attendance",
+          href: "/dashboard/clock-attendance",
+          visible: ["", ""],
+          isAccordion: false,
+          subCategories: [],
+        },
+        {
+          Icon: Icons.PostMaster,
+          label: " Assign Device ",
+          href: "/dashboard/assign-clockin-device",
+          visible: ["", ""],
+          isAccordion: false,
+          subCategories: [],
+        },
+        {
+          Icon: Icons.Commission,
+          label: " Approve Device ",
+          href: "/dashboard/device-request-approval",
+          visible: ["", ""],
+          isAccordion: false,
+          subCategories: [],
+        },
+        
+        {
+          Icon: Icons.DestktopDataSync,
+          label: " Attendance History",
+          href: "/dashboard/attendance-history",
+          visible: ["", ""],
+          isAccordion: false,
+          subCategories: [],
+        },
+        {
+          Icon: Icons.Admin,
+          label: " Register user",
+          href: "/dashboard/user-registration-form",
+          visible: ["", ""],
+          isAccordion: false,
+          subCategories: [],
+        },
 
-        ],
-      },
+      
       
       
     ],

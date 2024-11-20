@@ -96,7 +96,7 @@ const toggleSelection = (index: number) => {
             )
           }
         />
-        <Button variant="destructive" onClick={handleDeleteSelected}>
+        <Button size='sm' variant="destructive" onClick={handleDeleteSelected}>
           Delete Selected
         </Button>
       </div>
