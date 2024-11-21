@@ -198,15 +198,15 @@ export default function RosterScheduling() {
       header: 'Action',
       cell: ({ row }: { row: any }) => (
         <div className="flex space-x-2">
-          <Button onClick={() => handleAssignSchedule(row.original.id)} >
+          <Button onClick={() => handleAssignSchedule(row.original.id, '')} >
             Assigned
           </Button>
-          <Button onClick={() => handleAssignSchedule(row.original.id)} className="bg-red-500 text-white">
+          <Button onClick={() => handleAssignSchedule(row.original.id, '')} className="bg-red-500 text-white">
             Unassigned
           </Button>
         </div>
       ),
-    },
+    }, 
   ];
 
   return (

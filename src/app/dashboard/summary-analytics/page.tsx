@@ -1,244 +1,209 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { DatePicker } from "@/components/ui/date-picker"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import React, { useState } from "react";
+import { DataTable } from "@/components/ui/data-table";
 
-type SummaryData = {
-  country: string
-  regionState: string
-  branch: string
-  category: string
-  schedule: string
-  dateRange: string
-  attendees: { count: number; percentage: number }
-  absentees: { count: number; percentage: number }
-  lateComers: { count: number; percentage: number }
-  earlyComers: { count: number; percentage: number }
-  attendanceStatus: 'Low' | 'Average' | 'High'
-  admins: { name: string; phone: string }[]
-}
+import { Button } from "@/components/ui/button";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { DateRangePicker } from "@/components/DateRangePicker"; // Replace with ShadCN date picker
 
-const SummaryAnalytics = () => {
+// Example data type
+type DataType = {
+  id: number;
+  name: string;
+  country: string;
+  branch: string;
+  category: string;
+  gender: string;
+  attendanceStatus: string;
+  schedule: string;
+  startDate: string;
+  endDate: string;
+};
+
+const initialData: DataType[] = [
+  // Sample data
+  { id: 1, name: "John Doe", country: "USA", branch: "HQ", category: "Staff", gender: "Male", attendanceStatus: "Attendee", schedule: "Morning", startDate: "2024-11-01", endDate: "2024-11-15" },
+  { id: 2, name: "Jane Smith", country: "Ghana", branch: "Regional", category: "Student", gender: "Female", attendanceStatus: "Absentee", schedule: "Afternoon", startDate: "2024-11-05", endDate: "2024-11-10" },
+];
+
+import { ColumnDef } from "@tanstack/react-table";
+
+const columns: ColumnDef<DataType>[] = [
+  { header: "ID", accessorKey: "id" },
+  { header: "Name", accessorKey: "name" },
+  { header: "Country", accessorKey: "country" },
+  { header: "Branch", accessorKey: "branch" },
+  { header: "Category", accessorKey: "category" },
+  { header: "Gender", accessorKey: "gender" },
+  { header: "Attendance Status", accessorKey: "attendanceStatus" },
+  { header: "Schedule", accessorKey: "schedule" },
+  { header: "Start Date", accessorKey: "startDate" },
+  { header: "End Date", accessorKey: "endDate" },
+];
+
+const FiltersTable = () => {
+  const [data, setData] = useState(initialData);
   const [filters, setFilters] = useState({
-    country: 'all',
-    regionState: 'all',
-    branch: 'all',
-    category: 'all',
-    schedule: 'all',
-    startDate: null,
-    endDate: null,
-    attendanceStatus: 'all',
-  })
-  const [summaryData, setSummaryData] = useState<SummaryData[]>([])
-  const [searchTerm, setSearchTerm] = useState('')
+    country: "all",
+    regionState: "all",
+    branch: "all",
+    category: "all",
+    schedule: "all",
+    gender: "all",
+    attendanceStatus: "all",
+    startDate: new Date(),
+    endDate: new Date(),
+  });
 
   const handleFilterChange = (key: string, value: string | Date | null) => {
-    setFilters(prev => ({ ...prev, [key]: value }))
-  }
+    setFilters((prevFilters) => ({ ...prevFilters, [key]: value }));
+  };
 
-  const handleSearch = () => {
-    // Implement search logic here
-    console.log('Searching with term:', searchTerm)
-  }
+  const applyFilters = () => {
+    // Apply filtering logic
+    let filteredData = initialData;
 
-  const handleDownloadCSV = () => {
-    // Implement CSV download logic here
-    console.log('Downloading CSV')
-  }
+    if (filters.country !== "all") {
+      filteredData = filteredData.filter((item) => item.country === filters.country);
+    }
 
-  const fetchSummaryData = () => {
-    // Implement data fetching logic here
-    // This should update summaryData state
-    const mockData: SummaryData[] = [
-      {
-        country: 'USA',
-        regionState: 'California',
-        branch: 'HQ',
-        category: 'Staff',
-        schedule: 'Morning Shift',
-        dateRange: '2024-01-01 to 2024-01-31',
-        attendees: { count: 120, percentage: 80 },
-        absentees: { count: 15, percentage: 10 },
-        lateComers: { count: 10, percentage: 6.67 },
-        earlyComers: { count: 5, percentage: 3.33 },
-        attendanceStatus: 'High',
-        admins: [
-          { name: 'John Doe', phone: '+1234567890' },
-          { name: 'Jane Smith', phone: '+0987654321' },
-        ],
-      },
-      // Add more mock data as needed
-    ]
-    setSummaryData(mockData)
-  }
+    if (filters.regionState !== "all") {
+      filteredData = filteredData.filter((item) => item.branch === filters.regionState);
+    }
 
-  useEffect(() => {
-    fetchSummaryData()
-  }, [filters])
+    if (filters.branch !== "all") {
+      filteredData = filteredData.filter((item) => item.branch === filters.branch);
+    }
+
+    if (filters.category !== "all") {
+      filteredData = filteredData.filter((item) => item.category === filters.category);
+    }
+
+    if (filters.schedule !== "all") {
+      filteredData = filteredData.filter((item) => item.schedule === filters.schedule);
+    }
+
+    if (filters.gender !== "all") {
+      filteredData = filteredData.filter((item) => item.gender.toLowerCase() === filters.gender.toLowerCase());
+    }
+
+    if (filters.attendanceStatus !== "all") {
+      filteredData = filteredData.filter((item) => item.attendanceStatus.toLowerCase() === filters.attendanceStatus.toLowerCase());
+    }
+
+    // Add more filter conditions as needed
+    setData(filteredData);
+  };
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <h1 className="text-2xl font-bold">Summary Analytics</h1>
+    <div className="space-y-6">
 
-      <Card>
-        <CardContent className="flex flex-wrap gap-4 p-4">
-          <Select onValueChange={(value) => handleFilterChange('country', value)}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Country" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All</SelectItem>
-              <SelectItem value="usa">USA</SelectItem>
-              <SelectItem value="ghana">Ghana</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select onValueChange={(value) => handleFilterChange('regionState', value)}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Region/State" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All</SelectItem>
-              <SelectItem value="california">California</SelectItem>
-              <SelectItem value="accra">Accra</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select onValueChange={(value) => handleFilterChange('branch', value)}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Branch" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All</SelectItem>
-              <SelectItem value="hq">HQ</SelectItem>
-              <SelectItem value="westBranch">West Branch</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select onValueChange={(value) => handleFilterChange('category', value)}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All</SelectItem>
-              <SelectItem value="management">Management</SelectItem>
-              <SelectItem value="staff">Staff</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select onValueChange={(value) => handleFilterChange('schedule', value)}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Schedule" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All</SelectItem>
-              <SelectItem value="morningShift">Morning Shift</SelectItem>
-              <SelectItem value="nightShift">Night Shift</SelectItem>
-            </SelectContent>
-          </Select>
-          <DatePicker
-            selected={filters.startDate}
-            onSelect={(date) => handleFilterChange('startDate', date)}
-            placeholderText="Start Date"
-          />
-          <DatePicker
-            selected={filters.endDate}
-            onSelect={(date) => handleFilterChange('endDate', date)}
-            placeholderText="End Date"
-          />
-          <Select onValueChange={(value) => handleFilterChange('attendanceStatus', value)}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Attendance Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All</SelectItem>
-              <SelectItem value="low">Low</SelectItem>
-              <SelectItem value="average">Average</SelectItem>
-              <SelectItem value="high">High</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button onClick={fetchSummaryData}>Filter</Button>
-        </CardContent>
-      </Card>
+      <h3>Summary Analytics</h3>
+      {/* Filter Section */}
+      <div className="flex  gap-4 w-full overflow-auto">
+        {/* Country Filter */}
+        <Select onValueChange={(value) => handleFilterChange("country", value)}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Country" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All</SelectItem>
+            <SelectItem value="USA">USA</SelectItem>
+            <SelectItem value="Ghana">Ghana</SelectItem>
+          </SelectContent>
+        </Select>
 
-      <div className="flex justify-between items-center">
-        <Input
-          type="text"
-          placeholder="Search"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="max-w-sm"
+        {/* Region/State Filter */}
+        <Select onValueChange={(value) => handleFilterChange("regionState", value)}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Region/State" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All</SelectItem>
+            <SelectItem value="California">California</SelectItem>
+            <SelectItem value="Accra">Accra</SelectItem>
+          </SelectContent>
+        </Select>
+
+        {/* Branch Filter */}
+        <Select onValueChange={(value) => handleFilterChange("branch", value)}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Branch" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All</SelectItem>
+            <SelectItem value="HQ">HQ</SelectItem>
+            <SelectItem value="Regional">Regional</SelectItem>
+          </SelectContent>
+        </Select>
+
+        {/* Category Filter */}
+        <Select onValueChange={(value) => handleFilterChange("category", value)}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Category" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All</SelectItem>
+            <SelectItem value="Staff">Staff</SelectItem>
+            <SelectItem value="Student">Student</SelectItem>
+          </SelectContent>
+        </Select>
+
+        {/* Schedule Filter */}
+        <Select onValueChange={(value) => handleFilterChange("schedule", value)}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Schedule" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All</SelectItem>
+            <SelectItem value="Morning">Morning</SelectItem>
+            <SelectItem value="Afternoon">Afternoon</SelectItem>
+          </SelectContent>
+        </Select>
+
+        {/* Gender Filter */}
+        <Select onValueChange={(value) => handleFilterChange("gender", value)}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Gender" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All</SelectItem>
+            <SelectItem value="Male">Male</SelectItem>
+            <SelectItem value="Female">Female</SelectItem>
+          </SelectContent>
+        </Select>
+
+        {/* Attendance Status Filter */}
+        <Select onValueChange={(value) => handleFilterChange("attendanceStatus", value)}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Attendance Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All</SelectItem>
+            <SelectItem value="Attendee">Attendee</SelectItem>
+            <SelectItem value="Absentee">Absentee</SelectItem>
+            <SelectItem value="Late Check-ins">Late Check-ins</SelectItem>
+            <SelectItem value="Early Check-ins">Early Check-ins</SelectItem>
+          </SelectContent>
+        </Select>
+
+        {/* Date Range Picker */}
+        <DateRangePicker
+          startDate={filters.startDate}
+          endDate={filters.endDate}
+          onStartDateChange={(startDate) => handleFilterChange("startDate", startDate)}
+          onEndDateChange={(endDate) => handleFilterChange("endDate", endDate)}
         />
-        <Button onClick={handleDownloadCSV}>Download CSV</Button>
+
+        <Button onClick={applyFilters}>Apply Filters</Button>
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Country</TableHead>
-            <TableHead>Region/State</TableHead>
-            <TableHead>Branch</TableHead>
-            <TableHead>Category</TableHead>
-            <TableHead>Schedule</TableHead>
-            <TableHead>Date Range</TableHead>
-            <TableHead>Attendees</TableHead>
-            <TableHead>Absentees</TableHead>
-            <TableHead>Late Comers</TableHead>
-            <TableHead>Early Comers</TableHead>
-            <TableHead>Attendance Status</TableHead>
-            <TableHead>Admins</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {summaryData.map((row, index) => (
-            <TableRow key={index}>
-              <TableCell>{row.country}</TableCell>
-              <TableCell>{row.regionState}</TableCell>
-              <TableCell>{row.branch}</TableCell>
-              <TableCell>{row.category}</TableCell>
-              <TableCell>{row.schedule}</TableCell>
-              <TableCell>{row.dateRange}</TableCell>
-              <TableCell>{row.attendees.count} / {row.attendees.percentage.toFixed(2)}%</TableCell>
-              <TableCell>{row.absentees.count} / {row.absentees.percentage.toFixed(2)}%</TableCell>
-              <TableCell>{row.lateComers.count} / {row.lateComers.percentage.toFixed(2)}%</TableCell>
-              <TableCell>{row.earlyComers.count} / {row.earlyComers.percentage.toFixed(2)}%</TableCell>
-              <TableCell>{row.attendanceStatus}</TableCell>
-              <TableCell>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button variant="link">View</Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Admins</DialogTitle>
-                    </DialogHeader>
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Name</TableHead>
-                          <TableHead>Phone</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {row.admins.map((admin, adminIndex) => (
-                          <TableRow key={adminIndex}>
-                            <TableCell>{admin.name}</TableCell>
-                            <TableCell>{admin.phone}</TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </DialogContent>
-                </Dialog>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      {/* Data Table Section */}
+      <DataTable columns={columns} data={data} />
     </div>
-  )
-}
+  );
+};
 
-export default SummaryAnalytics
+export default FiltersTable;

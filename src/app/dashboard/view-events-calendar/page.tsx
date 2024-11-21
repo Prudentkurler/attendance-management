@@ -288,12 +288,12 @@ export default function ViewEventsCalendar() {
           </div>
           <div className="flex justify-between mb-4">
             <Button onClick={handleFilter}>Filter</Button>
-            <Button onClick={handleViewAgenda}>View Agenda</Button>
+            <Button className='bg-ds-primary text-foreground font-bold hover:bg-ds-primary-dark' onClick={handleViewAgenda}>View Agenda</Button>
           </div>
           <Tabs defaultValue="attendees">
             <TabsList>
-              <TabsTrigger value="attendees">Attendees</TabsTrigger>
-              <TabsTrigger value="absentees">Absentees</TabsTrigger>
+              <TabsTrigger value="attendees" className='bg-ds-foreground text-white'>Attendees</TabsTrigger>
+              <TabsTrigger value="absentees" className='bg-ds-foreground text-white'>Absentees</TabsTrigger>
             </TabsList>
             <TabsContent value="attendees">
               <div className="mb-2">

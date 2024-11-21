@@ -1,14 +1,26 @@
 "use client";
 
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Textarea } from '@/components/ui/textarea'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import Link from 'next/link'
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 type NotificationType = "SMS" | "Email" | "In-app";
 type UserType =
@@ -39,64 +51,64 @@ const columns = [
 ];
 
 type Template = {
-  id: string
-  name: string
-  content: string
-}
+  id: string;
+  name: string;
+  content: string;
+};
 
 export default function NotificationsPage() {
-  const [notificationTypes, setNotificationTypes] = useState<NotificationType[]>([])
-  const [userTypes, setUserTypes] = useState<UserType[]>([])
+  const [notificationTypes, setNotificationTypes] = useState<NotificationType[]>(
+    []
+  );
+  const [userTypes, setUserTypes] = useState<UserType[]>([]);
   const [formData, setFormData] = useState({
-    country: '',
-    branch: '',
-    category: '',
-    groupSubgroup: '',
-    messageMedium: '',
-    alertUserType: '',
-    alertType: '',
-    recurringStatus: '',
-    nonRecurringDate: '',
-    deliveryTime: '',
-    startingDate: '',
-    template: '',
-    customMessage: '',
-  })
-  const [logs, setLogs] = useState<NotificationLog[]>([
-    {
-      type: "Schedule Update",
-      lastUpdate: "2024-10-15 10:30",
-      sentBy: "Admin 1",
-      totalUsers: 120,
-      lastSent: "2024-10-15 10:30 AM",
-      medium: "SMS/Email",
-    },
-    {
-      type: "Absence Reminder",
-      lastUpdate: "2024-10-14 09:00",
-      sentBy: "Admin 2",
-      totalUsers: 80,
-      lastSent: "2024-10-14 09:00 AM",
-      medium: "Email",
-    },
-  ])
+    country: "",
+    branch: "",
+    category: "",
+    groupSubgroup: "",
+    messageMedium: "",
+    alertUserType: "",
+    alertType: "",
+    recurringStatus: "",
+    nonRecurringDate: "",
+    deliveryTime: "",
+    startingDate: "",
+    template: "",
+    customMessage: "",
+  });
+  const [logs, setLogs] = useState<NotificationLog[]>([]);
   const [templates, setTemplates] = useState<Template[]>([
     {
-      id: '1',
-      name: 'Attendance Reminder',
-      content: 'Hi [User Name], this is a reminder to clock in for your shift today.',
+      id: "1",
+      name: "Attendance Reminder",
+      content:
+        "Hi [User Name], this is a reminder to clock in for your shift today.",
     },
     {
-      id: '2',
-      name: 'Schedule Update',
-      content: 'Hi [User Name], your schedule has been updated. Please check the app for details.',
+      id: "2",
+      name: "Schedule Update",
+      content:
+        "Hi [User Name], your schedule has been updated. Please check the app for details.",
     },
     {
-      id: '3',
-      name: 'Absence Notification',
-      content: 'Hi [Parent Name], [Student Name] was absent from school today.',
+      id: "3",
+      name: "Absence Notification",
+      content: "Hi [Parent Name], [Student Name] was absent from school today.",
     },
-  ])
+  ]);
+  const [filteredUsers, setFilteredUsers] = useState([]); // Dynamic data based on filters
+
+  const fetchFilteredData = async () => {
+    try {
+      const response = await fetch(
+        `/api/users?country=${formData.country}&branch=${formData.branch}&category=${formData.category}`
+      );
+      const data = await response.json();
+      setFilteredUsers(data);
+    } catch (error) {
+      console.error("Error fetching filtered data:", error);
+    }
+  };
 
   const handleNotificationTypeChange = (type: NotificationType) => {
     setNotificationTypes((prev) =>
@@ -110,41 +122,109 @@ export default function NotificationsPage() {
     );
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
-  }
+  const handleInputChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const sendNotification = async (message: string, medium: string) => {
+    try {
+      const response = await fetch("/api/sendNotification", {
+        method: "POST",
+        body: JSON.stringify({ message, medium }),
+        headers: { "Content-Type": "application/json" },
+      });
+      if (!response.ok) {
+        throw new Error("Failed to send notification");
+      }
+      console.log("Notification sent successfully");
+    } catch (error) {
+      console.error("Error sending notification:", error);
+    }
+  };
+
+  const handlePreview = () => {
+    const selectedTemplate = templates.find(
+      (t) => t.id === formData.template
+    )?.content;
+    const message = formData.customMessage || selectedTemplate || "No message provided.";
+    alert(`Previewing Message:\n\n${message}`);
+  };
+
+  const handleBulkAssign = () => {
+    filteredUsers.forEach((user) => {
+      const selectedTemplate = templates.find(
+        (t) => t.id === formData.template
+      )?.content;
+      const message = formData.customMessage || selectedTemplate || "";
+      sendNotification(message, notificationTypes.join("/"));
+    });
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    console.log('Form submitted:', { notificationTypes, userTypes, ...formData })
-    // Here you would typically send this data to your backend
-    // For demonstration, let's add a new log entry
+    e.preventDefault();
+    handleBulkAssign();
+
     const newLog: NotificationLog = {
-      type: formData.template || 'Custom Notification',
+      type: formData.template || "Custom Notification",
       lastUpdate: new Date().toLocaleString(),
-      sentBy: 'Current Admin',
-      totalUsers: 100, // This would be calculated based on selected user types
+      sentBy: "Current Admin",
+      totalUsers: filteredUsers.length,
       lastSent: new Date().toLocaleString(),
-      medium: notificationTypes.join('/'),
-    }
-    setLogs(prev => [newLog, ...prev])
-  }
+      medium: notificationTypes.join("/"),
+    };
+    setLogs((prev) => [newLog, ...prev]);
+  };
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">Notifications</h1>
+      <h1 className="md:text-2xl text-xl font-bold mb-6">Notifications</h1>
 
+      {/* Filters Section */}
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle>Notification Setup</CardTitle>
+          <CardTitle className="text-lg mb-3">Filter Users</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex overflow-auto gap-4">
+            <Select name="country" onValueChange={(value) => handleInputChange({ target: { name: "country", value } } as any)}>
+              <SelectTrigger className="w-[130px]">
+                <SelectValue placeholder="Select Country" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="USA">USA</SelectItem>
+                <SelectItem value="Ghana">Ghana</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select name="branch" onValueChange={(value) => handleInputChange({ target: { name: "branch", value } } as any)}>
+              <SelectTrigger  className="w-[130px]">
+                <SelectValue placeholder="Select Branch" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="HQ">HQ</SelectItem>
+                <SelectItem value="West Branch">West Branch</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button  onClick={fetchFilteredData}>Fetch Users</Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Notification Setup */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="text-xl mb-3">Notification Setup</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <h2 className="text-lg font-semibold mb-2">Choose Notification Types</h2>
               <div className="flex space-x-4">
-                {(['SMS', 'Email', 'In-app'] as const).map(type => (
+                {(["SMS", "Email", "In-app"] as const).map((type) => (
                   <div key={type} className="flex items-center space-x-2">
                     <Checkbox
                       id={`type-${type}`}
@@ -160,7 +240,7 @@ export default function NotificationsPage() {
             <div>
               <h2 className="text-lg font-semibold mb-2">Select User Type</h2>
               <div className="flex flex-wrap gap-4">
-                {(['Admin Users', 'General Users', 'Parents', 'Absentees', 'Attendees'] as const).map(type => (
+                {(["Admin Users", "General Users", "Parents", "Absentees", "Attendees"] as const).map((type) => (
                   <div key={type} className="flex items-center space-x-2">
                     <Checkbox
                       id={`user-${type}`}
@@ -173,48 +253,9 @@ export default function NotificationsPage() {
               </div>
             </div>
 
+            {/* Add Recurring/Non-Recurring Alerts */}
             <div className="grid grid-cols-2 gap-4">
-              <Select name="country" onValueChange={(value) => handleInputChange({ target: { name: 'country', value } } as any)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Country" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="USA">USA</SelectItem>
-                  <SelectItem value="Ghana">Ghana</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select name="branch" onValueChange={(value) => handleInputChange({ target: { name: 'branch', value } } as any)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Branch" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="HQ">HQ</SelectItem>
-                  <SelectItem value="West Branch">West Branch</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select name="category" onValueChange={(value) => handleInputChange({ target: { name: 'category', value } } as any)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Management">Management</SelectItem>
-                  <SelectItem value="Staff">Staff</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select name="groupSubgroup" onValueChange={(value) => handleInputChange({ target: { name: 'groupSubgroup', value } } as any)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Group/Subgroup" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Group A">Group A</SelectItem>
-                  <SelectItem value="Subgroup B">Subgroup B</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select name="alertType" onValueChange={(value) => handleInputChange({ target: { name: 'alertType', value } } as any)}>
+              <Select name="alertType" onValueChange={(value) => handleInputChange({ target: { name: "alertType", value } } as any)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select Alert Type" />
                 </SelectTrigger>
@@ -223,77 +264,59 @@ export default function NotificationsPage() {
                   <SelectItem value="Non-Recurring">Non-Recurring</SelectItem>
                 </SelectContent>
               </Select>
-
-              {formData.alertType === 'Recurring' && (
-                <Select name="recurringStatus" onValueChange={(value) => handleInputChange({ target: { name: 'recurringStatus', value } } as any)}>
+              {formData.alertType === "Recurring" && (
+                <Select name="recurringStatus" onValueChange={(value) => handleInputChange({ target: { name: "recurringStatus", value } } as any)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select Recurring Status" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Daily">Daily</SelectItem>
                     <SelectItem value="Monthly">Monthly</SelectItem>
-                    <SelectItem value="Quarterly">Quarterly</SelectItem>
-                    <SelectItem value="Annually">Annually</SelectItem>
                   </SelectContent>
                 </Select>
               )}
-
-              {formData.alertType === 'Recurring' && (
-                <Input
-                  type="date"
-                  name="startingDate"
-                  placeholder="Starting Date"
-                  onChange={handleInputChange}
-                />
-              )}
-
-              {formData.alertType === 'Non-Recurring' && (
-                <Input
-                  type="date"
-                  name="nonRecurringDate"
-                  placeholder="Non-Recurring Date"
-                  onChange={handleInputChange}
-                />
-              )}
-
               <Input
-                type="time"
-                name="deliveryTime"
-                placeholder="Delivery Time"
+                type={formData.alertType === "Recurring" ? "date" : "time"}
+                placeholder={formData.alertType === "Recurring" ? "Start Date" : "Delivery Time"}
+                name={formData.alertType === "Recurring" ? "startingDate" : "deliveryTime"}
                 onChange={handleInputChange}
               />
             </div>
 
+            {/* Message Template */}
             <div>
               <h2 className="text-lg font-semibold mb-2">Message Template</h2>
-              <Select name="template" onValueChange={(value) => handleInputChange({ target: { name: 'template', value } } as any)}>
+              <Select name="template" onValueChange={(value) => handleInputChange({ target: { name: "template", value } } as any)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select Template" />
                 </SelectTrigger>
                 <SelectContent>
-                  {templates.map(template => (
-                    <SelectItem key={template.id} value={template.id}>{template.name}</SelectItem>
+                  {templates.map((template) => (
+                    <SelectItem key={template.id} value={template.id}>
+                      {template.name}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
               <Textarea
                 name="customMessage"
                 placeholder="Custom message or edit template here"
-                className="mt-2"
-                value={formData.customMessage || templates.find(t => t.id === formData.template)?.content || ''}
+                value={formData.customMessage || ""}
                 onChange={handleInputChange}
               />
             </div>
 
-            <div className="flex justify-end">
-              <Button type="submit">
-                Submit
+            <div className="flex justify-between">
+              <Button onClick={handlePreview} variant="outline">
+                Preview Message
               </Button>
+              <Button type="submit">Submit</Button>
             </div>
           </form>
         </CardContent>
       </Card>
 
+      {/* Logs Section */}
       <Card>
         <CardHeader>
           <CardTitle>Notification Logs</CardTitle>
@@ -302,37 +325,25 @@ export default function NotificationsPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Notification Type</TableHead>
-                <TableHead>Last Update</TableHead>
-                <TableHead>Sent By</TableHead>
-                <TableHead>Total Users</TableHead>
-                <TableHead>Last Notification Sent</TableHead>
-                <TableHead>Message Medium</TableHead>
+                {columns.map((column) => (
+                  <TableHead key={column.accessorKey}>{column.header}</TableHead>
+                ))}
               </TableRow>
             </TableHeader>
             <TableBody>
               {logs.map((log, index) => (
                 <TableRow key={index}>
-                  <TableCell>{log.type}</TableCell>
-                  <TableCell>{log.lastUpdate}</TableCell>
-                  <TableCell>{log.sentBy}</TableCell>
-                  <TableCell>{log.totalUsers}</TableCell>
-                  <TableCell>{log.lastSent}</TableCell>
-                  <TableCell>{log.medium}</TableCell>
+                  {columns.map((column) => (
+                    <TableCell key={column.accessorKey}>
+                      {log[column.accessorKey as keyof NotificationLog]}
+                    </TableCell>
+                  ))}
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </CardContent>
       </Card>
-
-      <div className="mt-6">
-        <Link href='/dashboard/view-notifications'>
-          <Button variant='default' className='bg-ds-primary text-ds-foreground'>
-            View Notifications
-          </Button>
-        </Link>
-      </div>
     </div>
   );
 }

@@ -13,6 +13,7 @@ import { Card } from "@/components/ui/card";
 
 
 export interface DeviceAssignment {
+    country: string;
     branch: string;                
     admins: string[];                
     devices: string[];              
@@ -24,8 +25,10 @@ const Page :React.FC  = ()=> {
   const [adminFilter, setAdminFilter] = useState("");
   const [assignments, setAssignments] = useState<DeviceAssignment[]>([]);
 
-  // Add new assignment
 const handleAssign = (newAssignment: DeviceAssignment) => {
+    if (!newAssignment.country) {
+        newAssignment.country = "Default Country"; // or any default value
+    }
     setAssignments([...assignments, newAssignment]);
 };
 
@@ -74,6 +77,7 @@ const handleAssign = (newAssignment: DeviceAssignment) => {
           data={assignments}
           branchFilter={branchFilter}
           adminFilter={adminFilter}
+          countryFilter="" // Add the appropriate value for countryFilter
           setAssignments={setAssignments}
         />
       </Card>

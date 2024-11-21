@@ -24,7 +24,7 @@ import {
 } from "@/schemas/third-party-provider-schema";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function CreateLocation() {
   const form = useForm<ThirdPartyProviderSchema>({
@@ -35,38 +35,53 @@ export default function CreateLocation() {
 
   const { control, handleSubmit, setValue } = form;
 
+  // State for accuracy
+  const [accuracy, setAccuracy] = useState<number | null>(null);
+  const [accuracyLevel, setAccuracyLevel] = useState<string | null>(null);
+
+  // Function to determine accuracy level
+  const determineAccuracyLevel = (accuracy: number) => {
+    if (accuracy <= 10) return "High";
+    if (accuracy <= 50) return "Average";
+    return "Low";
+  };
+
   // UseEffect for Auto-Generate Location
   useEffect(() => {
     if (typeof window !== "undefined" && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          const { latitude, longitude } = position.coords;
+          const { latitude, longitude, accuracy } = position.coords;
           setValue("latitude", latitude);
           setValue("longitude", longitude);
           setValue("radius", 0.02);
+          setAccuracy(accuracy);
+          setAccuracyLevel(determineAccuracyLevel(accuracy));
         },
         (error) => console.error("Geolocation error:", error)
       );
     }
   }, [setValue]);
 
-  const onSubmit: SubmitHandler<ThirdPartyProviderSchema> = async (values) => {
-    console.log("Form values submitted:", values);
-  };
-
   const autoGenerateLocation = () => {
     console.log("Auto-generating location...");
     if (typeof window !== "undefined" && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          const { latitude, longitude } = position.coords;
+          const { latitude, longitude, accuracy } = position.coords;
           setValue("latitude", latitude);
           setValue("longitude", longitude);
           setValue("radius", 0.02);
+          setAccuracy(accuracy);
+          setAccuracyLevel(determineAccuracyLevel(accuracy));
         },
         (error) => console.error("Geolocation error:", error)
       );
     }
+  };
+
+  const onSubmit: SubmitHandler<ThirdPartyProviderSchema> = (values) => {
+    console.log("Form values submitted:", values);
   };
 
   return (
@@ -169,16 +184,6 @@ export default function CreateLocation() {
           )}
         />
 
-        {/* Auto Generate Button */}
-        <Button
-          type="button"
-          onClick={autoGenerateLocation}
-          size="lg"
-          className="bg-ds-primary text-ds-foreground"
-        >
-          Auto Generate
-        </Button>
-
         {/* Radius */}
         <FormField
           control={control}
@@ -224,6 +229,36 @@ export default function CreateLocation() {
           )}
         />
 
+        {/* Accuracy Indicator */}
+        {accuracy !== null && (
+          <div className="text-sm text-gray-600">
+            Accuracy: {accuracy} meters (
+            <span
+              className={`font-bold ${
+                accuracyLevel === "Low"
+                  ? "text-red-500"
+                  : accuracyLevel === "Average"
+                  ? "text-yellow-500"
+                  : "text-green-500"
+              }`}
+            >
+              {accuracyLevel}
+            </span>
+            )
+          </div>
+        )}
+
+        {/* Auto Generate Button */}
+        <Button
+          type="button"
+          onClick={autoGenerateLocation}
+          size="lg"
+          className="bg-ds-primary text-ds-foreground hover:bg-ds-primary-dark"
+        >
+          Auto Generate
+        </Button>
+
+        {/* Save Button */}
         <Button
           type="submit"
           className="w-full rounded-lg bg-ds-primary px-8 py-2 text-ds-foreground hover:bg-ds-primary-dark"

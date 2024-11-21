@@ -19,7 +19,7 @@ const SchedulePage: React.FC = () => {
         <Button
           onClick={handleShow}
           variant="default"
-          className="bg-ds-primary text-ds-foreground"
+          className="bg-ds-primary text-ds-foreground hover:bg-ds-primary-dark"
         >
           {showCreateSchedule ? "Close Schedule" : "Add Schedule"}
         </Button>

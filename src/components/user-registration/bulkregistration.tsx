@@ -60,7 +60,23 @@ export default function BulkRegistration() {
   return (
     <div className="w-full mx-auto p-6">
       <Card className="p-4 py-6">
-        <h1 className="text-2xl font-bold mb-4">Bulk Registration</h1>
+
+        <div className="w-full flex justify-between items-center">
+          <h1 className="md:text-2xl text-lg font-bold mb-4">Bulk Registration</h1>
+          
+              {/* Download Template Button */}
+              <div>
+                <Button
+                  type="button"
+                  variant="default"
+                  onClick={downloadTemplate}
+                  className="w-full bg-ds-primary text-ds-foreground hover:bg-ds-primary-dark font-bold"
+                >
+                  Download Excel Template
+                </Button>
+              </div>
+
+        </div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             {/* Select Country */}
@@ -141,22 +157,12 @@ export default function BulkRegistration() {
               )}
             />
 
-            {/* Download Template Button */}
-            <div>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={downloadTemplate}
-                className="w-full"
-              >
-                Download Excel Template
-              </Button>
-            </div>
 
             {/* Submit Button */}
             <Button
               type="submit"
-              className="w-full bg-ds-primary text-ds-foreground"
+              variant='default'
+              className="w-full bg-ds-primary hover:bg-ds-primary-dark font-bold text-ds-foreground"
             >
               Submit
             </Button>

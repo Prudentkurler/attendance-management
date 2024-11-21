@@ -16,16 +16,17 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { DatePicker } from "@/components/ui/date-picker"
+import { DateRangePicker } from "@/components/DateRangePicker"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { LineChart, BarChart, PieChart } from "@/components/ui/chart"
+import   BarChart   from "@/components/attendance/BarChart"
+import  LineChart   from "@/components/attendance/LineChart"
 
 const Page = () => {
   const [currentDate, setCurrentDate] = useState('')
   const [filters, setFilters] = useState({
     dateInterval: 'today',
-    customStartDate: null,
-    customEndDate: null,
+    customStartDate: new Date(),
+    customEndDate: new Date(),
     schedule: 'all',
     country: 'all',
     region: 'all',
@@ -63,7 +64,29 @@ const Page = () => {
     setCurrentDate(`${day}${suffix} ${month} ${year}`)
   }
 
-  const handleFilterChange = (key, value) => {
+  interface Filters {
+    dateInterval: string;
+    customStartDate: Date | null;
+    customEndDate: Date | null;
+    schedule: string;
+    country: string;
+    region: string;
+    branch: string;
+    category: string;
+    group: string;
+    subgroup: string;
+  }
+
+  interface Stats {
+    totalEmployees: number;
+    lateArrivals: number;
+    onTime: number;
+    earlyDepartures: number;
+    absent: number;
+    timeOff: number;
+  }
+
+  const handleFilterChange = (key: keyof Filters, value: string | Date | null) => {
     setFilters(prev => ({ ...prev, [key]: value }))
   }
 
@@ -107,15 +130,17 @@ const Page = () => {
           </Select>
           {filters.dateInterval === 'custom' && (
             <>
-              <DatePicker
-                selected={filters.customStartDate}
-                onSelect={(date) => handleFilterChange('customStartDate', date)}
-                placeholderText="Start Date"
+              <DateRangePicker
+                startDate={filters.customStartDate as Date}
+                endDate={filters.customEndDate as Date}
+                onStartDateChange={(date) => handleFilterChange('customStartDate', date)}
+                onEndDateChange={(date) => handleFilterChange('customEndDate', date)}
               />
-              <DatePicker
-                selected={filters.customEndDate}
-                onSelect={(date) => handleFilterChange('customEndDate', date)}
-                placeholderText="End Date"
+              <DateRangePicker
+                startDate={filters.customStartDate as Date}
+                endDate={filters.customEndDate as Date}
+                onStartDateChange={(date) => handleFilterChange('customStartDate', date)}
+                onEndDateChange={(date) => handleFilterChange('customEndDate', date)}
               />
             </>
           )}
@@ -192,8 +217,8 @@ const Page = () => {
           <Button onClick={fetchAttendanceData}>Filter</Button>
           <Button variant="outline" onClick={() => setFilters({
             dateInterval: 'today',
-            customStartDate: null,
-            customEndDate: null,
+            customStartDate: new Date(),
+            customEndDate: new Date(),
             schedule: 'all',
             country: 'all',
             region: 'all',
@@ -305,12 +330,12 @@ const Page = () => {
       <div className="w-full h-[400px] flex flex-col md:flex-row gap-4 mt-8 mb-9">
         <Card className="md:w-[60%] w-full shadow-lg rounded-lg p-2">
           <CardContent className="w-full h-full">
-            <LineChart data={attendanceData} />
+            <LineChart  />
           </CardContent>
         </Card>
         <Card className="md:w-[40%] w-full h-[320px] md:h-full p-4">
           <CardContent className="w-full h-full">
-            <BarChart data={attendanceData} />
+            <BarChart  />
           </CardContent>
         </Card>
       </div>
@@ -335,7 +360,7 @@ const Page = () => {
                   <TableCell>40</TableCell>
                   <TableCell>50</TableCell>
                   <TableCell>
-                    <Button onClick={() => handleExportData(period)}>Download</Button>
+                    <Button onClick={() => handleExportData()}>Download</Button>
                   </TableCell>
                 </TableRow>
               ))}

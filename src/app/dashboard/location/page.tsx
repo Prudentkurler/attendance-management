@@ -18,13 +18,13 @@ const Page = () => {
   return (
     <div>
       <div className="w-full flex justify-between items-center">
-        <h3>Location Page</h3>
+        <h3>Clocking Location</h3>
 
         <div className="relative flex gap-2">
           <Button
-            size="sm"
+           
             variant="default"
-            className="flex gap-2 bg-ds-primary text-ds-foreground p-4"
+            className="flex text-sm md:text-lg gap-2 bg-ds-primary text-ds-foreground p-1 md:py-2 md:px-4 hover:bg-ds-primary-dark"
             onClick={handleDialogToggle}
           >
             <FaPlus />

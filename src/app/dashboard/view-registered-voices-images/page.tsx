@@ -195,7 +195,7 @@ export default function ViewRegisteredVoicesImages() {
                   <DialogTrigger asChild>
                     <Button variant="outline" onClick={() => setSelectedUser(user)}>Manage</Button>
                   </DialogTrigger>
-                  <DialogContent className="sm:max-w-[425px]">
+                  <DialogContent className="sm:max-w-[525px] p-6">
                     <DialogHeader>
                       <DialogTitle>Manage Biometric Data - {selectedUser?.name}</DialogTitle>
                     </DialogHeader>
@@ -205,20 +205,21 @@ export default function ViewRegisteredVoicesImages() {
                         <TabsTrigger value="image">Image</TabsTrigger>
                       </TabsList>
                       <TabsContent value="voice">
-                        <div className="space-y-4">
-                          <Button onClick={() => handleRecordVoice('CLOCK ME IN')} disabled={isRecording}>
-                            <Mic className="w-4 h-4 mr-2" />
+                        <div className="mt-5 mb-5 flex gap-3 items-center">
+                          <Button className=' font-bold ' onClick={() => handleRecordVoice('CLOCK ME IN')} disabled={isRecording}>
+                            <Mic  />
                             Record "CLOCK ME IN"
                           </Button>
-                          <Button onClick={() => handleRecordVoice('CLOCK ME OUT')} disabled={isRecording}>
-                            <Mic className="w-4 h-4 mr-2" />
+                          <Button className=' font-bold ' onClick={() => handleRecordVoice('CLOCK ME OUT')} disabled={isRecording}>
+                            <Mic className="" />
                             Record "CLOCK ME OUT"
                           </Button>
                           {recordingStatus === 'recording' && <p>Recording...</p>}
                           {recordingStatus === 'success' && <p>Recording successful</p>}
                           {recordingStatus === 'error' && <p>Recording failed</p>}
-                          <Button onClick={handleSubmitVoice} disabled={recordingStatus !== 'success'}>Submit Voice</Button>
+                         
                         </div>
+                        <Button className='bg-ds-primary text-ds-foreground font-bold hover:bg-ds-primary-dark' onClick={handleSubmitVoice} >Submit Voice</Button>
                       </TabsContent>
                       <TabsContent value="image">
                         <div className="space-y-4">
@@ -227,25 +228,25 @@ export default function ViewRegisteredVoicesImages() {
                             value={organizationCode}
                             onChange={(e) => setOrganizationCode(e.target.value)}
                           />
-                          <Button onClick={handleVerifyOrganization}>Verify Organization</Button>
+                          <Button className='font-semibold' onClick={handleVerifyOrganization}>Verify Organization</Button>
                           <Input
                             placeholder="Enter User ID"
                             value={userId}
                             onChange={(e) => setUserId(e.target.value)}
                           />
-                          <Button onClick={handleVerifyUser}>Verify User</Button>
-                          <Button onClick={handleCaptureImage}>
-                            <Camera className="w-4 h-4 mr-2" />
+                          <Button className='bg-ds-primary text-ds-foreground font-bold hover:bg-ds-primary-dark' onClick={handleVerifyUser}>Verify User</Button>
+                          <Button variant='outline'  onClick={handleCaptureImage}>
+                            <Camera className="w-4 h-4 mx-2" />
                             Capture Image
                           </Button>
-                          <Button onClick={handleUploadImage}>
-                            <Upload className="w-4 h-4 mr-2" />
+                          <Button variant='outline' onClick={handleUploadImage}>
+                            <Upload className="w-4 h-4 mx-2" />
                             Attach Image
                           </Button>
                           {imageSource && (
-                            <Button onClick={handleSubmitImage}>Submit Image</Button>
+                            <Button className='bg-ds-primary text-ds-foreground font-bold hover:bg-ds-primary-dark' onClick={handleSubmitImage}>Submit Image</Button>
                           )}
-                          <Button variant="outline">Read Instructions</Button>
+                          <Button variant="outline" className='font-bold'>Read Instructions</Button>
                         </div>
                       </TabsContent>
                     </Tabs>

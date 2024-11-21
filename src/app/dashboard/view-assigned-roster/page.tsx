@@ -164,7 +164,7 @@ export default function ViewAssignedRoster() {
         <h2 className="text-xl font-semibold">
           {format(selectedMonth, 'MMMM yyyy')}
         </h2>
-        <Button onClick={handleExport}>Export Roster</Button>
+        <Button className='bg-ds-primary text-ds-foreground font-bold hover:bg-ds-primary-dark' onClick={handleExport}>Export Roster</Button>
       </div>
 
       <div className="overflow-x-auto">

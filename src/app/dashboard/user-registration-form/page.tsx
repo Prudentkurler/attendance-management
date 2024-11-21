@@ -23,7 +23,7 @@ const Page = () => {
             <Button
               variant="default"
               size='sm'
-              className="flex gap-2 items-center bg-ds-primary text-ds-foreground"
+              className="flex gap-2 items-center bg-ds-primary hover:bg-ds-primary-dark font-bold text-ds-foreground"
               aria-label="Add new user"
             >
               <FaPlus className="text-md" />
@@ -43,7 +43,7 @@ const Page = () => {
             <Button
               variant="default"
               size="sm"
-              className="flex gap-2 items-center bg-ds-primary text-ds-foreground"
+              className="flex gap-2 items-center hover:bg-ds-primary-dark font-bold bg-ds-primary text-ds-foreground"
               aria-label="Add new user"
             >
               <FaPlus className="text-md" />

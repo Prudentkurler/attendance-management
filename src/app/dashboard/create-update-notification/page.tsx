@@ -45,7 +45,7 @@ export default function CreateUpdateNotifications() {
   return (
     <div className="p-6 w-full">
       <h1 className="text-2xl font-bold mb-4">Create/Update Notifications</h1>
-      <div className="grid grid-cols-2 gap-4 mb-4 overflow-auto">
+      <div className="grid grid-cols-2 gap-4 mb-4">
         <select name="country" onChange={handleFilterChange} className="border p-2 rounded text-sm">
           <option value="">Select Country</option>
           {/* Add country options */}

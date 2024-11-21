@@ -194,40 +194,8 @@ export default function ClockAttendance() {
         </div>
       ),
     },
-    { 
-      accessorKey: 'clockInTime', 
-      header: 'IN', 
-      cell: ({ row }: { row: any }) => {
-        const user = row.original;
-        return user.clockInTime ? (
-          <div>
-            {user.clockInTime}
-            {user.clockedBy && (
-              <div className="text-xs text-gray-500">
-                By {user.clockedBy}
-              </div>
-            )}
-          </div>
-        ) : '-';
-      }
-    },
-    { 
-      accessorKey: 'clockOutTime', 
-      header: 'OUT', 
-      cell: ({ row }: { row: any }) => {
-        const user = row.original;
-        return user.clockOutTime ? (
-          <div>
-            {user.clockOutTime}
-            {user.clockedBy && (
-              <div className="text-xs text-gray-500">
-                By {user.clockedBy}
-              </div>
-            )}
-          </div>
-        ) : '-';
-      }
-    },
+    
+    
     { 
       accessorKey: 'location', 
       header: 'Location',
@@ -267,15 +235,15 @@ export default function ClockAttendance() {
       cell: ({ row }: { row: any }) => (
         <div className="space-x-2">
           {activeTab === 'clockList' ? (
-            <Button onClick={() => console.log('Clock IN', row.original.id)}>
+            <Button className='bg-ds-primary text-ds-foreground font-bold hover:bg-ds-primary-dark' onClick={() => console.log('Clock IN', row.original.id)}>
               Clock IN
             </Button>
           ) : (
             <>
-              <Button onClick={() => console.log('Clock OUT', row.original.id)} className="bg-red-500 text-white">
+              <Button onClick={() => console.log('Clock OUT', row.original.id)} className="bg-red-500 font-bold text-white">
                 Clock OUT
               </Button>
-              <Button onClick={() => console.log('Cancel', row.original.id)} variant="outline">
+              <Button onClick={() => console.log('Cancel', row.original.id)} className='font-bold' variant="outline">
                 Cancel
               </Button>
             </>
@@ -292,7 +260,7 @@ export default function ClockAttendance() {
       {/* Tabs */}
       <div className="mb-4 flex space-x-4">
         <Button
-          className={`px-4 py-2 text-sm font-semibold rounded-lg ${
+          className={`px-4 py-2 text-sm font-bold rounded-lg ${
             activeTab === 'clockList' ? 'bg-red-500 text-white' : 'bg-gray-400 text-white'
           }`}
           onClick={() => setActiveTab('clockList')}
@@ -300,7 +268,7 @@ export default function ClockAttendance() {
           Clock List
         </Button>
         <Button
-          className={`px-4 py-2 text-sm font-semibold rounded-lg ${
+          className={`px-4 py-2 text-sm font-bold rounded-lg ${
             activeTab === 'clockedList' ? 'bg-red-500 text-white' : 'bg-gray-400 text-white'
           }`}
           onClick={() => setActiveTab('clockedList')}
@@ -450,7 +418,7 @@ export default function ClockAttendance() {
           className="w-full"
         />
         {activeTab === 'clockList' ? (
-          <Button onClick={() => handleBulkAction('in')}>
+          <Button className='bg-ds-primary text-ds-foreground hover:bg-ds-primary-dark font-bold' onClick={() => handleBulkAction('in')}>
             Bulk IN
           </Button>
         ) : (
@@ -486,7 +454,7 @@ export default function ClockAttendance() {
       </div>
 
       <div className="flex justify-end mt-6">
-        <Button size='sm' onClick={handleExportCSV} className="bg-ds-primary text-ds-foreground">
+        <Button size='sm' onClick={handleExportCSV} className="bg-ds-primary hover:bg-ds-primary-dark font-bold text-ds-foreground">
           Export CSV
         </Button>
       </div>

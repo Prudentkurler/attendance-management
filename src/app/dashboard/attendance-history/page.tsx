@@ -1,14 +1,21 @@
-"use client"
+"use client";
 
 // pages/attendance-history.tsx
-import React, { useState } from 'react';
-import { ColumnDef } from '@tanstack/react-table';
-import Image from 'next/image';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { DataTable } from '@/components/ui/data-table';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card } from '@/components/ui/card';
+import React, { useState } from "react";
+import { ColumnDef } from "@tanstack/react-table";
+import Image from "next/image";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { DataTable } from "@/components/ui/data-table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Card } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface AttendanceReport {
   id: string;
@@ -23,27 +30,72 @@ interface AttendanceReport {
   overtimeHours: number;
   lateHours: number;
   validated: boolean;
+  breakOverstay: number;
+  absentDays: number;
+  leaveDays: number;
+  excuseDutyDays: number;
 }
 
 interface DailyBreakdown {
   date: Date;
   clockIn: Date;
   clockOut: Date;
-  clockSource: 'Self' | 'Admin';
+  clockSource: "Self" | "Admin";
   hours: number;
-  status: 'On Time' | 'Late' | 'Early Leave';
+  status: "On Time" | "Late" | "Early Leave";
 }
 
 export default function AttendanceHistoryPage() {
-  const [viewType, setViewType] = useState<'summary' | 'breakdown'>('summary');
+  const [viewType, setViewType] = useState<"summary" | "breakdown">("summary");
   const [reports] = useState<AttendanceReport[]>([]);
   const [breakdowns] = useState<DailyBreakdown[]>([]);
   const [selectedReport, setSelectedReport] = useState<string | null>(null);
+  const [selectedReports, setSelectedReports] = useState<string[]>([]);
+
+  const handleToggleSelectAll = (checked: boolean) => {
+    setSelectedReports(checked ? reports.map((report) => report.id) : []);
+  };
+
+  const handleToggleSelect = (id: string) => {
+    setSelectedReports((prev) =>
+      prev.includes(id)
+        ? prev.filter((selectedId) => selectedId !== id)
+        : [...prev, id]
+    );
+  };
+
+  const handleViewBreakdown = (reportId: string) => {
+    setSelectedReport(reportId);
+    setViewType("breakdown");
+  };
+
+  const handleValidate = (reportId: string) => {
+    console.log("Validating report:", reportId);
+  };
+
+  const handleExport = () => {
+    console.log("Exporting data...");
+  };
 
   const summaryColumns: ColumnDef<AttendanceReport, unknown>[] = [
     {
-      accessorKey: 'user',
-      header: 'User',
+      id: "select",
+      header: ({ table }) => (
+        <Checkbox
+          checked={selectedReports.length === reports.length}
+          onCheckedChange={(checked) => handleToggleSelectAll(!!checked)}
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={selectedReports.includes(row.original.id)}
+          onCheckedChange={() => handleToggleSelect(row.original.id)}
+        />
+      ),
+    },
+    {
+      accessorKey: "user",
+      header: "User",
       cell: ({ row }) => (
         <div className="flex items-center">
           <Image
@@ -58,9 +110,13 @@ export default function AttendanceHistoryPage() {
         </div>
       ),
     },
+    { accessorKey: "breakOverstay", header: "Break Overstay (h)" },
+    { accessorKey: "absentDays", header: "Absent Days" },
+    { accessorKey: "leaveDays", header: "Leave Days" },
+    { accessorKey: "excuseDutyDays", header: "Excused Days" },
     {
-      accessorKey: 'clockEvents',
-      header: 'Clock Events',
+      accessorKey: "clockEvents",
+      header: "Clock Events",
       cell: ({ row }) => (
         <div>
           <div>In: {row.original.totalClockIns} (Admin: {row.original.adminClockIns})</div>
@@ -69,8 +125,8 @@ export default function AttendanceHistoryPage() {
       ),
     },
     {
-      accessorKey: 'hours',
-      header: 'Hours',
+      accessorKey: "hours",
+      header: "Hours",
       cell: ({ row }) => (
         <div>
           <div>Total: {row.original.totalHours}h</div>
@@ -80,31 +136,26 @@ export default function AttendanceHistoryPage() {
       ),
     },
     {
-      accessorKey: 'validation',
-      header: 'Validation',
+      accessorKey: "validation",
+      header: "Validation",
       cell: ({ row }) => (
-        <div className="flex items-center">
-          <span
-            className={`px-2 py-1 rounded-full text-sm ${
-              row.original.validated
-                ? 'bg-green-100 text-green-800'
-                : 'bg-yellow-100 text-yellow-800'
-            }`}
-          >
-            {row.original.validated ? 'Validated' : 'Pending'}
-          </span>
-        </div>
+        <span
+          className={`px-2 py-1 rounded-full text-sm ${
+            row.original.validated
+              ? "bg-green-100 text-green-800"
+              : "bg-yellow-100 text-yellow-800"
+          }`}
+        >
+          {row.original.validated ? "Validated" : "Pending"}
+        </span>
       ),
     },
     {
-      accessorKey: 'actions',
-      header: 'Actions',
+      accessorKey: "actions",
+      header: "Actions",
       cell: ({ row }) => (
         <div className="flex space-x-2">
-          <Button
-           size='lg'
-            onClick={() => handleViewBreakdown(row.original.id)}
-          >
+          <Button size="sm" onClick={() => handleViewBreakdown(row.original.id)}>
             View Details
           </Button>
           {!row.original.validated && (
@@ -122,29 +173,29 @@ export default function AttendanceHistoryPage() {
 
   const breakdownColumns: ColumnDef<DailyBreakdown, unknown>[] = [
     {
-      accessorKey: 'date',
-      header: 'Date',
+      accessorKey: "date",
+      header: "Date",
       cell: ({ row }) => row.original.date.toLocaleDateString(),
     },
     {
-      accessorKey: 'clockIn',
-      header: 'Clock In',
+      accessorKey: "clockIn",
+      header: "Clock In",
       cell: ({ row }) => row.original.clockIn.toLocaleTimeString(),
     },
     {
-      accessorKey: 'clockOut',
-      header: 'Clock Out',
+      accessorKey: "clockOut",
+      header: "Clock Out",
       cell: ({ row }) => row.original.clockOut.toLocaleTimeString(),
     },
     {
-      accessorKey: 'clockSource',
-      header: 'Source',
+      accessorKey: "clockSource",
+      header: "Source",
       cell: ({ row }) => (
         <span
           className={`px-2 py-1 rounded-full text-sm ${
-            row.original.clockSource === 'Self'
-              ? 'bg-blue-100 text-blue-800'
-              : 'bg-purple-100 text-purple-800'
+            row.original.clockSource === "Self"
+              ? "bg-blue-100 text-blue-800"
+              : "bg-purple-100 text-purple-800"
           }`}
         >
           {row.original.clockSource}
@@ -152,43 +203,28 @@ export default function AttendanceHistoryPage() {
       ),
     },
     {
-      accessorKey: 'hours',
-      header: 'Hours',
+      accessorKey: "hours",
+      header: "Hours",
       cell: ({ row }) => `${row.original.hours}h`,
     },
     {
-      accessorKey: 'status',
-      header: 'Status',
-      cell: () => (
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ row }) => (
         <span
           className={`px-2 py-1 rounded-full text-sm ${
-            status === 'On Time'
-              ? 'bg-green-100 text-green-800'
-              : status === 'Late'
-              ? 'bg-red-100 text-red-800'
-              : 'bg-yellow-100 text-yellow-800'
+            row.original.status === "On Time"
+              ? "bg-green-100 text-green-800"
+              : row.original.status === "Late"
+              ? "bg-red-100 text-red-800"
+              : "bg-yellow-100 text-yellow-800"
           }`}
         >
-          {status}
+          {row.original.status}
         </span>
       ),
     },
   ];
-
-  const handleViewBreakdown = (reportId: string) => {
-    setSelectedReport(reportId);
-    setViewType('breakdown');
-  };
-
-  const handleValidate = (reportId: string) => {
-    // Implementation for validation
-    console.log('Validating report:', reportId);
-  };
-
-  const handleExport = () => {
-    // Implementation for export
-    console.log('Exporting data...');
-  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -196,101 +232,81 @@ export default function AttendanceHistoryPage() {
         <h1 className="text-xl md:2xl font-bold">Attendance History</h1>
         <div className="flex space-x-4">
           <Button
-            className={` ${
-              viewType === 'summary'
-                ? 'bg-ds-primary text-white'
-                : 'bg-ds-foreground text-white'
+            className={`${
+              viewType === "summary"
+                ? "bg-ds-primary text-ds-foreground hover:bg-ds-primary-dark font-bold"
+                : "bg-gray-200 font-bold"
             }`}
-            onClick={() => setViewType('summary')}
+            onClick={() => setViewType("summary")}
           >
             Summary
           </Button>
-
           <Button
-            className={` ${
-              viewType === 'breakdown'
-              ? 'bg-ds-primary text-white'
-                : 'bg-ds-foreground text-white'
+            className={`${
+              viewType === "breakdown"
+                ? "bg-ds-primary text-ds-foreground hover:bg-ds-primary-dark font-bold"
+                : "bg-gray-200 font-bold"
             }`}
-            onClick={() => setViewType('breakdown')}
+            onClick={() => setViewType("breakdown")}
           >
             Breakdown
           </Button>
         </div>
       </div>
 
-      <Card className='p-3'>
-
-      <div className="bg-white  rounded-lg mb-3">
-      
-
-        <div className="flex overflow-auto  gap-4 ">
-          <Select value=''>
-            <SelectTrigger className='w-36'>
-              <SelectValue placeholder='User type'>
-
-              </SelectValue>
+      <Card className="p-3">
+        <div className="bg-white rounded-lg mb-3">
+          <div className="flex overflow-auto gap-4">
+            <Select value="">
+              <SelectTrigger className="w-36">
+                <SelectValue placeholder="User Type" />
               </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="userType">User Type</SelectItem>
-              {/* Add user type options */}
-            </SelectContent>
-         
-          </Select>
-          <Select value=''>
-            <SelectTrigger className='w-36'>
-              <SelectValue placeholder='User type'>
-
-              </SelectValue>
+              <SelectContent>
+                <SelectItem value="individual">Individual</SelectItem>
+                <SelectItem value="organization">Organization</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value="">
+              <SelectTrigger className="w-36">
+                <SelectValue placeholder="Schedule" />
               </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="userType">Scheduls</SelectItem>
-              {/* Add user type options */}
-            </SelectContent>
-         
-          </Select>
-
-        
-        <div>
-
-        </div>
-          <Input type='date' placeholder='Start Date' />
-          <Input type='date' placeholder='End Date' />
-
-          <Input
-          className='w-[150px] md:w-auto'
-            onChange={() => {}}
-            placeholder="Search by name or ID..."
-          />
-
+              <SelectContent>
+                <SelectItem value="morning">Morning Shift</SelectItem>
+                <SelectItem value="weekly">Weekly Roster</SelectItem>
+              </SelectContent>
+            </Select>
+            <Input type="date" placeholder="Start Date" />
+            <Input type="date" placeholder="End Date" />
+            <Input
+              className="w-[150px] md:w-auto"
+              placeholder="Search by name or ID..."
+            />
+          </div>
         </div>
 
-       
-      </div>
-
-      <div className="bg-white rounded-lg overflow-hidden">
-        {viewType === 'summary' ? (
-          <DataTable<AttendanceReport, unknown>
-            columns={summaryColumns}
-            data={reports}
-          />
-        ) : (
-          <DataTable<DailyBreakdown, unknown>
-            columns={breakdownColumns}
-            data={breakdowns}
-          />
-        )}
-
-      <div className="flex justify-end mt-3 ">
-          <Button
-          size='sm'
-            onClick={handleExport}
-            variant="destructive"
-          >
-            Export Report
-          </Button>
+        <div className="bg-white rounded-lg overflow-hidden">
+          {viewType === "summary" ? (
+            <DataTable<AttendanceReport, unknown>
+              columns={summaryColumns}
+              data={reports}
+            />
+          ) : (
+            <DataTable<DailyBreakdown, unknown>
+              columns={breakdownColumns}
+              data={breakdowns}
+            />
+          )}
+          <div className="flex justify-end mt-3">
+            <Button
+              size="sm"
+              onClick={handleExport}
+              variant="destructive"
+              className="font-bold"
+            >
+              Export Report
+            </Button>
+          </div>
         </div>
-      </div>
       </Card>
     </div>
   );

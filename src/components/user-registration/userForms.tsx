@@ -139,11 +139,12 @@ export default function UserRegistration() {
                 Previous
               </Button>
               {currentStep < sections.length - 1 ? (
-                <Button type="button" className="bg-ds-primary text-ds-foreground" onClick={handleNext}>
+                <Button type="button" className="bg-ds-primary font-bold hover:bg-ds-primary-dark text-ds-foreground" onClick={handleNext}>
                   Next
                 </Button>
               ) : (
-                <Button type="submit" className="bg-ds-primary text-ds-foreground">
+                <Button type="submit" className="bg-ds-primary font-bold
+                 hover:bg-ds-primary-dark text-ds-foreground">
                   Submit
                 </Button>
               )}
@@ -187,6 +188,7 @@ function PersonalDetailsSection({ form }: { form: any }) {
 function ContactDetailsSection({ form }: { form: any }) {
     return (
       <div>
+        <h4 className="text-ds-primary-dark mb-4 text-center">Personal Information</h4>
         <FormField
           control={form.control}
           name="contactDetails.phone"
@@ -302,6 +304,7 @@ function ContactDetailsSection({ form }: { form: any }) {
   function GroupingInfoSection({ form }: { form: any }) {
     return (
       <div>
+        <h4 className="text-ds-primary-dark mb-4 text-center"> Grouping Section</h4>
         <FormField
           control={form.control}
           name="groupingInfo.country"
@@ -376,6 +379,7 @@ function ContactDetailsSection({ form }: { form: any }) {
   function ParentGuardianDetailsSection({ form }: { form: any }) {
     return (
       <div>
+        <h4 className="text-ds-primary-dark mb-4 text-center">Parent/Gaurdian Information</h4>
         <FormField
           control={form.control}
           name="parentGuardianDetails.fatherName"

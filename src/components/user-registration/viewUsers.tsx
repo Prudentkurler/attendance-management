@@ -142,11 +142,15 @@ export default function ViewUsers() {
       cell: ({ row }) => (
         <DropdownMenu>
           <DropdownMenuTrigger>
-            <Button variant="ghost">Actions</Button>
+            <Button variant="ghost" className="font-bold text-xl">...</Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem>Edit</DropdownMenuItem>
-            <DropdownMenuItem>Delete</DropdownMenuItem>
+            <DropdownMenuItem>
+              <Button variant='default' size='sm'>Edit</Button>
+            </DropdownMenuItem>
+            <DropdownMenuItem >
+              <Button variant='destructive' size='sm'>Delete</Button>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       ),
