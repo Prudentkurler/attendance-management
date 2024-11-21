@@ -206,7 +206,7 @@ export default function ViewApproveDeviceRequests() {
 
       {/* Action Buttons */}
       <div className="flex gap-4">
-        <Button variant="default" onClick={handleApproveAll}>
+        <Button className="bg-ds-primary text-ds-foreground font-semibold hover:bg-ds-primary-dark" variant="default" onClick={handleApproveAll}>
           Approve All
         </Button>
         <Button variant="destructive" onClick={handleDeleteAll}>
