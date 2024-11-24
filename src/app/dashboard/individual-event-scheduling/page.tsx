@@ -1,3 +1,5 @@
+"use client"
+
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,7 +9,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DatePicker } from "@/components/ui/date-picker";
-import { TimePicker } from "@/components/ui/time-picker";
+import TimePicker  from "@/components/ui/TimePicker";
+import { DateRangePicker } from "@/components/DateRangePicker";
 
 const IndividualEventScheduling: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [isRecurring, setIsRecurring] = useState(false);
@@ -80,7 +83,12 @@ const IndividualEventScheduling: React.FC<{ onClose: () => void }> = ({ onClose 
       <div className="grid grid-cols-2 gap-4">
         <div>
           <Label>Start Date</Label>
-          <DatePicker />
+          <DateRangePicker 
+            startDate={new Date()} 
+            endDate={new Date()} 
+            onStartDateChange={(date) => console.log(date)} 
+            onEndDateChange={(date) => console.log(date)} 
+          />
         </div>
         <div>
           <Label>Start Time</Label>
@@ -91,7 +99,12 @@ const IndividualEventScheduling: React.FC<{ onClose: () => void }> = ({ onClose 
       <div className="grid grid-cols-2 gap-4">
         <div>
           <Label>End Date</Label>
-          <DatePicker />
+          <DateRangePicker 
+            startDate={new Date()} 
+            endDate={new Date()} 
+            onStartDateChange={(date) => console.log(date)} 
+            onEndDateChange={(date) => console.log(date)} 
+          />
         </div>
         <div>
           <Label>End Time</Label>
@@ -155,11 +168,20 @@ const IndividualEventScheduling: React.FC<{ onClose: () => void }> = ({ onClose 
           <div key={index} className="grid grid-cols-2 gap-4 mb-2">
             <div>
               <Label>Set Date</Label>
-              <DatePicker date={reminder.date} setDate={(date) => {
-                const newDates = [...reminderDates];
-                newDates[index].date = date;
-                setReminderDates(newDates);
-              }} />
+              <DateRangePicker 
+              startDate={new Date()} 
+              endDate={new Date()}  
+                onStartDateChange={(date: Date | null) => {
+                  const newDates = [...reminderDates];
+                  newDates[index].date = date;
+                  setReminderDates(newDates);
+                }} 
+                onEndDateChange={(date: Date | null) => {
+                  const newDates = [...reminderDates];
+                  newDates[index].date = date;
+                  setReminderDates(newDates);
+                }} 
+              />
             </div>
             <div>
               <Label>Set Time</Label>
