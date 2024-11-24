@@ -26,7 +26,7 @@ export default function AttendanceTable() {
   const [schedule, setSchedule] = React.useState<string | undefined>(undefined);
   const [status, setStatus] = React.useState<string | undefined>(undefined);
   const [nameSearch, setNameSearch] = React.useState<string>("");
-  const [genderFilter, setGenderFilter] = React.useState<string | undefined>("All");
+ 
   const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(undefined);
  
   const [showAdvancedFilter, setShowAdvancedFilter] = React.useState(false);
@@ -57,8 +57,7 @@ export default function AttendanceTable() {
       const matchesName = nameSearch
         ? attendee.name.toLowerCase().includes(nameSearch.toLowerCase())
         : true;
-      const matchesGender =
-        genderFilter === "All" ? true : attendee.gender === genderFilter;
+      
 
       // Date filter: only match if selectedDate matches the attendee's start_date
       const matchesDate = selectedDate
@@ -67,10 +66,10 @@ export default function AttendanceTable() {
         : true;
 
       return matchesCountry && matchesBranch && matchesRegion && matchesGroup && matchesSubgroup &&
-        matchesSchedule && matchesStatus && matchesName && matchesGender && matchesDate;
+        matchesSchedule && matchesStatus && matchesName  && matchesDate;
     });
     setFilteredData(filtered);
-  }, [country, branch, region, group, subgroup, schedule, status, nameSearch, genderFilter, selectedDate]);
+  }, [country, branch, region, group, subgroup, schedule, status, nameSearch, selectedDate]);
 
 
 
@@ -85,7 +84,6 @@ export default function AttendanceTable() {
     setSchedule(undefined);
     setStatus(undefined);
     setNameSearch("");
-    setGenderFilter("All");
     setSelectedDate(undefined);
   };
 
@@ -135,7 +133,7 @@ export default function AttendanceTable() {
         
         {/* Advanced filter */}
         <Card className="rounded-md">
-          <Button className="flex gap-2 items-center bg-ds-primary" onClick={handleAdvancedFilterOpen}>
+          <Button className="flex gap-2 items-center bg-ds-primary hover:bg-ds-primary-dark" onClick={handleAdvancedFilterOpen}>
             <FaSliders className="text-white text-md"/>
             <h5>Advanced Filter</h5>
           </Button>
@@ -170,33 +168,11 @@ export default function AttendanceTable() {
             </Select>
           ))}
 
-          {/* Gender Filter */}
-          <div className="gender-filter flex gap-2">
-            <label className="flex items-center space-x-2">
-              <Checkbox
-                checked={genderFilter === "All"}
-                onCheckedChange={() => setGenderFilter("All")}
-              />
-              <span>All</span>
-            </label>
-            <label className="flex items-center space-x-2">
-              <Checkbox
-                checked={genderFilter === "Males"}
-                onCheckedChange={() => setGenderFilter("Males")}
-              />
-              <span>Males</span>
-            </label>
-            <label className="flex items-center space-x-2">
-              <Checkbox
-                checked={genderFilter === "Females"}
-                onCheckedChange={() => setGenderFilter("Females")}
-              />
-              <span>Females</span>
-            </label>
-          </div>
+         
+           
 
           {/* Clear Filters */}
-          <Button onClick={clearFilters} className="flex items-center gap-2 bg-blue-700">
+          <Button onClick={clearFilters} className="flex items-center gap-2">
             Clear Filters
           </Button>
         </div>

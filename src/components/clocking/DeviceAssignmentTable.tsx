@@ -19,12 +19,12 @@ interface DeviceAssignmentTableProps {
   }[];
   branchFilter: string;
   adminFilter: string;
-  countryFilter:string;
+  countryFilter: string;
   setAssignments: React.Dispatch<
     React.SetStateAction<
       {
         branch: string;
-        country:string;
+        country: string;
         admins: string[];
         devices: string[];
       }[]
@@ -33,26 +33,55 @@ interface DeviceAssignmentTableProps {
 }
 
 interface AssignmentData {
-  country:string;
+  country: string;
   branch: string;
   admins: string[];
   devices: string[];
 }
 
+const sampleData: { country: string; branch: string; admins: string[]; devices: string[] }[] = [
+  {
+    country: "Ghana",
+    branch: "Accra",
+    admins: ["John Doe", "Jane Smith"],
+    devices: ["Laptop 1", "Laptop 2", "Desktop 1"],
+  },
+  {
+    country: "Ghana",
+    branch: "Kumasi",
+    admins: ["Michael Johnson", "Sarah Lee"],
+    devices: ["Tablet 1", "Tablet 2", "Desktop 2"],
+  },
+  {
+    country: "Nigeria",
+    branch: "Lagos",
+    admins: ["Adekunle Ajayi", "Fatima Bello"],
+    devices: ["Smartphone 1", "Smartphone 2", "Laptop 3"],
+  },
+  {
+    country: "Nigeria",
+    branch: "Abuja",
+    admins: ["Chika Okorie", "Amina Suleiman"],
+    devices: ["Desktop 3", "Desktop 4", "Tablet 3"],
+  },
+];
+
 export default function DeviceAssignmentTable({
   data,
   branchFilter,
   adminFilter,
+  countryFilter,
   setAssignments,
 }: DeviceAssignmentTableProps) {
   const [selectedAssignments, setSelectedAssignments] = useState<number[]>([]);
 
-  // Filter data based on branch and admin name
-  const filteredData = data.filter(
+  // Filter data based on branch, admin name, and country
+  const filteredData = sampleData.filter(
     (assignment) =>
       (branchFilter === "" || assignment.branch === branchFilter) &&
       (adminFilter === "" ||
-        assignment.admins.some((admin) => admin.includes(adminFilter)))
+        assignment.admins.some((admin) => admin.includes(adminFilter))) &&
+      (countryFilter === "" || assignment.country === countryFilter)
   );
 
   // Toggle selection for a single row
@@ -93,21 +122,7 @@ export default function DeviceAssignmentTable({
 
   // Add checkbox and action columns to table
   const columns: ColumnDef<AssignmentData>[] = [
-    {
-      id: "select",
-      header: ({ table }) => (
-        <Checkbox
-          checked={areAllSelected}
-          onCheckedChange={(checked) => toggleSelectAll(!!checked)}
-        />
-      ),
-      cell: ({ row, table }) => (
-        <Checkbox
-          checked={selectedAssignments.includes(row.index)}
-          onCheckedChange={() => toggleSelection(row.index)}
-        />
-      ),
-    },
+  
     {
       accessorKey: "country",
       header: "Country",
@@ -132,22 +147,43 @@ export default function DeviceAssignmentTable({
       cell: ({ row }) => (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon">
-              &#x22EE; {/* Vertical three dots */}
+            <Button variant="ghost" size="icon" className="font-bold">
+              ...
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem onClick={() => handleEdit(row.index)}>
-              Edit
+              <Button variant='default'>
+                Edit
+              </Button>
+              
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => handleDelete(row.index)}
-              className="text-red-600"
+              className="font-semibold"
             >
-              Delete
+              <Button variant='destructive'>
+                Delete
+              </Button>
+              
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+      ),
+    },
+    {
+      id: "select",
+      header: ({ table }) => (
+        <Checkbox
+          checked={areAllSelected}
+          onCheckedChange={(checked) => toggleSelectAll(!!checked)}
+        />
+      ),
+      cell: ({ row, table }) => (
+        <Checkbox
+          checked={selectedAssignments.includes(row.index)}
+          onCheckedChange={() => toggleSelection(row.index)}
+        />
       ),
     },
   ];

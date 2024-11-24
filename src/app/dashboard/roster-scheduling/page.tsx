@@ -8,19 +8,26 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card } from '@/components/ui/card';
 import { format, eachDayOfInterval, startOfMonth, endOfMonth } from 'date-fns';
+import { ColumnDef } from '@tanstack/react-table';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
-type User = {
-  id: string;
-  name: string;
-  image: string;
-  schedules: { [key: string]: string };
-};
+// Removed redundant User type definition
 
 type Schedule = {
   id: string;
   name: string;
   abbreviation: string;
 };
+
+
+interface User {
+  id: string;
+  name: string;
+  schedules: { [date: string]: string };
+  leave: { [date: string]: boolean };
+  excuse: { [date: string]: boolean };
+}
 
 export default function RosterScheduling() {
   const [filters, setFilters] = useState({
@@ -36,28 +43,9 @@ export default function RosterScheduling() {
     time: '',
   });
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+
   const [selectedDates, setSelectedDates] = useState<string[]>([]);
-  const [users, setUsers] = useState<User[]>([
-    {
-      id: '1',
-      name: 'Helena Abbey',
-      image: '/placeholder.svg?height=50&width=50',
-      schedules: {},
-    },
-    {
-      id: '2',
-      name: 'Daniel Ababio',
-      image: '/placeholder.svg?height=50&width=50',
-      schedules: {},
-    },
-    {
-      id: '3',
-      name: 'Yaw Ansah',
-      image: '/placeholder.svg?height=50&width=50',
-      schedules: {},
-    },
-  ]);
+ 
   const [schedules, setSchedules] = useState<Schedule[]>([
     { id: '1', name: 'Day Shift', abbreviation: 'DS' },
     { id: '2', name: 'Afternoon Shift', abbreviation: 'AS' },
@@ -100,7 +88,7 @@ export default function RosterScheduling() {
     const csvHeader = ['ID', 'Name', 'Image URL', ...dateRange].join(',');
     const csvRows = users.map((user) => {
       const scheduleValues = dateRange.map((date) => user.schedules[date] || '');
-      return [user.id, user.name, user.image, ...scheduleValues].join(',');
+      return [user.id, user.name, ...scheduleValues].join(',');
     });
 
     const csvContent = [csvHeader, ...csvRows].join('\n');
@@ -159,56 +147,173 @@ export default function RosterScheduling() {
     }
   };
 
-  const columns = [
+  const [users, setUsers] = useState<User[]>([
     {
-      accessorKey: 'name',
-      header: 'Name',
-      cell: ({ row }: { row: any }) => (
-        <div className="flex items-center">
-          <img src={row.original.image} alt={row.original.name} className="w-8 h-8 rounded-full mr-2" />
-          {row.original.name}
-        </div>
-      ),
+      id: 'user1',
+      name: 'User 1',
+      schedules: {
+        '2023-05-01': 'DS',
+        '2023-05-02': 'AS',
+        '2023-05-03': 'DS',
+      },
+      leave: {
+        '2023-05-04': true,
+      },
+      excuse: {
+        '2023-05-05': true,
+      },
     },
-    ...dateRange.map((date) => ({
-      accessorKey: date,
-      header: format(new Date(date), 'EEE d'),
-      cell: ({ row }: { row: any }) => {
-        const schedule = row.original.schedules[date];
-        let bgColor = 'bg-white';
-        if (schedule) {
-          bgColor = 'bg-green-500 text-white';
-        } else if (Math.random() < 0.1) { // Simulating leave (10% chance)
-          bgColor = 'bg-red-500';
-        } else if (Math.random() < 0.1) { // Simulating excuse duty (10% chance)
-          bgColor = 'bg-orange-500';
+    {
+      id: 'user2',
+      name: 'User 2',
+      schedules: {
+        '2023-05-01': 'AS',
+        '2023-05-02': 'DS',
+        '2023-05-03': 'AS',
+      },
+      leave: {
+        '2023-05-04': true,
+      },
+      excuse: {
+        '2023-05-05': true,
+      },
+    },
+    {
+      id: 'user3',
+      name: 'User 3',
+      schedules: {
+        '2023-05-01': 'DS',
+        '2023-05-02': 'DS',
+        '2023-05-03': 'AS',
+      },
+      leave: {
+        '2023-05-04': true,
+      },
+      excuse: {
+        '2023-05-05': true,
+      },
+    },]);
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+  const [selectedSchedule, setSelectedSchedule] = useState<string>('');
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+
+  
+  const handleUserSelect = (userId: string) => {
+    if (selectedUsers.includes(userId)) {
+      setSelectedUsers(selectedUsers.filter((id) => id !== userId));
+    } else {
+      setSelectedUsers([...selectedUsers, userId]);
+    }
+  };
+
+  const handleScheduleSelect = (schedule: string) => {
+    setSelectedSchedule(schedule);
+  };
+
+  const handleDateSelect = (date: Date) => {
+    if (!startDate) {
+      setStartDate(date);
+      setEndDate(new Date(date.getFullYear(), date.getMonth() + 1, 0));
+    } else {
+      setStartDate(null);
+      setEndDate(null);
+    }
+  };
+
+  const handleAssignRoster = () => {
+    // Assign the selected schedule to the selected users for the selected date range
+    selectedUsers.forEach((userId) => {
+      const user = users.find((u) => u.id === userId);
+      if (user) {
+        for (let i = startDate?.getDate() || 0; i <= (endDate?.getDate() || 0); i++) {
+          const date = new Date(startDate?.getFullYear() || 0, startDate?.getMonth() || 0, i);
+          user.schedules[date.toISOString().slice(0, 10)] = selectedSchedule;
         }
+      }
+    });
+    setSelectedUsers([]);
+    setSelectedSchedule('');
+    setStartDate(null);
+    setEndDate(null);
+  };
+
+  interface ColumnRenderProps {
+    name: string;
+    user: User;
+  }
+
+  const columns: ColumnDef<User>[] = [
+    {
+      header: 'User',
+      accessorKey: 'name',
+      cell: ({ row }: { row: { original: User } }) => {
+        const user = row.original;
         return (
-          <button
-            className={`p-2 rounded w-full h-full ${bgColor}`}
-            onClick={() => handleAssignSchedule(row.original.id, date)}
-          >
-            {schedule || ''}
-          </button>
+          <div className="flex items-center space-x-2">
+            <Checkbox checked={selectedUsers.includes(user.id)} onChange={() => handleUserSelect(user.id)} />
+            <span>{user.name}</span>
+          </div>
         );
       },
-    })),
-    {
-      accessorKey: 'action',
-      header: 'Action',
-      cell: ({ row }: { row: any }) => (
-        <div className="flex space-x-2">
-          <Button onClick={() => handleAssignSchedule(row.original.id, '')} >
-            Assigned
-          </Button>
-          <Button onClick={() => handleAssignSchedule(row.original.id, '')} className="bg-red-500 text-white">
-            Unassigned
-          </Button>
-        </div>
-      ),
-    }, 
+    },
+    ...Array.from({ length: (endDate?.getDate() || 0) - (startDate?.getDate() || 0) + 1 }, (_, i) => {
+      const date = new Date(startDate?.getFullYear() || 0, startDate?.getMonth() || 0, (startDate?.getDate() || 0) + i);
+      const dateStr = date.toISOString().slice(0, 10);
+      return {
+        header: date.toDateString(),
+        accessorKey: dateStr,
+        cell: ({ row }: { row: { original: User } }) => {
+          const user = row.original;
+          return (
+            <div className="flex items-center justify-between">
+              {user.schedules[dateStr] ? (
+                <span className={`${user.leave[dateStr] ? 'text-red-500' : user.excuse[dateStr] ? 'text-orange-500' : ''}`}>
+                  {user.schedules[dateStr]}
+                </span>
+              ) : (
+                '-'
+              )}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="ml-2 text-gray-500 hover:text-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                      <path
+                        fillRule="evenodd"
+                        d="M12 3.75a.75.75 0 01.75.75v6.75h6.75a.75.75 0 010 1.5h-6.75v6.75a.75.75 0 01-1.5 0v-6.75H4.5a.75.75 0 010-1.5h6.75V4.5a.75.75 0 01.75-.75z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  {/* Render schedule options for this date here */}
+                  <button onClick={() => handleScheduleSelect('DS')}>Day Shift</button>
+                  <button onClick={() => handleScheduleSelect('AS')}>Afternoon Shift</button>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              {user.leave[dateStr] && (
+                <Tooltip>
+                  <TooltipTrigger>
+                    <span className="text-red-500">L</span>
+                  </TooltipTrigger>
+                  <TooltipContent>On Leave</TooltipContent>
+                </Tooltip>
+              )}
+              {user.excuse[dateStr] && (
+                <Tooltip>
+                  <TooltipTrigger>
+                    <span className="text-orange-500">E</span>
+                  </TooltipTrigger>
+                  <TooltipContent>On Excuse</TooltipContent>
+                </Tooltip>
+              )}
+            </div>
+          );
+        },
+      };
+    }),
   ];
-
   return (
     <Card className="p-6 max-w-full mx-auto space-y-6">
       <h1 className="text-2xl font-bold">Roster Scheduling</h1>

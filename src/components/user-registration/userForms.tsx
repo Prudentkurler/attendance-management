@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/form";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "../ui/label";
 
 const registrationSchema = z.object({
   personalDetails: z.object({
@@ -191,6 +192,84 @@ function ContactDetailsSection({ form }: { form: any }) {
         <h4 className="text-ds-primary-dark mb-4 text-center">Personal Information</h4>
         <FormField
           control={form.control}
+          name="contactDetails.FirstName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>FirstName</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="Enter FirstName" />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="contactDetails.MiddleName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>MiddleName</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="Enter MiddleName" />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="contactDetails.LastName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>LastName</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="Enter LastName" />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="contactDetails.DateOfBirth"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Date Of Birth</FormLabel>
+              <FormControl>
+                <Input {...field} type="date"  />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+        <FormField
+  control={form.control}
+  name="contactDetails.gender"
+  render={({ field }) => (
+    <FormItem className="mb-4">
+      <FormLabel>Gender</FormLabel>
+      <FormControl>
+        <div className="flex gap-4 mb-3">
+          <div className="flex items-center space-x-2">
+            <Checkbox 
+              id="male" 
+              checked={field.value === "male"} 
+              onCheckedChange={() => field.onChange("male")} 
+            />
+            <Label htmlFor="male">Male</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox 
+              id="female" 
+              checked={field.value === "female"} 
+              onCheckedChange={() => field.onChange("female")} 
+            />
+            <Label htmlFor="female">Female</Label>
+          </div>
+        </div>
+      </FormControl>
+    </FormItem>
+  )}
+/>
+
+        <FormField
+          control={form.control}
           name="contactDetails.phone"
           render={({ field }) => (
             <FormItem>
@@ -297,6 +376,18 @@ function ContactDetailsSection({ form }: { form: any }) {
             </FormItem>
           )}
         />
+        <FormField
+          control={form.control}
+          name="contactDetails.disability"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Disability</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="Do you have any disability?" />
+              </FormControl>
+            </FormItem>
+          )}
+        />
       </div>
     );
   }
@@ -379,7 +470,7 @@ function ContactDetailsSection({ form }: { form: any }) {
   function ParentGuardianDetailsSection({ form }: { form: any }) {
     return (
       <div>
-        <h4 className="text-ds-primary-dark mb-4 text-center">Parent/Gaurdian Information</h4>
+        <h4 className="text-ds-primary-dark mb-4 text-center">Parent/Guardian Information</h4>
         <FormField
           control={form.control}
           name="parentGuardianDetails.fatherName"

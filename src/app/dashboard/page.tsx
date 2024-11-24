@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from "react"
 import { CgSearch } from "react-icons/cg"
-import { LuFilter } from "react-icons/lu"
-import { BiSort } from "react-icons/bi"
 import { FiSun } from "react-icons/fi"
 import { PiUsersFill } from "react-icons/pi"
 import { HiPlusCircle } from "react-icons/hi"
@@ -104,6 +102,12 @@ const Page = () => {
     fetchAttendanceData()
   }, [filters])
 
+  const [showMoreFilters, setShowMoreFilters] = useState<boolean>(false)
+
+  const handleShowFilters = ()=>{
+    setShowMoreFilters(!showMoreFilters)
+  }
+
   return (
     <div className="py-4 md:px-8 px-4 flex flex-col gap-8">
       <div className="flex justify-between items-center flex-col sm:flex-row gap-4">
@@ -114,6 +118,12 @@ const Page = () => {
         </div>
       </div>
 
+      <Button variant='default' className="font-semibold  mb-5 md:w-[200px]" onClick={handleShowFilters}>Show Filters</Button>
+
+      {
+        showMoreFilters && (
+
+       
       <Card className="p-4">
         <CardContent className="flex flex-wrap gap-4">
           <Select onValueChange={(value) => handleFilterChange('dateInterval', value)}>
@@ -144,6 +154,10 @@ const Page = () => {
               />
             </>
           )}
+
+          
+
+          
           <Select onValueChange={(value) => handleFilterChange('schedule', value)}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Schedule" />
@@ -230,9 +244,12 @@ const Page = () => {
         </CardContent>
       </Card>
 
+)
+}
+
       <div className="flex flex-col md:flex-row gap-3 w-full items-center">
         <Card className="w-full md:w-1/3 h-[240px] flex gap-3 items-center justify-center rounded-lg">
-          <FiSun className="text-6xl text-gray-400"/>
+          <FiSun className="text-6xl text-ds-primary"/>
           <div className="flex flex-col gap-1">
             <p className="text-4xl text-gray-400 mt-8 font-semibold">{new Date().toLocaleTimeString()}</p>
             <p className="text-md text-indigo-950 font-semibold">{currentDate}</p>
@@ -340,6 +357,8 @@ const Page = () => {
         </Card>
       </div>
 
+     
+
       <Card>
         <CardContent>
           <Table>
@@ -353,7 +372,7 @@ const Page = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {['Today', 'Yesterday', '3 days ago', 'This Week', 'Last Week', 'This Month'].map((period) => (
+              {['Today', 'Yesterday', '3 days ago', 'Last Week','Last 2 Months','Last 3 Months', ' Last year'].map((period) => (
                 <TableRow key={period}>
                   <TableCell>{period}</TableCell>
                   <TableCell>100</TableCell>

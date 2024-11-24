@@ -184,20 +184,7 @@ export default function CreateLocation() {
           )}
         />
 
-        {/* Radius */}
-        <FormField
-          control={control}
-          name="radius"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Radius (km)</FormLabel>
-              <FormControl>
-                <Input {...field} type="number" placeholder="Enter radius" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+       
 
         {/* WiFi ID (Optional) */}
         <FormField
@@ -223,6 +210,21 @@ export default function CreateLocation() {
               <FormLabel>Bluetooth Device ID (Optional)</FormLabel>
               <FormControl>
                 <Input {...field} type="text" placeholder="Enter Bluetooth Device ID" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+         {/* Radius */}
+         <FormField
+          control={control}
+          name="radius"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Radius (km)</FormLabel>
+              <FormControl>
+                <Input {...field} type="number" placeholder="Enter radius" />
               </FormControl>
               <FormMessage />
             </FormItem>

@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Checkbox } from "@/components/ui/checkbox";
-import { TimePicker } from "@/components/ui/time-picker";
+import TimePicker  from "@/components/ui/time-picker";
 
 const IndividualAttendanceScheduling: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [scheduleCategory, setScheduleCategory] = useState("longPeriod");
@@ -74,11 +74,11 @@ const IndividualAttendanceScheduling: React.FC<{ onClose: () => void }> = ({ onC
         <div className="grid grid-cols-2 gap-4">
           <div>
             <Label>Start Date</Label>
-            <DatePicker date={startDate} setDate={setStartDate} />
+            <DatePicker selectedDate={startDate} onDateChange={(date: Date| undefined) => setStartDate(date)} />
           </div>
           <div>
             <Label>End Date</Label>
-            <DatePicker date={endDate} setDate={setEndDate} />
+            <DatePicker selectedDate={endDate} onDateChange={(date: Date | undefined) => setEndDate(date)} />
           </div>
         </div>
       )}
@@ -130,7 +130,7 @@ const IndividualAttendanceScheduling: React.FC<{ onClose: () => void }> = ({ onC
         </div>
       )}
 
-      <Button type="submit" className="w-full">Next</Button>
+      <Button type="submit" className="w-[150px] bg-ds-primary text-ds-foreground font-semibold hover:bg-ds-primary-dark">Next</Button>
     </form>
   );
 };

@@ -163,21 +163,7 @@ export default function ClockAttendance() {
   });
 
   const columns = [
-    {
-      accessorKey: 'Select',
-      header: () => (
-        <Checkbox
-          checked={selectedUsers.length === filteredUsers.length}
-          onCheckedChange={handleCheckAll}
-        />
-      ),
-      cell: ({ row }: { row: any }) => (
-        <Checkbox
-          checked={selectedUsers.includes(row.original.id)}
-          onCheckedChange={() => handleUserSelect(row.original.id)}
-        />
-      ),
-    },
+  
     {
       accessorKey: 'name',
       header: 'Image/Name',
@@ -191,6 +177,28 @@ export default function ClockAttendance() {
             height={32}
           />
           {row.original.name}
+        </div>
+      ),
+    },
+    {
+      accessorKey: 'action',
+      header: 'Action',
+      cell: ({ row }: { row: any }) => (
+        <div className="space-x-2">
+          {activeTab === 'clockList' ? (
+            <Button className='bg-ds-primary text-ds-foreground font-bold hover:bg-ds-primary-dark' onClick={() => console.log('Clock IN', row.original.id)}>
+              Clock IN
+            </Button>
+          ) : (
+            <>
+              <Button onClick={() => console.log('Clock OUT', row.original.id)} className="bg-red-500 font-bold text-white">
+                Clock OUT
+              </Button>
+              <Button onClick={() => console.log('Cancel', row.original.id)} className='font-bold' variant="outline">
+                Cancel
+              </Button>
+            </>
+          )}
         </div>
       ),
     },
@@ -229,29 +237,29 @@ export default function ClockAttendance() {
     },
     { accessorKey: 'lastSeen', header: 'Last Seen' },
     { accessorKey: 'status', header: 'Status' },
+ 
     {
-      accessorKey: 'action',
-      header: 'Action',
+      accessorKey: 'Select',
+      header: () => (
+        <Checkbox
+          checked={selectedUsers.length === filteredUsers.length}
+          onCheckedChange={handleCheckAll}
+        />
+      ),
       cell: ({ row }: { row: any }) => (
-        <div className="space-x-2">
-          {activeTab === 'clockList' ? (
-            <Button className='bg-ds-primary text-ds-foreground font-bold hover:bg-ds-primary-dark' onClick={() => console.log('Clock IN', row.original.id)}>
-              Clock IN
-            </Button>
-          ) : (
-            <>
-              <Button onClick={() => console.log('Clock OUT', row.original.id)} className="bg-red-500 font-bold text-white">
-                Clock OUT
-              </Button>
-              <Button onClick={() => console.log('Cancel', row.original.id)} className='font-bold' variant="outline">
-                Cancel
-              </Button>
-            </>
-          )}
-        </div>
+        <Checkbox
+          checked={selectedUsers.includes(row.original.id)}
+          onCheckedChange={() => handleUserSelect(row.original.id)}
+        />
       ),
     },
   ];
+
+  const [showFilters, setShowFilters] = useState(false);
+
+  const handleShowFilters = ()=>{
+    setShowFilters(!showFilters)
+  }
 
   return (
     <Card className="p-4 max-w-full gap-6 flex flex-col mx-auto">
@@ -278,7 +286,12 @@ export default function ClockAttendance() {
       </div>
 
       {/* Filters */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
+
+      {
+        showFilters && (
+
+       <div className='flex flex-col gap-3'>
+      <div className="flex md:flex-row flex-col w-full  gap-4 mb-6">
         <Select onValueChange={(value) => handleFilterChange('userType', value)}>
           <SelectTrigger>
             <SelectValue placeholder="Select User Type" />
@@ -334,11 +347,7 @@ export default function ClockAttendance() {
             <SelectItem value="Subgroup2">Subgroup 2</SelectItem>
           </SelectContent>
         </Select>
-        <Input
-          placeholder="Search User [Name/ID]"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+       
         <Select onValueChange={(value) => handleFilterChange('location', value)}>
           <SelectTrigger>
             <SelectValue placeholder="Select Location" />
@@ -359,15 +368,30 @@ export default function ClockAttendance() {
           </SelectContent>
         </Select>
       </div>
+       <Input
+       placeholder="Search User [Name/ID]"
+       value={searchTerm}
+       onChange={(e) => setSearchTerm(e.target.value)}
+       className='w-full md:w-1/2 py-3'
+     />
+     </div>
 
+)
+}
+      <Button onClick={handleShowFilters} className="mb-1 w-1/2 md:w-[150px] font-semibold">
+        {showFilters ? 'Hide Filters' : ' Filters'}
+      </Button>
       {/* More Filters */}
-      <div className="mb-4">
-        <Button onClick={() => setShowMoreFilters(!showMoreFilters)}>
+      <div className="mb-2">
+        <Button className='font-semibold' onClick={() => setShowMoreFilters(!showMoreFilters)}>
           {showMoreFilters ? 'Hide More Filters' : 'Show More Filters'}
         </Button>
       </div>
       {showMoreFilters && (
-        <div className="grid grid-cols-3 gap-4 mb-6">
+
+
+        <div >
+          <div className="flex items-center md:flex-row flex-col gap-4 mb-6">
           <Select onValueChange={(value) => handleFilterChange('schedule', value)}>
             <SelectTrigger>
               <SelectValue placeholder="Select Schedule" />
@@ -403,20 +427,19 @@ export default function ClockAttendance() {
             onChange={(e) => handleFilterChange('setTime', e.target.value)}
           />
         </div>
-      )}
 
-      <Button onClick={clearFilters} variant="outline" className="w-full mb-6">
-        Clear Filters
-      </Button>
-
-      {/* Bulk Actions */}
-      <div className="flex items-center gap-4 mb-6">
+              {/* Bulk Actions */}
+      <div className="flex flex-col items-center gap-4 mb-6">
         <Textarea
           value={clockReason}
           onChange={(e) => setClockReason(e.target.value)}
           placeholder="Reason for clocking"
           className="w-full"
         />
+
+        <div className='flex w-full flex-row-reverse gap-4 items-center'>
+          
+        
         {activeTab === 'clockList' ? (
           <Button className='bg-ds-primary text-ds-foreground hover:bg-ds-primary-dark font-bold' onClick={() => handleBulkAction('in')}>
             Bulk IN
@@ -431,19 +454,32 @@ export default function ClockAttendance() {
             </Button>
           </>
         )}
-      </div>
+      
 
       {/* Bulk IDs Input */}
-      <div className="mb-6">
+      <div className="mb-6 w-full">
         <Label htmlFor="bulkIds">Paste Bulk Clock-In/Out IDs</Label>
         <Textarea
           id="bulkIds"
           value={bulkIds}
           onChange={(e) => setBulkIds(e.target.value)}
-          placeholder="Enter user IDs separated by commas"
+          placeholder="Enter user IDs "
           className="mt-2"
         />
+        </div>
+        </div>
       </div>
+      
+        </div>
+
+        
+      )}
+
+      <Button onClick={clearFilters} size='default' variant="outline" className=" w-[100px] mb-6">
+        Clear Filters
+      </Button>
+
+  
 
       {/* Data Table */}
       <DataTable columns={columns} data={filteredUsers} />

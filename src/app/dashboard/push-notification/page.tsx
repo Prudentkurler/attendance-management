@@ -180,6 +180,11 @@ export default function NotificationsPage() {
     setLogs((prev) => [newLog, ...prev]);
   };
 
+    const [showFilters, setShowFilters] = useState<boolean>(false)
+
+    const handleShowFilters = ()=>{
+      setShowFilters(!showFilters)
+    }
   return (
     <div className="container mx-auto p-6">
       <h1 className="md:text-2xl text-xl font-bold mb-6">Notifications</h1>
@@ -189,8 +194,10 @@ export default function NotificationsPage() {
         <CardHeader>
           <CardTitle className="text-lg mb-3">Filter Users</CardTitle>
         </CardHeader>
+        {
+          showFilters && (
         <CardContent>
-          <div className="flex overflow-auto gap-4">
+          <div className="flex flex-col md:flex-row gap-4">
             <Select name="country" onValueChange={(value) => handleInputChange({ target: { name: "country", value } } as any)}>
               <SelectTrigger className="w-[130px]">
                 <SelectValue placeholder="Select Country" />
@@ -209,10 +216,31 @@ export default function NotificationsPage() {
                 <SelectItem value="West Branch">West Branch</SelectItem>
               </SelectContent>
             </Select>
+            <Select name="category" onValueChange={(value) => handleInputChange({ target: { name: "category", value } } as any)}>
+              <SelectTrigger className="w-[130px]">
+                <SelectValue placeholder="Select Category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Management">Management</SelectItem>
+                <SelectItem value="Staff">Staff</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select name="groupSubgroup" onValueChange={(value) => handleInputChange({ target: { name: "groupSubgroup", value } } as any)}>
+              <SelectTrigger className="w-[130px]">
+                <SelectValue placeholder="Select Group/Subgroup" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Group A">Group A</SelectItem>
+                <SelectItem value="Subgroup B">Subgroup B</SelectItem>
+              </SelectContent>
+            </Select>
             <Button  onClick={fetchFilteredData}>Fetch Users</Button>
           </div>
         </CardContent>
+          )}
       </Card>
+
+      <Button variant='default' size='lg' className="font-semibold" onClick={handleShowFilters}>Filters</Button>
 
       {/* Notification Setup */}
       <Card className="mb-6">
@@ -271,13 +299,25 @@ export default function NotificationsPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Daily">Daily</SelectItem>
-                    <SelectItem value="Monthly">Monthly</SelectItem>
+                    <SelectItem value="Monthly">Weekly</SelectItem>
+                    <SelectItem value="Quarterly">Monthly</SelectItem>
+                    <SelectItem value="Quarterly">Every 3 months</SelectItem>
+                    <SelectItem value="Quarterly">Every 6 months</SelectItem>
+                    <SelectItem value="Annually">Annually</SelectItem>
                   </SelectContent>
                 </Select>
               )}
+              {formData.alertType === "Non-Recurring" && (
+                <Input
+                  type="date"
+                  placeholder="Non-Recurring Date"
+                  name="nonRecurringDate"
+                  onChange={handleInputChange}
+                />
+              )}
               <Input
                 type={formData.alertType === "Recurring" ? "date" : "time"}
-                placeholder={formData.alertType === "Recurring" ? "Start Date" : "Delivery Time"}
+                placeholder={formData.alertType === "Recurring" ? "Starting Date" : "Delivery Time"}
                 name={formData.alertType === "Recurring" ? "startingDate" : "deliveryTime"}
                 onChange={handleInputChange}
               />
@@ -286,7 +326,11 @@ export default function NotificationsPage() {
             {/* Message Template */}
             <div>
               <h2 className="text-lg font-semibold mb-2">Message Template</h2>
-              <Select name="template" onValueChange={(value) => handleInputChange({ target: { name: "template", value } } as any)}>
+              <Select name="template" onValueChange={(value) => {
+                handleInputChange({ target: { name: "template", value } } as any);
+                const selectedTemplate = templates.find((t) => t.id === value)?.content;
+                setFormData((prev) => ({ ...prev, customMessage: selectedTemplate || "" }));
+              }}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select Template" />
                 </SelectTrigger>
@@ -301,7 +345,7 @@ export default function NotificationsPage() {
               <Textarea
                 name="customMessage"
                 placeholder="Custom message or edit template here"
-                value={formData.customMessage || ""}
+                value={formData.customMessage}
                 onChange={handleInputChange}
               />
             </div>
@@ -310,7 +354,7 @@ export default function NotificationsPage() {
               <Button onClick={handlePreview} variant="outline">
                 Preview Message
               </Button>
-              <Button type="submit">Submit</Button>
+              <Button type="submit" className="bg-ds-primary text-ds-foreground font-semibold hover:bg-ds-primary-dark">Submit</Button>
             </div>
           </form>
         </CardContent>
@@ -326,7 +370,12 @@ export default function NotificationsPage() {
             <TableHeader>
               <TableRow>
                 {columns.map((column) => (
-                  <TableHead key={column.accessorKey}>{column.header}</TableHead>
+                  <TableHead
+                    key={column.accessorKey}
+                    className={column.accessorKey === "type" ? "sticky left-0 bg-white" : ""}
+                  >
+                    {column.header}
+                  </TableHead>
                 ))}
               </TableRow>
             </TableHeader>
@@ -334,7 +383,10 @@ export default function NotificationsPage() {
               {logs.map((log, index) => (
                 <TableRow key={index}>
                   {columns.map((column) => (
-                    <TableCell key={column.accessorKey}>
+                    <TableCell
+                      key={column.accessorKey}
+                      className={column.accessorKey === "type" ? "sticky left-0 bg-white" : ""}
+                    >
                       {log[column.accessorKey as keyof NotificationLog]}
                     </TableCell>
                   ))}
@@ -347,3 +399,4 @@ export default function NotificationsPage() {
     </div>
   );
 }
+   

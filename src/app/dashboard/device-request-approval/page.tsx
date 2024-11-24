@@ -39,26 +39,7 @@ const columns = (
   onDelete: (id: number) => void,
   filteredData: DeviceRequest[]
 ) => [
-  {
-    accessorKey: "select",
-    header: () => (
-      <Checkbox
-        checked={selectedRequests.length === filteredData.length && filteredData.length > 0}
-        onCheckedChange={(isChecked) => {
-          const allRowIds = filteredData.map((row) => row.id);
-          handleCheckboxChange(-1, !!isChecked, allRowIds);
-        }}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }: { row: { original: DeviceRequest } }) => (
-      <Checkbox
-        checked={selectedRequests.includes(row.original.id)}
-        onCheckedChange={(isChecked) => handleCheckboxChange(row.original.id, !!isChecked)}
-        aria-label="Select row"
-      />
-    ),
-  },
+ 
   { accessorKey: "name", header: "Requester", cell: ({ row }: { row: { original: DeviceRequest } }) => row.original.name },
   { accessorKey: "branch", header: "Branch", cell: ({ row }: { row: { original: DeviceRequest } }) => row.original.branch },
   { accessorKey: "deviceInfo", header: "Device ID", cell: ({ row }: { row: { original: DeviceRequest } }) => row.original.deviceInfo },
@@ -94,6 +75,26 @@ const columns = (
           Delete
         </Button>
       </div>
+    ),
+  },
+  {
+    accessorKey: "select",
+    header: () => (
+      <Checkbox
+        checked={selectedRequests.length === filteredData.length && filteredData.length > 0}
+        onCheckedChange={(isChecked) => {
+          const allRowIds = filteredData.map((row) => row.id);
+          handleCheckboxChange(-1, !!isChecked, allRowIds);
+        }}
+        aria-label="Select all"
+      />
+    ),
+    cell: ({ row }: { row: { original: DeviceRequest } }) => (
+      <Checkbox
+        checked={selectedRequests.includes(row.original.id)}
+        onCheckedChange={(isChecked) => handleCheckboxChange(row.original.id, !!isChecked)}
+        aria-label="Select row"
+      />
     ),
   },
 ];
@@ -169,13 +170,13 @@ export default function ViewApproveDeviceRequests() {
       <h2 className="text-xl  md:text-2xl font-semibold">View/Approve Device Requests</h2>
 
       {/* Filters */}
-      <div className="flex gap-4 flex-col md:flex-row items-center">
+      <div className="flex gap-4 flex-col md:flex-row ">
         <Input
           placeholder="Search Name/ID"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <div className="px-2 flex gap-3 overflow-auto items-center">
+        <div className="w-full px-2 flex gap-3 flex-wrap items-center">
 
         <Select value={branchFilter} onValueChange={setBranchFilter}>
           <SelectTrigger>
@@ -198,10 +199,10 @@ export default function ViewApproveDeviceRequests() {
             <SelectItem value="denied">Denied</SelectItem>
           </SelectContent>
         </Select>
-        <Button variant="destructive" onClick={clearFilters}>
+        </div>
+        <Button className="w-[150px]" variant="default" onClick={clearFilters}>
           Clear
         </Button>
-        </div>
       </div>
 
       {/* Action Buttons */}

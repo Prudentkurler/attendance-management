@@ -161,7 +161,7 @@ export default function ViewRegisteredVoicesImages() {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>User Image/Name</TableHead>
+            <TableHead className='sticky left-0 z-10 bg-white'>User Image/Name</TableHead>
             <TableHead>Date/Time</TableHead>
             <TableHead>Voice Status</TableHead>
             <TableHead>Image Status</TableHead>
@@ -171,21 +171,21 @@ export default function ViewRegisteredVoicesImages() {
         <TableBody>
           {filteredUsers.map((user) => (
             <TableRow key={user.id}>
-              <TableCell className="flex items-center space-x-2">
+              <TableCell className="flex items-center space-x-2 sticky left-0 bg-white z-10">
                 <img src={user.image} alt={user.name} className="w-8 h-8 rounded-full" />
                 <span>{user.name}</span>
               </TableCell>
               <TableCell>{user.registrationDate}</TableCell>
               <TableCell>
                 {user.voiceStatus === 'Available' ? (
-                  <span className="text-green-500 flex items-center"><Check className="w-4 h-4 mr-1" /> Available</span>
+                  <span className="text-green-800 flex items-center"><Check className="w-4 h-4 mr-1" /> Available</span>
                 ) : (
                   <span className="text-red-500 flex items-center"><X className="w-4 h-4 mr-1" /> Empty</span>
                 )}
               </TableCell>
               <TableCell>
                 {user.imageStatus === 'Available' ? (
-                  <span className="text-green-500 flex items-center"><Check className="w-4 h-4 mr-1" /> Available</span>
+                  <span className="text-green-800 flex items-center"><Check className="w-4 h-4 mr-1" /> Available</span>
                 ) : (
                   <span className="text-red-500 flex items-center"><X className="w-4 h-4 mr-1" /> Empty</span>
                 )}

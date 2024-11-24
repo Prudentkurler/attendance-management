@@ -24,6 +24,7 @@ const Page :React.FC  = ()=> {
   const [branchFilter, setBranchFilter] = useState("");
   const [adminFilter, setAdminFilter] = useState("");
   const [assignments, setAssignments] = useState<DeviceAssignment[]>([]);
+  const [countryFilter, setCountryFilter] = useState("");
 
 const handleAssign = (newAssignment: DeviceAssignment) => {
     if (!newAssignment.country) {
@@ -74,11 +75,11 @@ const handleAssign = (newAssignment: DeviceAssignment) => {
 
         {/* Device Assignment Table */}
         <DeviceAssignmentTable
-          data={assignments}
-          branchFilter={branchFilter}
-          adminFilter={adminFilter}
-          countryFilter="" // Add the appropriate value for countryFilter
-          setAssignments={setAssignments}
+        data={assignments}
+        branchFilter={branchFilter}
+        adminFilter={adminFilter}
+        countryFilter={countryFilter}
+        setAssignments={setAssignments}
         />
       </Card>
     </div>

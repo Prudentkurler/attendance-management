@@ -193,9 +193,18 @@ const ViewLocationTable = () => {
   const uniqueLocationNames = Array.from(new Set(data.map((entry) => entry.locationName)));
   const uniqueLastUpdated = Array.from(new Set(data.map((entry) => entry.lastUpdated)));
 
+  const [showFilters, setShowFilters] = useState<boolean>(false)
+
+  const handleShowFilters = ()=>{
+    setShowFilters(!showFilters)
+  }
+
   return (
     <Card className="mt-8 p-4 w-full">
       {/* Filter Controls */}
+
+      {
+        showFilters &&(
       <div className="mb-4 flex gap-4 w-full flex-row flex-wrap lg:flex-nowrap overflow-auto">
         <Select value={selectCountry} onValueChange={(value) => setCountry(value)}>
           <SelectTrigger>
@@ -267,6 +276,9 @@ const ViewLocationTable = () => {
           Clear Filters
         </Button>
       </div>
+      )}
+
+      <Button size='lg' className="my-4 font-semibold" onClick={handleShowFilters}>Filters</Button>
 
       {/* Data Table */}
       <DataTable columns={columns} data={filterData} />

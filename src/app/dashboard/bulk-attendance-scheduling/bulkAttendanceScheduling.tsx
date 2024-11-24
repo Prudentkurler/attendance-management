@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { DatePicker } from "@/components/ui/date-picker";
+import { DatePicker } from '@/components/ui/date-picker'
 
 const BulkAttendanceScheduling: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [scheduleType, setScheduleType] = useState("longPeriod");
@@ -69,11 +69,11 @@ const BulkAttendanceScheduling: React.FC<{ onClose: () => void }> = ({ onClose }
         <div className="grid grid-cols-2 gap-4">
           <div>
             <Label>Start Date</Label>
-            <DatePicker date={startDate} setDate={setStartDate} />
+            <DatePicker selectedDate={startDate} onDateChange={setStartDate} />
           </div>
           <div>
             <Label>End Date</Label>
-            <DatePicker date={endDate} setDate={setEndDate} />
+            <DatePicker selectedDate={endDate} onDateChange={setEndDate} />
           </div>
         </div>
       )}
