@@ -1,3 +1,4 @@
+"use client"
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -7,7 +8,11 @@ import { DatePicker } from "@/components/ui/date-picker";
 import { Checkbox } from "@/components/ui/checkbox";
 import TimePicker  from "@/components/ui/time-picker";
 
-const IndividualAttendanceScheduling: React.FC<{ onClose: () => void }> = ({ onClose }) => {
+interface IndividualAttendanceSchedulingProps {
+  onClose: () => void;
+}
+
+const IndividualAttendanceScheduling = ({ onClose }: IndividualAttendanceSchedulingProps) =>  {
   const [scheduleCategory, setScheduleCategory] = useState("longPeriod");
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);

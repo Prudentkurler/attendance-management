@@ -29,13 +29,13 @@ const SchedulePage: React.FC = () => {
       </div>
 
       {showCreateSchedule && (
-        <Tabs defaultValue="individual" className="w-full px-5">
+        <Tabs defaultValue="individual" className="w-full px-6 py-2">
           <TabsList>
             <TabsTrigger value="individual">Individual Scheduling</TabsTrigger>
             <TabsTrigger value="bulk">Bulk Scheduling</TabsTrigger>
           </TabsList>
           <TabsContent value="individual" >
-            <IndividualAttendanceScheduling onClose={handleShow} />
+            <IndividualAttendanceScheduling />
           </TabsContent>
           <TabsContent value="bulk">
             <BulkAttendanceScheduling onClose={handleShow} />

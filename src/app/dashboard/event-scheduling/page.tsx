@@ -3,9 +3,9 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import IndividualEventScheduling from "@/components/event/individualEventScheduling";
-import BulkEventScheduling from "@/components/event/bulkEventScheduling";
-import ViewEventsCalendar from "@/components/event/viewEventsCalendar";
+import IndividualEventScheduling from "@/app/dashboard/individual-event-scheduling/page";
+import BulkEventScheduling from "@/app/dashboard/bulk-event-scheduling/bulkEventScheduling";
+import ViewEventsCalendar from "@/app/dashboard/event-scheduling/page";
 
 const EventSchedulePage: React.FC = () => {
   const [showCreateEvent, setShowCreateEvent] = useState(false);
