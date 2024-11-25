@@ -127,12 +127,21 @@ const UpdateSchedulePage: React.FC = () => {
     console.log("Deleting schedule:", id);
   };
 
+  const [showFilters, setShowFilters] = useState<boolean>(false)
+
+  const handleShowFilters = ()=>{
+    setShowFilters(!showFilters)
+  }
+
   return (
     <Card className=" mt-8 w-full">
     <div className="container w-full">
-      <h1 className="text-2xl font-bold mb-4">Update Schedules</h1>
+      <h1 className="text-lg md:text-2xl font-bold mb-4">Update Schedules</h1>
 
       {/* Filters */}
+
+      {
+        showFilters && (
       <form onSubmit={handleSubmit(onFilterSubmit)} className="flex gap-4 flex-col md:flex-wrap md:flex-row mb-6 w-full ">
         <div>
           
@@ -236,6 +245,18 @@ const UpdateSchedulePage: React.FC = () => {
         </div>
       </form>
 
+)
+}
+      <div className="w-full flex justify-end items-center">
+        <Button
+          onClick={handleShowFilters}
+          variant="default"
+          className="font-semibold mb-3"
+        >
+          {showFilters ? "Hide Filters" : "Show Filters"}
+        </Button>
+
+      </div>
       {/* Data Table */}
       <DataTable columns={columns} data={filteredData} />
     </div>

@@ -361,10 +361,26 @@ export default function ViewUsers() {
   const groupInput = useRef<HTMLSelectElement>(null);
   const subgroupInput = useRef<HTMLSelectElement>(null);
   const statusInput = useRef<HTMLSelectElement>(null);
+
+
+  const [showFilters, setShowFilters] = useState<boolean>(false)
+
+  const handleShowFilters =()=>{
+    setShowFilters(!showFilters)
+  }
  
   return (
     <Card className="w-full p-2 md:p-4 m-0">
+
+
+
+      
+     
       {/* Filters Section */}
+
+      {
+        showFilters &&(
+
       <div className="flex flex-col md:flex-row gap-4 mb-4">
         <Input
           className="w-[150px] md:w-auto"
@@ -444,7 +460,7 @@ export default function ViewUsers() {
             <SelectItem value="Deactivated">Deactivated</SelectItem>
           </SelectContent>
         </Select>
-        <Button onClick={() => setFilters({
+        <Button className="w-1/3 md:w-[150px]" onClick={() => setFilters({
           userType: "",
           country: "",
           branch: "",
@@ -458,6 +474,11 @@ export default function ViewUsers() {
           Clear Filters
         </Button>
       </div>
+
+)
+}
+
+<Button className="font-semibold" onClick={handleShowFilters}>Filters</Button>
 
 
         {/* Action Buttons */}

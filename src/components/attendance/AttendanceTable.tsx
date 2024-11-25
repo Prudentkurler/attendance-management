@@ -89,8 +89,8 @@ export default function AttendanceTable() {
 
   return (
     <div className="p-4">
-      <div className="w-full flex items-center justify-between py-3">
-        <h1 className="text-2xl">Attendance Table</h1>
+      <div className="w-full flex flex-wrap items-center justify-between py-3">
+        <h1 className="text-2xl mb-3 md:mb-0"> Table</h1>
         
         {/* Name Search Filter */}
         <Input
@@ -98,11 +98,11 @@ export default function AttendanceTable() {
           placeholder="Search..."
           value={nameSearch}
           onChange={(e) => setNameSearch(e.target.value)}
-          className="w-[30%] p-2"
+          className="w-[30%] p-2 mb-3 md:mb-0"
         />
 
         {/* Date Filter with Calendar */}
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 mb-3 md:mb-0">
 
 
           <Card className="flex flex-col gap-1 rounded-md">

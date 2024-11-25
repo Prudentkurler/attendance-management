@@ -190,12 +190,12 @@ export default function NotificationsPage() {
       <h1 className="md:text-2xl text-xl font-bold mb-6">Notifications</h1>
 
       {/* Filters Section */}
+        {
+          showFilters && (
       <Card className="mb-6">
         <CardHeader>
           <CardTitle className="text-lg mb-3">Filter Users</CardTitle>
         </CardHeader>
-        {
-          showFilters && (
         <CardContent>
           <div className="flex flex-col md:flex-row gap-4">
             <Select name="country" onValueChange={(value) => handleInputChange({ target: { name: "country", value } } as any)}>
@@ -237,10 +237,10 @@ export default function NotificationsPage() {
             <Button  onClick={fetchFilteredData}>Fetch Users</Button>
           </div>
         </CardContent>
-          )}
       </Card>
+          )}
 
-      <Button variant='default' size='lg' className="font-semibold" onClick={handleShowFilters}>Filters</Button>
+      <Button variant='default' size='lg' className="font-semibold mb-3" onClick={handleShowFilters}>Filters</Button>
 
       {/* Notification Setup */}
       <Card className="mb-6">
