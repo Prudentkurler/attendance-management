@@ -372,7 +372,7 @@ const Page = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {['Today', 'Yesterday', '3 days ago', 'Last Week','Last 2 Months','Last 3 Months', ' Last year'].map((period) => (
+              {['Today', 'Yesterday', '3 days ago', 'Last Week','Last 2 Months','Last 3 Months', "Last 5 Months", ' Last year'].map((period) => (
                 <TableRow key={period}>
                   <TableCell>{period}</TableCell>
                   <TableCell>100</TableCell>
