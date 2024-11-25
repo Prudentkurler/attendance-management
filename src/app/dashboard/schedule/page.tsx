@@ -5,13 +5,16 @@ import { Button } from "@/components/ui/button";
 import UpdateSchedulePage from "@/components/schedule/viewSchedule";
 import CreateSchedule from "@/components/schedule/createSchedule";
 import BulkAttendanceScheduling from "@/app/dashboard/bulk-attendance-scheduling/bulkAttendanceScheduling";
-import IndividualAttendanceScheduling from "@/app/dashboard/individual-attendance-scheduling/page";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import IndividualEventScheduling from "@/components/individual-event-scheduling/IndividualEventSceduling";
+
+
 
 const SchedulePage: React.FC = () => {
   const [showCreateSchedule, setShowCreateSchedule] = useState(false);
 
-  const handleShow = () => {
+  const handleShow = (): void => {
     setShowCreateSchedule(!showCreateSchedule);
   };
 
@@ -35,7 +38,7 @@ const SchedulePage: React.FC = () => {
             <TabsTrigger value="bulk">Bulk Scheduling</TabsTrigger>
           </TabsList>
           <TabsContent value="individual" >
-            <IndividualAttendanceScheduling />
+            <IndividualEventScheduling onClose={handleShow} />
           </TabsContent>
           <TabsContent value="bulk">
             <BulkAttendanceScheduling onClose={handleShow} />

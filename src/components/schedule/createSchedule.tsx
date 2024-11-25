@@ -10,27 +10,93 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { DatePicker } from "@/components/ui/date-picker";
+import TimePicker from "@/components/ui/time-picker";
+import { useForm, Controller } from "react-hook-form";
 
 type ScheduleType = "Attendance" | "Event";
 type ScheduleCategory = "Long Period" | "Weekly/Monthly Roster";
 
+interface Schedule {
+  id: number;
+  name: string;
+  branch: string;
+  startTime: string;
+  closingTime: string;
+  assignedUsers: number;
+  location: string;
+}
+
+interface FilterForm {
+  country: string;
+  branch: string;
+  category: string;
+  scheduleType: string;
+  scheduleLocation: string;
+}
+
 const CreateSchedule: React.FC<{ onClose: () => void }> = ({ onClose }) => {
+  const { control, handleSubmit: handleFilterSubmit, reset } = useForm<FilterForm>();
   const [scheduleType, setScheduleType] = useState<ScheduleType>("Attendance");
   const [bulkUpload, setBulkUpload] = useState(false);
   const [scheduleCategory, setScheduleCategory] = useState<ScheduleCategory>("Long Period");
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
+  const [hasBreak, setHasBreak] = useState(false);
+  const [filteredData, setFilteredData] = useState<Schedule[]>([]);
+
+
 
   const handleClear = () => {
-    // Reset all form fields here
+    reset();
     setScheduleType("Attendance");
     setBulkUpload(false);
     setScheduleCategory("Long Period");
-    // Reset other form fields as needed
+    setStartDate(undefined);
+    setEndDate(undefined);
+    setHasBreak(false);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Handle form submission
     console.log("Form submitted");
+  };
+
+  // Filter form submission
+  const onFilterSubmit = (data: FilterForm) => {
+    console.log("Filter Data:", data);
+    // Fetch filtered data based on form inputs
+    setFilteredData([
+      {
+        id: 1,
+        name: "Morning Shift",
+        branch: "HQ",
+        startTime: "08:00 AM",
+        closingTime: "05:00 PM",
+        assignedUsers: 120,
+        location: "Known",
+      },
+      {
+        id: 2,
+        name: "Weekly Meeting",
+        branch: "West Branch",
+        startTime: "09:00 AM",
+        closingTime: "11:00 AM",
+        assignedUsers: 60,
+        location: "Virtual",
+      },
+    ]);
+  };
+
+  // Edit schedule
+  const onEditSchedule = (schedule: Schedule) => {
+    console.log("Editing schedule:", schedule);
+  };
+
+  // Delete schedule
+  const onDeleteSchedule = (id: number) => {
+    console.log("Deleting schedule:", id);
   };
 
   return (
@@ -39,7 +105,7 @@ const CreateSchedule: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         <CardTitle>Create {scheduleType}</CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleFormSubmit}>
           <div className="space-y-4">
             <RadioGroup
               defaultValue={scheduleType}
@@ -83,43 +149,35 @@ const CreateSchedule: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                       </SelectContent>
                     </Select>
 
-                    {/* Add more form fields based on the selected category */}
                     {scheduleCategory === "Long Period" && (
-                      <>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <Label htmlFor="startDate">Start Date</Label>
-                            <Input type="date" id="startDate" />
-                          </div>
-                          <div>
-                            <Label htmlFor="endDate">End Date</Label>
-                            <Input type="date" id="endDate" />
-                          </div>
+                      <div className="flex flex-col md:flex-row gap-4">
+                        <div className="w-1/3">
+                          <Label>Start Date</Label>
+                          <DatePicker
+                            selectedDate={startDate}
+                            onDateChange={(date: Date | undefined) => setStartDate(date)}
+                            
+                          />
                         </div>
-                        <div>
-                          <Label htmlFor="scheduleStatus">Schedule Status</Label>
-                          <Select>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select Status" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="Limited">Limited</SelectItem>
-                              <SelectItem value="Unlimited">Unlimited</SelectItem>
-                            </SelectContent>
-                          </Select>
+                        <div className="w-1/3">
+                          <Label>End Date</Label>
+                          <DatePicker
+                            selectedDate={endDate}
+                            onDateChange={(date: Date | undefined) => setEndDate(date)}
+                          />
                         </div>
-                      </>
+                      </div>
                     )}
 
                     {scheduleCategory === "Weekly/Monthly Roster" && (
                       <>
                         <div>
                           <Label htmlFor="clockInTime">Clock In Time</Label>
-                          <Input type="time" id="clockInTime" />
+                          <TimePicker id="clockInTime" />
                         </div>
                         <div>
                           <Label htmlFor="clockOutTime">Clock Out Time</Label>
-                          <Input type="time" id="clockOutTime" />
+                          <TimePicker id="clockOutTime" />
                         </div>
                         {/* Add more fields for Weekly/Monthly Roster */}
                       </>
@@ -189,12 +247,10 @@ const CreateSchedule: React.FC<{ onClose: () => void }> = ({ onClose }) => {
               </>
             )}
 
-            <div className="flex justify-end space-x-2">
-              <Button type="button" variant="outline" onClick={handleClear}>
-                Clear
-              </Button>
-              <Button type="submit">Submit</Button>
-            </div>
+            {/* Filters */}
+            
+
+           
           </div>
         </form>
       </CardContent>

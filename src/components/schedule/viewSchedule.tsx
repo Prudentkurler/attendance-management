@@ -128,12 +128,12 @@ const UpdateSchedulePage: React.FC = () => {
   };
 
   return (
-    <Card className="p-4 mt-8 w-full">
+    <Card className=" mt-8 w-full">
     <div className="container w-full">
       <h1 className="text-2xl font-bold mb-4">Update Schedules</h1>
 
       {/* Filters */}
-      <form onSubmit={handleSubmit(onFilterSubmit)} className="flex gap-4 mb-6 w-full overflow-auto">
+      <form onSubmit={handleSubmit(onFilterSubmit)} className="flex gap-4 flex-col md:flex-wrap md:flex-row mb-6 w-full ">
         <div>
           
           <Controller

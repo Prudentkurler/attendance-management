@@ -12,7 +12,9 @@ import { DatePicker } from "@/components/ui/date-picker";
 import TimePicker  from "@/components/ui/TimePicker";
 import { DateRangePicker } from "@/components/DateRangePicker";
 
-const IndividualEventScheduling: React.FC<{ onClose: () => void }> = ({ onClose }) => {
+
+
+const IndividualEventScheduling = ({ onClose }: { onClose: () => void }) => {
   const [isRecurring, setIsRecurring] = useState(false);
   const [reminderDates, setReminderDates] = useState<{ date: Date | null; time: string }[]>([]);
 
@@ -29,6 +31,7 @@ const IndividualEventScheduling: React.FC<{ onClose: () => void }> = ({ onClose 
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      <h4>Event Scheduling</h4>
       <div>
         <Label htmlFor="eventName">Enter Event Name</Label>
         <Input id="eventName" placeholder="Event name" required />
@@ -229,7 +232,7 @@ const IndividualEventScheduling: React.FC<{ onClose: () => void }> = ({ onClose 
       </div>
 
       <div className="flex justify-between">
-        <Button type="submit">Submit</Button>
+        <Button onClick={onClose} type="submit">Submit</Button>
         <Button type="button" variant="outline">Add New Event</Button>
       </div>
     </form>
