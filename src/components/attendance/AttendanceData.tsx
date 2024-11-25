@@ -10,8 +10,13 @@ export interface Attendee {
     region: string;
     branch: string;
     category: string;
-    group: string;    // Changed to string
-    subgroup: string; // Changed to string
+    attendees: string;
+    absentees: string;
+    latecomers: string;
+    earlycomers: string;
+    admin: string;
+
+   // Changed to string
   
     id: string;
     status: string;
@@ -21,14 +26,17 @@ export const columns: ColumnDef<Attendee, any>[] = [
     { header: "Schedule", accessorKey: "schedule" },
     { header: "Start Date", accessorKey: "start_date" },
     { header: "End Date", accessorKey: "end_date" },
+    {header:"Atendees",accessorKey:"attendees"},
+    {header:"Absentees",accessorKey:"absentees"},
+    {header:"Late Comers",accessorKey:"latecomers"},
+    {header:"Early comers",accessorKey:"earlycomers"},
     { header: "Status", accessorKey: "status" },
+    {header:"Admin",accessorKey:"admin"},
     { header: "Country", accessorKey: "country" },
     { header: "Region", accessorKey: "region" },
     { header: "Branch", accessorKey: "branch" },
     { header: "Category", accessorKey: "category" },
-    { header: "Group", accessorKey: "group" },
-    { header: "Subgroup", accessorKey: "subgroup" },
-    { header: "Period", accessorKey: "period" },
+
 
    
     { header: "ID", accessorKey: "id" },
@@ -48,10 +56,12 @@ const AttendeesData: Attendee[] = [
         region: "Ontario",
         branch: "Toronto",
         category: "Product",
-        group: "B",
-        status: "Absent",
-        subgroup: "3",
-      
+        attendees: "10%",
+        status: "low",
+        absentees: "30%",
+        latecomers: "20%",
+        earlycomers: "40%",
+        admin: "Joe",
         id: "34",
         
     },
@@ -65,11 +75,16 @@ const AttendeesData: Attendee[] = [
         region: "Ontario",
         branch: "Toronto",
         category: "Product",
-        group: "B",
-        subgroup: "3",
+        attendees: "10%",
+        status: "Average",
+        absentees: "30%",
+        latecomers: "20%",
+        earlycomers: "40%",
+        admin: "Jane",
+
       
         id: "35",
-        status: "Late Check-ins"
+      
     },
     {
         name: "Jane Doe",
@@ -81,11 +96,16 @@ const AttendeesData: Attendee[] = [
         region: "Ontario",
         branch: "Toronto",
         category: "Product",
-        group: "B",
-        subgroup: "3",
+        attendees: "10%",
+        status: "High",
+        absentees: "30%",
+        latecomers: "20%",
+        earlycomers: "40%",
+        admin: "Mike",
+
      
         id: "36",
-        status: "Early Check-ins"
+       
     }
 ];
 

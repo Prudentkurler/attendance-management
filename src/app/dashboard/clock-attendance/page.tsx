@@ -201,7 +201,7 @@ export default function ClockAttendance() {
           )}
         </div>
       ),
-    },
+    }, 
     
     
     { 

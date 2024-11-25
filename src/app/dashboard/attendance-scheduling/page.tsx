@@ -8,6 +8,7 @@ import BulkAttendanceScheduling from "@/app/dashboard/bulk-attendance-scheduling
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import IndividualEventScheduling from "@/components/individual-event-scheduling/IndividualEventSceduling";
+import IndividualAttendanceScheduling from "@/components/individual-attendance-scheduling/page";
 
 
 
@@ -38,7 +39,7 @@ const SchedulePage: React.FC = () => {
             <TabsTrigger value="bulk">Bulk Scheduling</TabsTrigger>
           </TabsList>
           <TabsContent value="individual" >
-            <IndividualEventScheduling onClose={handleShow} />
+            <IndividualAttendanceScheduling onClose={handleShow} />
           </TabsContent>
           <TabsContent value="bulk">
             <BulkAttendanceScheduling onClose={handleShow} />

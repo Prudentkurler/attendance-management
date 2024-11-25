@@ -56,8 +56,24 @@ export const menuItems = [
         
         {
           Icon: Icons.ServiceModule,
-          label: "Create Schedule",
-          href: "/dashboard/schedule",
+          label: "Attendance Scheduling",
+          href: "/dashboard/attendance-scheduling",
+          visible: ["", ""],
+          isAccordion: false,
+          subCategories: [],
+        },
+        {
+          Icon: Icons.ServiceModule,
+          label: "Event Scheduling",
+          href: "/dashboard/event-scheduling",
+          visible: ["", ""],
+          isAccordion: false,
+          subCategories: [],
+        },
+        {
+          Icon: Icons.ServiceModule,
+          label: "Assign Admin Schedule",
+          href: "/dashboard/assign-admin-schedule",
           visible: ["", ""],
           isAccordion: false,
           subCategories: [],

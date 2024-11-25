@@ -314,103 +314,123 @@ export default function RosterScheduling() {
       };
     }),
   ];
+
+  const [showFilters, setShowFilters] = useState<boolean>(false)
+
+  const handleShowFilters = ()=>{
+    setShowFilters(!showFilters)
+  }
   return (
     <Card className="p-6 max-w-full mx-auto space-y-6">
       <h1 className="text-2xl font-bold">Roster Scheduling</h1>
 
-      {/* Filters */}
-      <div className="flex overflow-auto gap-4">
-        <Select onValueChange={(value) => handleFilterChange('country', value)}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select Country" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="USA">USA</SelectItem>
-            <SelectItem value="Ghana">Ghana</SelectItem>
-          </SelectContent>
-        </Select>
+     {/* Filters */}
+{
+  showFilters && (
+    <div>
 
-        <Select onValueChange={(value) => handleFilterChange('branch', value)}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select Branch" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="Branch 1">Branch 1</SelectItem>
-            <SelectItem value="Branch 2">Branch 2</SelectItem>
-          </SelectContent>
-        </Select>
+   
+    <div className="flex  gap-3 w-full">
+      <Select onValueChange={(value) => handleFilterChange('country', value)}>
+        <SelectTrigger>
+          <SelectValue placeholder="Select Country" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="USA">USA</SelectItem>
+          <SelectItem value="Ghana">Ghana</SelectItem>
+        </SelectContent>
+      </Select>
 
-        <Select onValueChange={(value) => handleFilterChange('category', value)}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select Category" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="Category 1">Category 1</SelectItem>
-            <SelectItem value="Category 2">Category 2</SelectItem>
-          </SelectContent>
-        </Select>
+      <Select onValueChange={(value) => handleFilterChange('branch', value)}>
+        <SelectTrigger>
+          <SelectValue placeholder="Select Branch" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="Branch 1">Branch 1</SelectItem>
+          <SelectItem value="Branch 2">Branch 2</SelectItem>
+        </SelectContent>
+      </Select>
 
-        <Select onValueChange={(value) => handleFilterChange('group', value)}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select Group" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="Group 1">Group 1</SelectItem>
-            <SelectItem value="Group 2">Group 2</SelectItem>
-          </SelectContent>
-        </Select>
+      <Select onValueChange={(value) => handleFilterChange('category', value)}>
+        <SelectTrigger>
+          <SelectValue placeholder="Select Category" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="Category 1">Category 1</SelectItem>
+          <SelectItem value="Category 2">Category 2</SelectItem>
+        </SelectContent>
+      </Select>
 
-        <Select onValueChange={(value) => handleFilterChange('subgroup', value)}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select Subgroup" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="Subgroup 1">Subgroup 1</SelectItem>
-            <SelectItem value="Subgroup 2">Subgroup 2</SelectItem>
-          </SelectContent>
-        </Select>
+      <Select onValueChange={(value) => handleFilterChange('group', value)}>
+        <SelectTrigger>
+          <SelectValue placeholder="Select Group" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="Group 1">Group 1</SelectItem>
+          <SelectItem value="Group 2">Group 2</SelectItem>
+        </SelectContent>
+      </Select>
 
-        <Select onValueChange={(value) => handleFilterChange('rosterType', value)}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select Roster Type" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="Weekly">Weekly</SelectItem>
-            <SelectItem value="Monthly">Monthly</SelectItem>
-          </SelectContent>
-        </Select>
+      <Select onValueChange={(value) => handleFilterChange('subgroup', value)}>
+        <SelectTrigger>
+          <SelectValue placeholder="Select Subgroup" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="Subgroup 1">Subgroup 1</SelectItem>
+          <SelectItem value="Subgroup 2">Subgroup 2</SelectItem>
+        </SelectContent>
+      </Select>
 
-        <Input
-          type="date"
-          placeholder="Start Date"
-          value={filters.startDate}
-          onChange={(e) => handleFilterChange('startDate', e.target.value)}
-        />
-        <Input
-          type="date"
-          placeholder="End Date"
-          value={filters.endDate}
-          onChange={(e) => handleFilterChange('endDate', e.target.value)}
-        />
-
-        <Select onValueChange={(value) => handleFilterChange('schedule', value)}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select Schedule" />
-          </SelectTrigger>
-          <SelectContent>
-            {schedules.map(schedule => (
-              <SelectItem key={schedule.id} value={schedule.abbreviation}>{schedule.name}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        <Input
-          type="time"
-          placeholder="Select Time"
-          onChange={(e) => handleFilterChange('time', e.target.value)}
-        />
+      <Select onValueChange={(value) => handleFilterChange('rosterType', value)}>
+        <SelectTrigger>
+          <SelectValue placeholder="Select Roster Type" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="Weekly">Weekly</SelectItem>
+          <SelectItem value="Monthly">Monthly</SelectItem>
+        </SelectContent>
+      </Select>
       </div>
+      <div className='flex mt-3 flex-col md:flex-row gap-3'>
 
+      <Input
+        type="date"
+        placeholder="Start Date"
+        value={filters.startDate}
+        onChange={(e) => handleFilterChange('startDate', e.target.value)}
+      />
+      <Input
+        type="date"
+        placeholder="End Date"
+        value={filters.endDate}
+        onChange={(e) => handleFilterChange('endDate', e.target.value)}
+        />
+
+      <Select onValueChange={(value) => handleFilterChange('schedule', value)}>
+        <SelectTrigger>
+          <SelectValue placeholder="Select Schedule" />
+        </SelectTrigger>
+        <SelectContent>
+          {schedules.map(schedule => (
+            <SelectItem key={schedule.id} value={schedule.abbreviation}>{schedule.name}</SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      <Input
+        type="time"
+        placeholder="Select Time"
+        onChange={(e) => handleFilterChange('time', e.target.value)}
+        />
+        </div>
+
+        </div>
+   
+  )
+}
+
+
+<Button onClick={handleShowFilters} className='font-semibold'>Filters</Button>
       {/* Search and Select All */}
       <div className="flex justify-between">
         <Input

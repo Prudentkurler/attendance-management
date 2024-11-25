@@ -21,8 +21,6 @@ export default function AttendanceTable() {
   const [country, setCountry] = React.useState<string | undefined>(undefined);
   const [branch, setBranch] = React.useState<string | undefined>(undefined);
   const [region, setRegion] = React.useState<string | undefined>(undefined);
-  const [group, setGroup] = React.useState<string | undefined>(undefined);
-  const [subgroup, setSubgroup] = React.useState<string | undefined>(undefined);
   const [schedule, setSchedule] = React.useState<string | undefined>(undefined);
   const [status, setStatus] = React.useState<string | undefined>(undefined);
   const [nameSearch, setNameSearch] = React.useState<string>("");
@@ -40,18 +38,14 @@ export default function AttendanceTable() {
   const uniqueCountries = Array.from(new Set(AttendeesData.map(a => a.country)));
   const uniqueBranches = Array.from(new Set(AttendeesData.map(a => a.branch)));
   const uniqueRegions = Array.from(new Set(AttendeesData.map(a => a.region)));
-  const uniqueGroups = Array.from(new Set(AttendeesData.map(a => a.group)));
-  const uniqueSubgroups = Array.from(new Set(AttendeesData.map(a => a.subgroup)));
   const uniqueSchedules = Array.from(new Set(AttendeesData.map(a => a.schedule)));
-  const uniqueStatuses = ["Attendee", "Absentee", "Late Check-ins", "Early Check-ins"];
+  const uniqueStatuses = ["Low", "High", "Average"];
 
  React.useEffect(() => {
     const filtered = AttendeesData.filter((attendee) => {
       const matchesCountry = country ? attendee.country === country : true;
       const matchesBranch = branch ? attendee.branch === branch : true;
       const matchesRegion = region ? attendee.region === region : true;
-      const matchesGroup = group ? attendee.group === group : true;
-      const matchesSubgroup = subgroup ? attendee.subgroup === subgroup : true;
       const matchesSchedule = schedule ? attendee.schedule === schedule : true;
       const matchesStatus = status ? attendee.status === status : true;
       const matchesName = nameSearch
@@ -65,11 +59,11 @@ export default function AttendanceTable() {
           selectedDate.toISOString().split("T")[0]
         : true;
 
-      return matchesCountry && matchesBranch && matchesRegion && matchesGroup && matchesSubgroup &&
+      return matchesCountry && matchesBranch && matchesRegion  &&
         matchesSchedule && matchesStatus && matchesName  && matchesDate;
     });
     setFilteredData(filtered);
-  }, [country, branch, region, group, subgroup, schedule, status, nameSearch, selectedDate]);
+  }, [country, branch, region, schedule, status, nameSearch, selectedDate]);
 
 
 
@@ -79,8 +73,6 @@ export default function AttendanceTable() {
     setCountry(undefined);
     setBranch(undefined);
     setRegion(undefined);
-    setGroup(undefined);
-    setSubgroup(undefined);
     setSchedule(undefined);
     setStatus(undefined);
     setNameSearch("");
@@ -145,8 +137,6 @@ export default function AttendanceTable() {
           {[["Country", uniqueCountries, country, setCountry],
             ["Branch", uniqueBranches, branch, setBranch],
             ["Region", uniqueRegions, region, setRegion],
-            ["Group", uniqueGroups, group, setGroup],
-            ["Subgroup", uniqueSubgroups, subgroup, setSubgroup],
             ["Schedule", uniqueSchedules, schedule, setSchedule],
             ["Status", uniqueStatuses, status, setStatus]
           ].map(([label, options, value, setValue]) => (
