@@ -72,8 +72,8 @@ export const menuItems = [
         },
         {
           Icon: Icons.ServiceModule,
-          label: "Assign Admin Schedule",
-          href: "/dashboard/assign-admin-schedule",
+          label: " Admin Schedule",
+          href: "/dashboard/admin-scheduling",
           visible: ["", ""],
           isAccordion: false,
           subCategories: [],

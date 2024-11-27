@@ -38,7 +38,26 @@ interface Schedule {
 
 const UpdateSchedulePage: React.FC = () => {
   const { control, handleSubmit, reset } = useForm<FilterForm>();
-  const [filteredData, setFilteredData] = useState<Schedule[]>([]);
+  const [filteredData, setFilteredData] = useState<Schedule[]>([
+    {
+      id: 1,
+      name: "Morning Shift",
+      branch: "HQ",
+      startTime: "08:00 AM",
+      closingTime: "05:00 PM",
+      assignedUsers: 120,
+      location: "Known",
+    },
+    {
+      id: 2,
+      name: "Weekly Meeting",
+      branch: "West Branch",
+      startTime: "09:00 AM",
+      closingTime: "11:00 AM",
+      assignedUsers: 60,
+      location: "Virtual",
+    },
+  ]);
   
   // Columns for the Data Table
   const columns: ColumnDef<Schedule>[] = [

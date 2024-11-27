@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import BulkEventScheduling from "@/app/dashboard/bulk-event-scheduling/bulkEventScheduling";
-import ViewEventsCalendar from "@/app/dashboard/event-scheduling/page";
+
 import IndividualEventScheduling from "../../../components/individual-event-scheduling/IndividualEventSceduling";
+import UpdateSchedulePage from "@/components/schedule/viewSchedule";
 
 const EventSchedulePage: React.FC = () => {
   const [showCreateEvent, setShowCreateEvent] = useState(false);
@@ -43,7 +44,7 @@ const EventSchedulePage: React.FC = () => {
         </Tabs>
       )}
 
-      <ViewEventsCalendar />
+     <UpdateSchedulePage/>
     </div>
   );
 };
