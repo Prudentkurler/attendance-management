@@ -5,12 +5,18 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import BulkRegistration from '@/components/user-registration/bulkregistration'
 import UserRegistration from '@/components/user-registration/userForms'
 import ViewUsers from '@/components/user-registration/viewUsers'
+import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
 import { FaPlus } from 'react-icons/fa6'
 
 const Page = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDialogOpenTwo, setIsDialogOpenTwo] = useState(false);
+  const navigate = useRouter()
+
+  const handleNavigation = () => {
+    navigate.push('/dashboard/user-registration-form/archives-table')
+  }
 
   return (
     <div className="w-full">
@@ -61,6 +67,10 @@ const Page = () => {
 
       <ViewUsers/>
 
+        <div className='w-full flex items-center justify-end'>
+
+      <Button className='font-semibold w-[120px]' onClick={handleNavigation}>Archive</Button>
+        </div>
      
     </div>
   );
