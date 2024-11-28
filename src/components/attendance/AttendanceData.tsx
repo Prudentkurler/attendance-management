@@ -1,7 +1,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 
 export interface Attendee {
-    name: string;
+
     period: string;
     start_date: string | null;
     end_date: string | null;
@@ -15,11 +15,6 @@ export interface Attendee {
     latecomers: string;
     earlycomers: string;
     admin: string;
-
-   // Changed to string
-  
-    id: string;
-    status: string;
 }
 
 export const columns: ColumnDef<Attendee, any>[] = [
@@ -30,24 +25,18 @@ export const columns: ColumnDef<Attendee, any>[] = [
     {header:"Absentees",accessorKey:"absentees"},
     {header:"Late Comers",accessorKey:"latecomers"},
     {header:"Early comers",accessorKey:"earlycomers"},
-    { header: "Status", accessorKey: "status" },
     {header:"Admin",accessorKey:"admin"},
     { header: "Country", accessorKey: "country" },
     { header: "Region", accessorKey: "region" },
     { header: "Branch", accessorKey: "branch" },
     { header: "Category", accessorKey: "category" },
-
-
-   
-    { header: "ID", accessorKey: "id" },
-    // New column for status
 ];
 
 // Sample data array with the new status field
 
 const AttendeesData: Attendee[] = [
     {
-        name: "Ava Smith",
+
         period: "Today",
         start_date: "2024-11-10T08:50:15.000Z",
         end_date: "2024-11-10T17:20:25.000Z",
@@ -56,17 +45,15 @@ const AttendeesData: Attendee[] = [
         region: "Ontario",
         branch: "Toronto",
         category: "Product",
-        attendees: "10%",
-        status: "low",
-        absentees: "30%",
-        latecomers: "20%",
-        earlycomers: "40%",
+        attendees: "25/10%",
+        absentees: "58/30%",
+        latecomers: "48/20%",
+        earlycomers: "79/40%",
         admin: "Joe",
-        id: "34",
+  
         
     },
     {
-        name: "John Doe",
         period: "Today",
         start_date: "2024-11-10T08:50:15.000Z",
         end_date: "2024-11-10T17:20:25.000Z",
@@ -75,19 +62,15 @@ const AttendeesData: Attendee[] = [
         region: "Ontario",
         branch: "Toronto",
         category: "Product",
-        attendees: "10%",
-        status: "Average",
-        absentees: "30%",
-        latecomers: "20%",
-        earlycomers: "40%",
+        attendees: "15/10%",
+        absentees: "45/30%",
+        latecomers: "47/20%",
+        earlycomers: "75/40%",
         admin: "Jane",
 
-      
-        id: "35",
-      
     },
     {
-        name: "Jane Doe",
+
         period: "Today",
         start_date: "2024-11-10T08:50:15.000Z",
         end_date: "2024-11-10T17:20:25.000Z",
@@ -96,15 +79,11 @@ const AttendeesData: Attendee[] = [
         region: "Ontario",
         branch: "Toronto",
         category: "Product",
-        attendees: "10%",
-        status: "High",
-        absentees: "30%",
-        latecomers: "20%",
-        earlycomers: "40%",
+        attendees: "45/10%",
+        absentees: "56/30%",
+        latecomers: "26/20%",
+        earlycomers: "48/40%",
         admin: "Mike",
-
-     
-        id: "36",
        
     }
 ];

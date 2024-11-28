@@ -78,18 +78,9 @@ export const menuItems = [
           isAccordion: false,
           subCategories: [],
         },
-        
-        {
-          Icon: Icons.ServiceModule,
-          label: "Roster Schedule",
-          href: "/dashboard/roster-scheduling",
-          visible: ["", ""],
-          isAccordion: false,
-          subCategories: [],
-        },
         {
           Icon: Icons.Eye,
-          label: "View Assigned Roster",
+          label: " Roster Schedule",
           href: "/dashboard/view-assigned-roster",
           visible: ["", ""],
           isAccordion: false,

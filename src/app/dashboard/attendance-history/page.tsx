@@ -188,7 +188,7 @@ const [breakdowns] = useState<DailyBreakdown[]>([
   const summaryColumns: ColumnDef<AttendanceReport, unknown>[] = [
   {
       accessorKey: "user",
-      header: "User",
+      header: "Users",
       cell: ({ row }) => (
         <div className="flex items-center ">
           <Image
@@ -210,7 +210,7 @@ const [breakdowns] = useState<DailyBreakdown[]>([
     { accessorKey: "excuseDutyDays", header: "Excused Days" },
     {
       accessorKey: "clockEvents",
-      header: "Clock Events",
+      header: "Clock Info",
       cell: ({ row }) => (
         <div>
           <div>In: {row.original.totalClockIns} (Admin: {row.original.adminClockIns})</div>

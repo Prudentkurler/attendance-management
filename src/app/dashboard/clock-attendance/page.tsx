@@ -235,9 +235,9 @@ export default function ClockAttendance() {
         );
       }
     },
-    { accessorKey: 'lastSeen', header: 'Last Seen' },
+   
     { accessorKey: 'status', header: 'Status' },
- 
+    { accessorKey: 'lastSeen', header: 'Last Seen' },
     {
       accessorKey: 'Select',
       header: () => (

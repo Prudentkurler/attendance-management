@@ -23,7 +23,7 @@ const ViewEventsCalendar: React.FC = () => {
     for (let i = 1; i <= daysInMonth; i++) {
       const dayEvents = events.filter(event => event.date === i);
       days.push(
-        <TableCell key={i} className="h-24 align-top">
+        <TableCell key={i} className="h-24 align-top border-r border-gray-300">
           <div className="font-bold">{i}</div>
           {dayEvents.map((event, index) => (
             <div key={index} className="text-xs">
@@ -37,7 +37,7 @@ const ViewEventsCalendar: React.FC = () => {
     }
     return days;
   };
-
+  
   return (
     <div className="space-y-4">
       <h2 className="text-2xl font-bold">View Events Calendar</h2>
@@ -90,10 +90,13 @@ const ViewEventsCalendar: React.FC = () => {
         </TableHeader>
         <TableBody>
           {[...Array(Math.ceil((daysInMonth + firstDayOfMonth - 1) / 7))].map((_, weekIndex) => (
-            <TableRow key={weekIndex}>
+            <TableRow className="border-b border-gray-300" key={weekIndex}>
               {[...Array(7)].map((_, dayIndex) => {
                 const day = weekIndex * 7 + dayIndex - firstDayOfMonth + 2;
-                return day > 0 && day <= daysInMonth ? renderCalendarDays()[day - 1] : <TableCell key={dayIndex} />;
+                return day > 0 && day <= daysInMonth
+                ? renderCalendarDays()[day - 1]
+                : <TableCell key={dayIndex} className="border-r border-gray-300" />;
+              
               })}
             </TableRow>
           ))}

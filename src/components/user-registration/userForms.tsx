@@ -77,6 +77,8 @@ export default function UserRegistration() {
         gender: "Male",
         disability: false,
         disabilityType: "",
+        organizationName: "",
+        organizationLogo: "",
       },
       contactDetails: {
         phone: "",
@@ -158,6 +160,12 @@ export default function UserRegistration() {
 }
 
 function PersonalDetailsSection({ form }: { form: any }) {
+  const [showOrganizationFields, setShowOrganizationFields] = useState(false);
+
+  const handleUserTypeChange = (userType: string) => {
+    form.setValue("personalDetails.userType", userType);
+    setShowOrganizationFields(userType === "Organization");
+  };
   return (
     <div>
       <FormField
@@ -167,7 +175,7 @@ function PersonalDetailsSection({ form }: { form: any }) {
           <FormItem>
             <FormLabel>User Type</FormLabel>
             <FormControl>
-              <Select onValueChange={field.onChange}>
+              <Select onValueChange={handleUserTypeChange}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select User Type" />
                 </SelectTrigger>
@@ -180,6 +188,35 @@ function PersonalDetailsSection({ form }: { form: any }) {
           </FormItem>
         )}
       />
+
+{showOrganizationFields && (
+        <>
+          <FormField
+            control={form.control}
+            name="personalDetails.organizationName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Organization Name</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="Enter organization name" />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="personalDetails.organizationLogo"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Organization Logo</FormLabel>
+                <FormControl>
+                  <Input type="image" {...field} placeholder="Upload organization logo" />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+        </>
+      )}
       {/* Other personal details fields */}
     </div>
   );
@@ -190,6 +227,18 @@ function ContactDetailsSection({ form }: { form: any }) {
     return (
       <div>
         <h4 className="text-ds-primary-dark mb-4 text-center">Personal Information</h4>
+        <FormField
+          control={form.control}
+          name="contactDetails.FirstName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Upload image</FormLabel>
+              <FormControl>
+                <Input type="image" {...field} placeholder="Enter FirstName" />
+              </FormControl>
+            </FormItem>
+          )}
+        />
         <FormField
           control={form.control}
           name="contactDetails.FirstName"

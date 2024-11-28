@@ -98,7 +98,7 @@ export default function AssignDeviceForm({ onAssign }: AssignDeviceFormProps) {
       {/* Assign Button */}
       <Button
         onClick={handleAssign}
-        className="bg-ds-primary text- lg font-bold text-ds-foreground mt-4 hover:bg-ds-primary-dark"
+        className="bg-ds-primary w-[120px] text- lg font-bold text-ds-foreground mt-4 hover:bg-ds-primary-dark"
       >
         Assign
       </Button>

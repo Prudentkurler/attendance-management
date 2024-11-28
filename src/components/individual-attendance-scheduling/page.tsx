@@ -135,7 +135,7 @@ const IndividualAttendanceScheduling = ({ onClose }: IndividualAttendanceSchedul
         </div>
       )}
 
-      <Button type="submit" className="w-[150px] bg-ds-primary text-ds-foreground font-semibold hover:bg-ds-primary-dark">Next</Button>
+      <Button type="submit" className="w-[150px] bg-ds-primary text-ds-foreground font-semibold hover:bg-ds-primary-dark">Submit</Button>
     </form>
   );
 };

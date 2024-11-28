@@ -67,7 +67,7 @@ const Page = () => {
 
       <ViewUsers/>
 
-        <div className='w-full flex items-center justify-end'>
+        <div className='w-full flex items-center mt-5 p-3 justify-end'>
 
       <Button className='font-semibold w-[120px]' onClick={handleNavigation}>Archive</Button>
         </div>

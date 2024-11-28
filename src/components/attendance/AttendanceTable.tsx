@@ -47,9 +47,8 @@ export default function AttendanceTable() {
       const matchesBranch = branch ? attendee.branch === branch : true;
       const matchesRegion = region ? attendee.region === region : true;
       const matchesSchedule = schedule ? attendee.schedule === schedule : true;
-      const matchesStatus = status ? attendee.status === status : true;
       const matchesName = nameSearch
-        ? attendee.name.toLowerCase().includes(nameSearch.toLowerCase())
+        ? attendee.admin.toLowerCase().includes(nameSearch.toLowerCase())
         : true;
       
 
@@ -60,7 +59,7 @@ export default function AttendanceTable() {
         : true;
 
       return matchesCountry && matchesBranch && matchesRegion  &&
-        matchesSchedule && matchesStatus && matchesName  && matchesDate;
+        matchesSchedule  && matchesName  && matchesDate;
     });
     setFilteredData(filtered);
   }, [country, branch, region, schedule, status, nameSearch, selectedDate]);
@@ -138,7 +137,6 @@ export default function AttendanceTable() {
             ["Branch", uniqueBranches, branch, setBranch],
             ["Region", uniqueRegions, region, setRegion],
             ["Schedule", uniqueSchedules, schedule, setSchedule],
-            ["Status", uniqueStatuses, status, setStatus]
           ].map(([label, options, value, setValue]) => (
             <Select
               key={label as string}

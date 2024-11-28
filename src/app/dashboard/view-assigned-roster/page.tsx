@@ -110,7 +110,7 @@ export default function ViewAssignedRoster() {
   return (
     <TooltipProvider>
       <div className="container mx-auto p-6 space-y-6">
-        <h1 className="text-2xl font-bold">View Assigned Roster</h1>
+        <h1 className="text-2xl font-bold"> Roster Schedule</h1>
 
         {showFilters && (
           <Card>
