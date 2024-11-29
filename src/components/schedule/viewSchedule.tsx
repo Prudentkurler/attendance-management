@@ -24,6 +24,7 @@ interface FilterForm {
   category: string;
   scheduleType: string;
   scheduleLocation: string;
+
 }
 
 interface Schedule {
@@ -31,7 +32,8 @@ interface Schedule {
   name: string;
   branch: string;
   startTime: string;
-  closingTime: string;
+  endTime: string;
+  eventStatus:string;
   assignedUsers: number;
   location: string;
 }
@@ -44,7 +46,8 @@ const UpdateSchedulePage: React.FC = () => {
       name: "Morning Shift",
       branch: "HQ",
       startTime: "08:00 AM",
-      closingTime: "05:00 PM",
+      endTime: "05:00 PM",
+      eventStatus:"Recuring",
       assignedUsers: 120,
       location: "Known",
     },
@@ -53,7 +56,8 @@ const UpdateSchedulePage: React.FC = () => {
       name: "Weekly Meeting",
       branch: "West Branch",
       startTime: "09:00 AM",
-      closingTime: "11:00 AM",
+      endTime: "11:00 AM",
+      eventStatus:"Non-REcuring",
       assignedUsers: 60,
       location: "Virtual",
     },
@@ -74,8 +78,12 @@ const UpdateSchedulePage: React.FC = () => {
       header: "Start Time",
     },
     {
-      accessorFn: row => row.closingTime,
-      header: "Closing Time",
+      accessorFn: row => row.endTime,
+      header: "End Time",
+    },
+    {
+      accessorFn: row => row.eventStatus,
+      header: "Event Status",
     },
     {
       accessorFn: row => row.assignedUsers,
@@ -120,7 +128,8 @@ const UpdateSchedulePage: React.FC = () => {
         name: "Morning Shift",
         branch: "HQ",
         startTime: "08:00 AM",
-        closingTime: "05:00 PM",
+        endTime: "05:00 PM",
+        eventStatus:"Recuring",
         assignedUsers: 120,
         location: "Known",
       },
@@ -129,7 +138,8 @@ const UpdateSchedulePage: React.FC = () => {
         name: "Weekly Meeting",
         branch: "West Branch",
         startTime: "09:00 AM",
-        closingTime: "11:00 AM",
+        endTime: "11:00 AM",
+        eventStatus:"Non-REcuring",
         assignedUsers: 60,
         location: "Virtual",
       },

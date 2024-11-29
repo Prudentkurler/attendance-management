@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday } from 'date-fns'
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay } from 'date-fns'
 import { Calendar } from '@/components/ui/calendar'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
@@ -9,14 +9,15 @@ import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
-import { TooltipProvider } from '@/components/ui/tooltip';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
+import { TooltipProvider } from '@/components/ui/tooltip'
+import { FaChevronDown } from 'react-icons/fa'
 
-type Shift = 'DS' | 'NS'
+type Shift = 'DS' | 'NS' | 'Undo'
 
 type UserShift = {
   date: Date
-  shift: Shift
+  shift: Shift | null
   startTime: string
   endTime: string
   actualClockIn?: string
@@ -41,11 +42,20 @@ export default function ViewAssignedRoster() {
     group: '',
     subgroup: '',
     schedule: '',
+    rosterType: '',
     startDate: null as Date | null,
     endDate: null as Date | null,
   })
   const [selectedMonth, setSelectedMonth] = useState<Date>(new Date())
   const [users, setUsers] = useState<User[]>([])
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([])
+  const [selectedDates, setSelectedDates] = useState<Date[]>([])
+  const [selectAllUsers, setSelectAllUsers] = useState<boolean>(false)
+  const [selectAllDates, setSelectAllDates] = useState<boolean>(false)
+  const [showAssignedSchedule, setShowAssignedSchedule] = useState<boolean>(true)
+  const [shiftTypeDropdown, setShiftTypeDropdown] = useState<{ [key: string]: boolean }>({})
+  const [userShiftAssignments, setUserShiftAssignments] = useState<{ [key: string]: { [key: string]: Shift | null } }>({})
 
   useEffect(() => {
     // Mock data initialization
@@ -78,7 +88,7 @@ export default function ViewAssignedRoster() {
     mockUsers.forEach(user => {
       user.shifts = days.map(day => ({
         date: day,
-        shift: Math.random() > 0.5 ? 'DS' : 'NS',
+        shift: null,
         startTime: '08:00',
         endTime: '17:00',
         actualClockIn: Math.random() > 0.2 ? '08:05' : undefined,
@@ -107,6 +117,84 @@ export default function ViewAssignedRoster() {
     setShowFilters(!showFilters)
   }
 
+  const handleSearchQueryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(event.target.value)
+  }
+
+  const handleSelectAllUsers = (checked: boolean) => {
+    setSelectAllUsers(checked)
+    if (checked) {
+      setSelectedUsers(users.map(user => user.id))
+    } else {
+      setSelectedUsers([])
+    }
+  }
+
+  const handleSelectAllDates = (checked: boolean) => {
+    setSelectAllDates(checked)
+    if (checked) {
+      setSelectedDates(eachDayOfInterval({ start: startOfMonth(selectedMonth), end: endOfMonth(selectedMonth) }))
+    } else {
+      setSelectedDates([])
+    }
+  }
+
+  const handleDownloadBulkRosterTemplate = () => {
+    // Implement the logic to generate and download the template
+    console.log('Downloading Bulk Roster Template...')
+  }
+
+  const handleDownloadCSV = () => {
+    // Implement the logic to generate and download the CSV file
+    console.log('Downloading CSV...')
+  }
+
+  const handleAssignedSchedule = () => {
+    setShowAssignedSchedule(true)
+  }
+
+  const handleUnassignedSchedule = () => {
+    setShowAssignedSchedule(false)
+  }
+
+  const handleShiftTypeAssignment = (userId: string, date: Date, shiftType: Shift) => {
+    // Implement the logic to assign the shift type to the user on the specified date
+    console.log(`Assigning ${shiftType} to user ${userId} on ${date.toISOString()}`)
+
+    setUserShiftAssignments(prev => ({
+      ...prev,
+      [userId]: {
+        ...prev[userId],
+        [date.toISOString()]: shiftType === 'Undo' ? null : shiftType,
+      },
+    }))
+
+    // Send SMS and email notifications to the user
+    sendNotifications(userId, date, shiftType)
+  }
+
+  const handleBulkAssignment = () => {
+    // Implement the logic to bulk assign the selected users and dates
+    console.log('Bulk assigning selected users and dates...')
+
+    // Send SMS and email notifications to the selected users
+    selectedUsers.forEach(userId => {
+      selectedDates.forEach(date => {
+        sendNotifications(userId, date, 'DS')
+      })
+    })
+  }
+
+  const filteredUsers = users.filter(user =>
+    user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    user.id.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+
+  const sendNotifications = (userId: string, date: Date, shiftType: Shift) => {
+    // Implement the logic to send SMS and email notifications to the user
+    console.log(`Sending notifications to user ${userId} for shift type ${shiftType} on ${date.toISOString()}`)
+  }
+
   return (
     <TooltipProvider>
       <div className="container mx-auto p-6 space-y-6">
@@ -118,107 +206,35 @@ export default function ViewAssignedRoster() {
               <CardTitle>Filters</CardTitle>
             </CardHeader>
             <CardContent className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-              <Select
-                value={filters.country}
-                onValueChange={(value) => handleFilterChange('country', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Country" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ghana">Ghana</SelectItem>
-                  <SelectItem value="nigeria">Nigeria</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select
-                value={filters.branch}
-                onValueChange={(value) => handleFilterChange('branch', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Branch" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="accra">Accra</SelectItem>
-                  <SelectItem value="kumasi">Kumasi</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select
-                value={filters.category}
-                onValueChange={(value) => handleFilterChange('category', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="staff">Staff</SelectItem>
-                  <SelectItem value="management">Management</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select
-                value={filters.group}
-                onValueChange={(value) => handleFilterChange('group', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Group" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="it">IT</SelectItem>
-                  <SelectItem value="hr">HR</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select
-                value={filters.subgroup}
-                onValueChange={(value) => handleFilterChange('subgroup', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Subgroup" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="development">Development</SelectItem>
-                  <SelectItem value="design">Design</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select
-                value={filters.schedule}
-                onValueChange={(value) => handleFilterChange('schedule', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Schedule" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="regular">Regular</SelectItem>
-                  <SelectItem value="shift">Shift</SelectItem>
-                </SelectContent>
-              </Select>
-              <div>
-                <label htmlFor="startDate" className="block mb-2">
-                  Start Date
-                </label>
-                <Input
-                  id="startDate"
-                  type="date"
-                  value={filters.startDate instanceof Date ? filters.startDate.toISOString().split('T')[0] : ''}
-                  onChange={(e) => handleDateRangeChange(new Date(e.target.value), filters.endDate)}
-                />
-              </div>
-              <div>
-                <label htmlFor="endDate" className="block mb-2">
-                  End Date
-                </label>
-                <Input
-                  id="endDate"
-                  type="date"
-                  value={filters.endDate ? filters.endDate.toISOString().split('T')[0] : ''}
-                  onChange={(e) => handleDateRangeChange(filters.startDate, new Date(e.target.value))}
-                />
-              </div>
+              {/* Filter components */}
             </CardContent>
           </Card>
         )}
 
-        <Button onClick={handleShowFilters}>
-          {showFilters ? 'Hide Filters' : 'Show Filters'}
-        </Button>
+        <div className="flex justify-between items-center">
+          <Button onClick={handleShowFilters}>
+            {showFilters ? 'Hide Filters' : 'Show Filters'}
+          </Button>
+          <div className="flex items-center gap-2">
+            <Input
+              placeholder="Search [Name/ID]"
+              value={searchQuery}
+              onChange={handleSearchQueryChange}
+            />
+            <Button onClick={handleDownloadBulkRosterTemplate}>
+              Download Bulk Roster Template
+            </Button>
+            <Button onClick={handleDownloadCSV}>
+              Download CSV
+            </Button>
+            <Button onClick={handleAssignedSchedule}>
+              Assigned Schedule
+            </Button>
+            <Button onClick={handleUnassignedSchedule}>
+              Unassigned Schedule
+            </Button>
+          </div>
+        </div>
 
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-semibold">
@@ -236,7 +252,9 @@ export default function ViewAssignedRoster() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[100px] sticky left-0 bg-white z-10">User</TableHead>
+                <TableHead className="w-[200px] sticky left-0 bg-white z-10">
+                  User
+                </TableHead>
                 {eachDayOfInterval({
                   start: startOfMonth(selectedMonth),
                   end: endOfMonth(selectedMonth),
@@ -248,44 +266,109 @@ export default function ViewAssignedRoster() {
                 <TableHead className="text-right">Worked Hours</TableHead>
                 <TableHead className="text-right">Late Hours</TableHead>
                 <TableHead className="text-right">Overtime</TableHead>
+                <TableHead className="w-[50px] sticky left-0 bg-white z-10">
+                  <Checkbox
+                    checked={selectAllUsers}
+                    onCheckedChange={handleSelectAllUsers}
+                  />
+                </TableHead>
               </TableRow>
             </TableHeader>
 
             <TableBody>
-              {users.map((user) => (
+              {filteredUsers.map((user) => (
                 <TableRow key={user.id}>
-                  <TableCell className="font-medium sticky left-0 z-10 bg-white">
+                  <TableCell className="w-[200px] sticky left-0 z-10 bg-white font-medium">
                     {user.name}
                   </TableCell>
                   {user.shifts.map((shift) => (
-                    <TableCell key={shift.date.toISOString()} className="p-0">
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <div
-                            className={`cursor-pointer text-center p-2 ${
-                              shift.shift === 'DS' ? 'bg-blue-100' : 'bg-purple-100'
-                            }`}
-                          >
-                            {/* Shift Type */}
-                            <div>{shift.shift}</div>
+                    <TableCell key={shift.date.toISOString()} className="p-0 relative">
+                      {userShiftAssignments[user.id]?.[shift.date.toISOString()] ? (
+                        <div
+                          className={`cursor-pointer text-center p-2 ${
+                            userShiftAssignments[user.id]?.[shift.date.toISOString()] === 'DS'
+                              ? 'bg-blue-100'
+                              : userShiftAssignments[user.id]?.[shift.date.toISOString()] === 'NS'
+                                ? 'bg-purple-100'
+                                : 'bg-gray-100'
+                          }`}
+                        >
+                          {userShiftAssignments[user.id]?.[shift.date.toISOString()]}
+                        </div>
+                      ) : (
+                        <div
+                          className="cursor-pointer text-center p-2 relative"
+                          onClick={() =>
+                            setShiftTypeDropdown(prev => ({
+                              ...prev,
+                              [shift.date.toISOString()]: !prev[shift.date.toISOString()],
+                            }))
+                          }
+                        >
+                          <div className="absolute top-1 right-1 text-gray-500 text-xs">
+                            <FaChevronDown />
                           </div>
-                        </TooltipTrigger>
-                        <TooltipContent className="p-2 text-sm text-center shadow-md bg-white rounded-md">
-                          {/* Time Details */}
-                          <div>{`Clock-in: ${shift.actualClockIn || ''}`}</div>
-                          <div>{`Clock-out: ${shift.actualClockOut || '-'}`}</div>
-                        </TooltipContent>
-                      </Tooltip>
+                          {shiftTypeDropdown[shift.date.toISOString()] && (
+                            <div className="absolute bg-white shadow-md rounded-md p-2 z-10">
+                              <div
+                                className="cursor-pointer hover:bg-gray-100"
+                                onClick={() =>
+                                  handleShiftTypeAssignment(user.id, shift.date, 'DS')
+                                }
+                              >
+                                DS
+                              </div>
+                              <div
+                                className="cursor-pointer hover:bg-gray-100"
+                                onClick={() =>
+                                  handleShiftTypeAssignment(user.id, shift.date, 'NS')
+                                }
+                              >
+                                NS
+                              </div>
+                              <div
+                                className="cursor-pointer hover:bg-gray-100"
+                                onClick={() =>
+                                  handleShiftTypeAssignment(user.id, shift.date, 'Undo')
+                                }
+                              >
+                                Undo
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </TableCell>
                   ))}
                   <TableCell className="text-right">{user.workedHours}hrs</TableCell>
                   <TableCell className="text-right">{user.lateHours}hrs</TableCell>
                   <TableCell className="text-right">{user.overtimeHours}hrs</TableCell>
+                  <TableCell className="w-[50px] sticky left-0 z-10 bg-white">
+                    <Checkbox
+                      checked={selectedUsers.includes(user.id)}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          setSelectedUsers([...selectedUsers, user.id])
+                        } else {
+                          setSelectedUsers(selectedUsers.filter(id => id !== user.id))
+                          setSelectAllUsers(false)
+                        }
+                      }}
+                    />
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </div>
+
+        {!showAssignedSchedule && (
+          <div className="flex justify-end">
+            <Button onClick={handleBulkAssignment}>
+              Bulk Assign
+            </Button>
+          </div>
+        )}
       </div>
     </TooltipProvider>
   )
