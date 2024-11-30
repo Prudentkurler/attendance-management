@@ -18,6 +18,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Card } from "../ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { getCoreRowModel } from "@tanstack/react-table"; 
+import { usePathname } from "next/navigation";
 
 interface User {
   id: string;
@@ -64,6 +65,8 @@ const initialUsersData: User[] = [
 ];
 
 export default function ViewUsers() {
+  const path = usePathname()
+  const isArchivesPath = path.includes('/archives-table')
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [filters, setFilters] = useState({
     userType: "",
@@ -483,6 +486,22 @@ export default function ViewUsers() {
 
         {/* Action Buttons */}
         <div className="flex w-full justify-end items-center my-4 gap-4">
+
+          {
+            isArchivesPath && (
+              <Button
+                variant='default'
+                className="bg-green-600 text-white font-semibold"
+                size='sm'
+                onClick={() => {
+                  // Restore all selected users
+                  setUsersData(usersData.filter((user) => !table.getSelectedRowModel().rows.some((row) => row.original.id === user.id)));
+                }}
+              >
+                Restore Selected  
+              </Button>
+            )
+          }
         <Button
         variant='destructive'
         className="text-white font-semibold"

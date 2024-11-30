@@ -39,6 +39,9 @@ interface AttendanceReport {
 }
 
 interface DailyBreakdown {
+  userId: string;
+  userName: string;
+  userImage: string;
   date: Date;
   clockIn: Date;
   clockOut: Date;
@@ -108,6 +111,9 @@ export default function AttendanceHistoryPage() {
   
 const [breakdowns] = useState<DailyBreakdown[]>([
   {
+    userId: "USR002",
+    userName: "Jane Smith",
+    userImage: "",
     date: new Date(2024, 10, 1),
     clockIn: new Date(2024, 10, 1, 9, 0),
     clockOut: new Date(2024, 10, 1, 17, 0),
@@ -116,6 +122,9 @@ const [breakdowns] = useState<DailyBreakdown[]>([
     status: "On Time",
   },
   {
+    userId: "USR003",
+    userName: "Alice Johnson",
+    userImage: "",
     date: new Date(2024, 10, 2),
     clockIn: new Date(2024, 10, 2, 9, 15),
     clockOut: new Date(2024, 10, 2, 17, 0),
@@ -124,6 +133,9 @@ const [breakdowns] = useState<DailyBreakdown[]>([
     status: "Late",
   },
   {
+    userId: "USR001",
+    userName: "John Doe",
+    userImage: "",
     date: new Date(2024, 10, 3),
     clockIn: new Date(2024, 10, 3, 8, 45),
     clockOut: new Date(2024, 10, 3, 16, 45),
@@ -132,6 +144,9 @@ const [breakdowns] = useState<DailyBreakdown[]>([
     status: "On Time",
   },
   {
+    userId: "USR002",
+    userName: "Jane Jones",
+    userImage: "",
     date: new Date(2024, 10, 4),
     clockIn: new Date(2024, 10, 4, 9, 30),
     clockOut: new Date(2024, 10, 4, 17, 15),
@@ -291,6 +306,25 @@ const [breakdowns] = useState<DailyBreakdown[]>([
   ];
 
   const breakdownColumns: ColumnDef<DailyBreakdown, unknown>[] = [
+
+    {
+      accessorKey: "user",
+      header: "Users",
+      cell: ({ row }) => (
+        <div className="flex items-center ">
+          <Image
+            src={row.original.userImage}
+            alt={row.original.userName}
+            className="h-8 w-8 rounded-full mr-2"
+          />
+          <div>
+            <div className="font-medium">{row.original.userName}</div>
+            <div className="text-sm text-gray-500">{row.original.userId}</div>
+          </div>
+        </div>
+      ),
+      meta: { position:'sticky', left:16 },
+    },
     {
       accessorKey: "date",
       header: "Date",

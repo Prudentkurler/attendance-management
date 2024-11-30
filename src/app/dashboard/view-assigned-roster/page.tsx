@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { FaChevronDown } from 'react-icons/fa'
 
@@ -281,65 +281,43 @@ export default function ViewAssignedRoster() {
                   <TableCell className="w-[200px] sticky left-0 z-10 bg-white font-medium">
                     {user.name}
                   </TableCell>
-                  {user.shifts.map((shift) => (
-                    <TableCell key={shift.date.toISOString()} className="p-0 relative">
-                      {userShiftAssignments[user.id]?.[shift.date.toISOString()] ? (
-                        <div
-                          className={`cursor-pointer text-center p-2 ${
-                            userShiftAssignments[user.id]?.[shift.date.toISOString()] === 'DS'
-                              ? 'bg-blue-100'
-                              : userShiftAssignments[user.id]?.[shift.date.toISOString()] === 'NS'
-                                ? 'bg-purple-100'
-                                : 'bg-gray-100'
-                          }`}
-                        >
-                          {userShiftAssignments[user.id]?.[shift.date.toISOString()]}
-                        </div>
-                      ) : (
-                        <div
-                          className="cursor-pointer text-center p-2 relative"
-                          onClick={() =>
-                            setShiftTypeDropdown(prev => ({
-                              ...prev,
-                              [shift.date.toISOString()]: !prev[shift.date.toISOString()],
-                            }))
-                          }
-                        >
-                          <div className="absolute top-1 right-1 text-gray-500 text-xs">
-                            <FaChevronDown />
-                          </div>
-                          {shiftTypeDropdown[shift.date.toISOString()] && (
-                            <div className="absolute bg-white shadow-md rounded-md p-2 z-10">
-                              <div
-                                className="cursor-pointer hover:bg-gray-100"
-                                onClick={() =>
-                                  handleShiftTypeAssignment(user.id, shift.date, 'DS')
-                                }
-                              >
-                                DS
-                              </div>
-                              <div
-                                className="cursor-pointer hover:bg-gray-100"
-                                onClick={() =>
-                                  handleShiftTypeAssignment(user.id, shift.date, 'NS')
-                                }
-                              >
-                                NS
-                              </div>
-                              <div
-                                className="cursor-pointer hover:bg-gray-100"
-                                onClick={() =>
-                                  handleShiftTypeAssignment(user.id, shift.date, 'Undo')
-                                }
-                              >
-                                Undo
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </TableCell>
-                  ))}
+                 
+{user.shifts.map((shift) => (
+  <TableCell key={shift.date.toISOString()} className="border-1 border relative">
+    {userShiftAssignments[user.id]?.[shift.date.toISOString()] ? (
+      <div
+        className={`cursor-pointer text-center ${
+          userShiftAssignments[user.id]?.[shift.date.toISOString()] === "DS"
+            ? "bg-blue-100"
+            : userShiftAssignments[user.id]?.[shift.date.toISOString()] === "NS"
+            ? "bg-purple-100"
+            : "bg-gray-100"
+        }`}
+      >
+        {userShiftAssignments[user.id]?.[shift.date.toISOString()]}
+      </div>
+    ) : (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <div className="absolute top-0 right-0 text-gray-500 text-xs cursor-pointer text-center p-0">
+            <FaChevronDown />
+          </div>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="absolute bg-white shadow-md rounded-md z-40">
+          <DropdownMenuItem onClick={() => handleShiftTypeAssignment(user.id, shift.date, "DS")}>
+            DS
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => handleShiftTypeAssignment(user.id, shift.date, "NS")}>
+            NS
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => handleShiftTypeAssignment(user.id, shift.date, "Undo")}>
+            Undo
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    )}
+  </TableCell>
+))}
                   <TableCell className="text-right">{user.workedHours}hrs</TableCell>
                   <TableCell className="text-right">{user.lateHours}hrs</TableCell>
                   <TableCell className="text-right">{user.overtimeHours}hrs</TableCell>
