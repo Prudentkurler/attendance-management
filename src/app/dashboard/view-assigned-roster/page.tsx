@@ -32,6 +32,13 @@ type User = {
   lateHours: number
   overtimeHours: number
   absentDays: number
+  country?: string
+  branch?: string
+  category?: string[]
+  group?: string
+  subgroup?: string
+  schedule?: string
+  rosterType?: string
 }
 
 export default function ViewAssignedRoster() {
@@ -108,9 +115,46 @@ export default function ViewAssignedRoster() {
   }
 
   const handleExport = () => {
-    // Implement export logic here
-    console.log('Exporting roster data...')
-  }
+    const csvContent = "data:text/csv;charset=utf-8," + users.map(user => 
+      `${user.name},${user.workedHours},${user.lateHours},${user.overtimeHours}`
+    ).join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "roster.csv");
+    document.body.appendChild(link);
+    link.click();
+  };
+
+  const filteredUsers = users.filter(user => {
+    const { country, branch, category, group, subgroup, schedule, rosterType, startDate, endDate } = filters;
+  
+    // Check if user matches the filters
+    const matchesFilters = (
+      (!country || user.country === country) &&
+      (!branch || user.branch === branch) &&
+      (!category || user.category?.includes(category)) &&
+      (!group || user.group === group) &&
+      (!subgroup || user.subgroup === subgroup) &&
+      (!schedule || user.schedule === schedule) &&
+      (!rosterType || user.rosterType === rosterType) &&
+      user.shifts.some(shift =>
+        (!startDate || shift.date >= startDate) &&
+        (!endDate || shift.date <= endDate)
+      )
+    );
+  
+    // Additional filtering based on assigned/unassigned schedule
+    const hasAssignedShifts = user.shifts.some(shift =>
+      userShiftAssignments[user.id]?.[shift.date.toISOString()]
+    );
+  
+    return matchesFilters && (showAssignedSchedule ? hasAssignedShifts : !hasAssignedShifts);
+  });
+  
+  
+  
+  
 
   const [showFilters, setShowFilters] = useState<boolean>(false)
   const handleShowFilters = () => {
@@ -140,14 +184,56 @@ export default function ViewAssignedRoster() {
   }
 
   const handleDownloadBulkRosterTemplate = () => {
-    // Implement the logic to generate and download the template
-    console.log('Downloading Bulk Roster Template...')
-  }
+    const templateData = "User ID,Date,Shift Type\nSampleID,2024-12-01,DS";
+    const templateUri = encodeURI(`data:text/csv;charset=utf-8,${templateData}`);
+    const link = document.createElement("a");
+    link.setAttribute("href", templateUri);
+    link.setAttribute("download", "bulk_roster_template.csv");
+    document.body.appendChild(link);
+    link.click();
+  };
+
+  const assignedUsers = users.filter(user =>
+    user.shifts.some(shift => shift.shift !== null)
+  );
+
+  const clearFilters = () => {
+    setFilters({
+      country: '',
+      branch: '',
+      category: '',
+      group: '',
+      subgroup: '',
+      schedule: '',
+      rosterType: '',
+      startDate: null,
+      endDate: null,
+    });
+  
+    // Clear other related states if necessary
+    setSearchQuery('');
+  };
+  
+  
+  
 
   const handleDownloadCSV = () => {
-    // Implement the logic to generate and download the CSV file
-    console.log('Downloading CSV...')
-  }
+    const csvData = filteredUsers.map(user => {
+      const shifts = user.shifts.map(shift =>
+        `${format(shift.date, "yyyy-MM-dd")}: ${userShiftAssignments[user.id]?.[shift.date.toISOString()] || "Unassigned"}`
+      ).join(", ");
+      return `${user.name},${user.id},${shifts}`;
+    });
+  
+    const csvContent = `Name,ID,Shifts\n${csvData.join("\n")}`;
+    const encodedUri = encodeURI(`data:text/csv;charset=utf-8,${csvContent}`);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "roster.csv");
+    document.body.appendChild(link);
+    link.click();
+  };
+  
 
   const handleAssignedSchedule = () => {
     setShowAssignedSchedule(true)
@@ -174,21 +260,26 @@ export default function ViewAssignedRoster() {
   }
 
   const handleBulkAssignment = () => {
-    // Implement the logic to bulk assign the selected users and dates
-    console.log('Bulk assigning selected users and dates...')
-
-    // Send SMS and email notifications to the selected users
+    if (!selectedUsers.length || !selectedDates.length) {
+      alert("Please select at least one user and one date to proceed.");
+      return;
+    }
+  
+    const updates: { [key: string]: { [key: string]: Shift | null } } = {};
     selectedUsers.forEach(userId => {
       selectedDates.forEach(date => {
-        sendNotifications(userId, date, 'DS')
-      })
-    })
-  }
+        if (!updates[userId]) updates[userId] = {};
+        updates[userId][date.toISOString()] = "DS";
+      });
+    });
+  
+    setUserShiftAssignments(prev => ({ ...prev, ...updates }));
+    console.log("Bulk assignments completed.");
+  };
+  
+  
 
-  const filteredUsers = users.filter(user =>
-    user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.id.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+ 
 
   const sendNotifications = (userId: string, date: Date, shiftType: Shift) => {
     // Implement the logic to send SMS and email notifications to the user
@@ -201,14 +292,71 @@ export default function ViewAssignedRoster() {
         <h1 className="text-2xl font-bold"> Roster Schedule</h1>
 
         {showFilters && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Filters</CardTitle>
-            </CardHeader>
-            <CardContent className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-              {/* Filter components */}
-            </CardContent>
-          </Card>
+         <CardContent className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+         <Select onValueChange={(value) => handleFilterChange('country', value)}>
+           <SelectTrigger>
+             <SelectValue placeholder="Select Country" />
+           </SelectTrigger>
+           <SelectContent>
+             <SelectItem value="USA">USA</SelectItem>
+             <SelectItem value="Canada">Canada</SelectItem>
+           </SelectContent>
+         </Select>
+         <Select onValueChange={(value) => handleFilterChange('branch', value)}>
+           <SelectTrigger>
+             <SelectValue placeholder="Select Branch" />
+           </SelectTrigger>
+           <SelectContent>
+             <SelectItem value="Branch A">Branch A</SelectItem>
+             <SelectItem value="Branch B">Branch B</SelectItem>
+           </SelectContent>
+         </Select>
+         <Input
+           placeholder="Category"
+           value={filters.category}
+           onChange={(e) => handleFilterChange('category', e.target.value)}
+         />
+         <Select onValueChange={(value) => handleFilterChange('group', value)}>
+           <SelectTrigger>
+             <SelectValue placeholder="Select Group" />
+           </SelectTrigger>
+           <SelectContent>
+             <SelectItem value="Group A">Group A</SelectItem>
+             <SelectItem value="Group B">Group B</SelectItem>
+           </SelectContent>
+         </Select>
+         <Input
+           placeholder="Subgroup"
+           value={filters.subgroup}
+           onChange={(e) => handleFilterChange('subgroup', e.target.value)}
+         />
+         <Select onValueChange={(value) => handleFilterChange('schedule', value)}>
+           <SelectTrigger>
+             <SelectValue placeholder="Select Schedule" />
+           </SelectTrigger>
+           <SelectContent>
+             <SelectItem value="Schedule 1">Schedule 1</SelectItem>
+             <SelectItem value="Schedule 2">Schedule 2</SelectItem>
+           </SelectContent>
+         </Select>
+         <Select onValueChange={(value) => handleFilterChange('rosterType', value)}>
+           <SelectTrigger>
+             <SelectValue placeholder="Select Roster Type" />
+           </SelectTrigger>
+           <SelectContent>
+             <SelectItem value="Type A">Type A</SelectItem>
+             <SelectItem value="Type B">Type B</SelectItem>
+           </SelectContent>
+         </Select>
+
+          <div className="col-span-2 flex justify-start">
+        <Button variant="secondary" onClick={clearFilters}>
+          Clear Filters
+        </Button>
+      </div>
+        
+       </CardContent>
+       
         )}
 
         <div className="flex justify-between items-center">
@@ -227,12 +375,21 @@ export default function ViewAssignedRoster() {
             <Button onClick={handleDownloadCSV}>
               Download CSV
             </Button>
-            <Button onClick={handleAssignedSchedule}>
-              Assigned Schedule
-            </Button>
-            <Button onClick={handleUnassignedSchedule}>
-              Unassigned Schedule
-            </Button>
+            <div className="flex items-center gap-2">
+          <Button
+            variant={showAssignedSchedule ? "default" : "outline"}
+            onClick={() => setShowAssignedSchedule(true)}
+          >
+            Assigned Schedule
+          </Button>
+          <Button
+            variant={!showAssignedSchedule ? "default" : "outline"}
+            onClick={() => setShowAssignedSchedule(false)}
+          >
+            Unassigned Schedule
+          </Button>
+        </div>
+
           </div>
         </div>
 
@@ -297,7 +454,7 @@ export default function ViewAssignedRoster() {
         {userShiftAssignments[user.id]?.[shift.date.toISOString()]}
       </div>
     ) : (
-      <DropdownMenu>
+            <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <div className="absolute top-0 right-0 text-gray-500 text-xs cursor-pointer text-center p-0">
             <FaChevronDown />
@@ -305,16 +462,17 @@ export default function ViewAssignedRoster() {
         </DropdownMenuTrigger>
         <DropdownMenuContent className="absolute bg-white shadow-md rounded-md z-40">
           <DropdownMenuItem onClick={() => handleShiftTypeAssignment(user.id, shift.date, "DS")}>
-            DS
+            <span className="text-blue-500">Day Shift</span>
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => handleShiftTypeAssignment(user.id, shift.date, "NS")}>
-            NS
+            <span className="text-purple-500">Night Shift</span>
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => handleShiftTypeAssignment(user.id, shift.date, "Undo")}>
-            Undo
+            <span className="text-red-500">Undo</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+
     )}
   </TableCell>
 ))}

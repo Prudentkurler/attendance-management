@@ -36,6 +36,7 @@ interface Schedule {
   eventStatus:string;
   assignedUsers: number;
   location: string;
+  username?:string;
 }
 
 const UpdateSchedulePage: React.FC = () => {
@@ -50,6 +51,7 @@ const UpdateSchedulePage: React.FC = () => {
       eventStatus:"Recuring",
       assignedUsers: 120,
       location: "Known",
+      username:"John Doe"
     },
     {
       id: 2,
@@ -60,8 +62,21 @@ const UpdateSchedulePage: React.FC = () => {
       eventStatus:"Non-REcuring",
       assignedUsers: 60,
       location: "Virtual",
+      username:"Jane Doe"
     },
   ]);
+
+  const [userSearch, setUserSearch] = useState("");
+  const [dropdownOpen, setDropdownOpen] = useState<number | null>(null); // Track which row's dropdown is open.
+
+  const handleUserSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUserSearch(e.target.value);
+  };
+
+  const toggleDropdown = (id: number) => {
+    setDropdownOpen(dropdownOpen === id ? null : id); // Toggle dropdown state.
+  };
+
   
   // Columns for the Data Table
   const columns: ColumnDef<Schedule>[] = [
@@ -88,6 +103,43 @@ const UpdateSchedulePage: React.FC = () => {
     {
       accessorFn: row => row.assignedUsers,
       header: "Assigned Users",
+      cell: ({ row }) => (
+        <div className="relative">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => toggleDropdown(row.original.id)}
+          >
+            {row.original.assignedUsers} Users
+          </Button>
+          {dropdownOpen === row.original.id && (
+            <div className="absolute top-full mt-2 w-64 bg-white border shadow-md rounded-md z-40">
+              <Input
+                placeholder="Search users..."
+                value={userSearch}
+                onChange={handleUserSearch}
+                className="mb-2"
+              />
+              <ul className="max-h-40 overflow-y-auto">
+                {/* Example user list */}
+                {["John Doe", "Jane Doe", "Emily Smith", "Michael Brown"]
+                  .filter((user) =>
+                    user.toLowerCase().includes(userSearch.toLowerCase())
+                  )
+                  .map((user, index) => (
+                    <li
+                      key={index}
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                      onClick={() => console.log(`User selected: ${user}`)}
+                    >
+                      {user}
+                    </li>
+                  ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      ),
     },
     {
       accessorFn: row => row.location,
