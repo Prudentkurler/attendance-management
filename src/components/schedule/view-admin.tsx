@@ -71,8 +71,31 @@ const ViewAssignedAdminSchedulesPage = () => {
   };
 
   const columns: ColumnDef<typeof data[0]>[] = [
-   
-    { header: "Admin", accessorKey: "admin" },
+    {
+      header: ({ table }) => (
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            checked={
+              selectedRows.length === filteredData.length && filteredData.length > 0
+            }
+            onCheckedChange={handleCheckAll}
+          />
+          <span>Admin</span>
+        </div>
+      ),
+      accessorKey: "admin",
+      cell: ({ row }: { row: any }) => (
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            checked={selectedRows.includes(row.original.id)}
+            onCheckedChange={(isChecked: boolean) =>
+              handleRowCheck(row.original.id, isChecked)
+            }
+          />
+          <span>{row.original.admin}</span>
+        </div>
+      ),
+    },
     { header: "Attendance", accessorKey: "attendance" },
     { header: "Event", accessorKey: "event" },
     { header: "Role", accessorKey: "role" },
@@ -93,40 +116,21 @@ const ViewAssignedAdminSchedulesPage = () => {
             <DropdownMenuItem
               onClick={() => console.log("Editing row:", row.original.id)}
             >
-                <Button variant='default' size='sm'>
-                    Edit
-                </Button>
+              <Button variant='default' size='sm'>
+                Edit
+              </Button>
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => console.log("Deleting row:", row.original.id)}
             >
               <Button variant='destructive' size='sm'>
                 Delete
-                </Button>
+              </Button>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       ),
     },
-    {
-        header: () => (
-          <Checkbox
-            checked={
-              selectedRows.length === filteredData.length && filteredData.length > 0
-            }
-            onCheckedChange={handleCheckAll}
-          />
-        ),
-        accessorKey: "checkAll",
-        cell: ({ row }: { row: any }) => (
-          <Checkbox
-            checked={selectedRows.includes(row.original.id)}
-            onCheckedChange={(isChecked: boolean) =>
-              handleRowCheck(row.original.id, isChecked)
-            }
-          />
-        ),
-      },
   ];
 
   const [showFilters, setShowFilters] = useState(false);

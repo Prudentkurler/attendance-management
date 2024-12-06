@@ -9,6 +9,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+//import CSv
+import { CSVLink } from "react-csv";
 
 interface DeviceAssignmentTableProps {
   data: {
@@ -125,7 +127,24 @@ export default function DeviceAssignmentTable({
   
     {
       accessorKey: "country",
-      header: "Country",
+      header: ({ table }) => (
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            checked={areAllSelected}
+            onCheckedChange={(checked) => toggleSelectAll(!!checked)}
+          />
+          <span>Country</span>
+        </div>
+      ),
+      cell: ({ row }) => (
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            checked={selectedAssignments.includes(row.index)}
+            onCheckedChange={() => toggleSelection(row.index)}
+          />
+          <span>{row.original.country}</span>
+        </div>
+      ),
     },
     {
       accessorKey: "branch",
@@ -171,22 +190,17 @@ export default function DeviceAssignmentTable({
         </DropdownMenu>
       ),
     },
-    {
-      id: "select",
-      header: ({ table }) => (
-        <Checkbox
-          checked={areAllSelected}
-          onCheckedChange={(checked) => toggleSelectAll(!!checked)}
-        />
-      ),
-      cell: ({ row, table }) => (
-        <Checkbox
-          checked={selectedAssignments.includes(row.index)}
-          onCheckedChange={() => toggleSelection(row.index)}
-        />
-      ),
-    },
+    
   ];
+
+
+
+  //Export CSV Logic
+  const handleExportCSV = () => {
+    console.log("Exporting CSV...");
+    // Add export logic here
+  };
+
 
   return (
     <div className="mt-4">
@@ -208,6 +222,15 @@ export default function DeviceAssignmentTable({
 
       {/* Data Table */}
       <DataTable columns={columns} data={filteredData} />
+
+      {/*Export CSV Button*/}
+      <div className="flex justify-end mt-2">
+        <Button variant='default' size='sm' className="bg-ds-primary text-ds-foreground hover:bg-ds-primary-dark font-semibold mt-3">
+        <CSVLink data={filteredData} onClick={handleExportCSV} className="text-sm font-bold">
+          Export CSV
+        </CSVLink>
+        </Button>
+        </div>
     </div>
   );
 }

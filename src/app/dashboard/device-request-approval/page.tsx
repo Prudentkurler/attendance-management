@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { CSVLink } from "react-csv";
 
 // Define DeviceRequest type
 interface DeviceRequest {
@@ -39,10 +40,44 @@ const columns = (
   onDelete: (id: number) => void,
   filteredData: DeviceRequest[]
 ) => [
- 
-  { accessorKey: "name", header: "Requester", cell: ({ row }: { row: { original: DeviceRequest } }) => row.original.name },
-  { accessorKey: "branch", header: "Branch", cell: ({ row }: { row: { original: DeviceRequest } }) => row.original.branch },
-  { accessorKey: "deviceInfo", header: "Device ID", cell: ({ row }: { row: { original: DeviceRequest } }) => row.original.deviceInfo },
+  {
+    accessorKey: "name",
+    header: () => (
+      <div className="flex items-center space-x-2">
+        <Checkbox
+          checked={
+            selectedRequests.length === filteredData.length && filteredData.length > 0
+          }
+          onCheckedChange={(isChecked) => {
+            const allRowIds = filteredData.map((row) => row.id);
+            handleCheckboxChange(-1, !!isChecked, allRowIds);
+          }}
+          aria-label="Select all"
+        />
+        <span>Requester</span>
+      </div>
+    ),
+    cell: ({ row }: { row: { original: DeviceRequest } }) => (
+      <div className="flex items-center space-x-2">
+        <Checkbox
+          checked={selectedRequests.includes(row.original.id)}
+          onCheckedChange={(isChecked) => handleCheckboxChange(row.original.id, !!isChecked)}
+          aria-label="Select row"
+        />
+        <span>{row.original.name}</span>
+      </div>
+    ),
+  },
+  {
+    accessorKey: "branch",
+    header: "Branch",
+    cell: ({ row }: { row: { original: DeviceRequest } }) => row.original.branch,
+  },
+  {
+    accessorKey: "deviceInfo",
+    header: "Device ID",
+    cell: ({ row }: { row: { original: DeviceRequest } }) => row.original.deviceInfo,
+  },
   {
     accessorKey: "status",
     header: "Status",
@@ -75,26 +110,6 @@ const columns = (
           Delete
         </Button>
       </div>
-    ),
-  },
-  {
-    accessorKey: "select",
-    header: () => (
-      <Checkbox
-        checked={selectedRequests.length === filteredData.length && filteredData.length > 0}
-        onCheckedChange={(isChecked) => {
-          const allRowIds = filteredData.map((row) => row.id);
-          handleCheckboxChange(-1, !!isChecked, allRowIds);
-        }}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }: { row: { original: DeviceRequest } }) => (
-      <Checkbox
-        checked={selectedRequests.includes(row.original.id)}
-        onCheckedChange={(isChecked) => handleCheckboxChange(row.original.id, !!isChecked)}
-        aria-label="Select row"
-      />
     ),
   },
 ];
@@ -227,6 +242,16 @@ export default function ViewApproveDeviceRequests() {
         )}
         data={filteredData}
       />
+
+      {/*Export CSV Button*/}
+      <div className="w-full flex items-center justify-end mt-3">
+
+      <Button className="bg-ds-primary text-ds-foreground hover:bg-ds-primary-dark font-semibold" variant='default' size='sm'>
+        <CSVLink data={filteredData} filename={"device_requests.csv"}>
+          Export CSV
+        </CSVLink>
+      </Button>
+      </div>
 
       {/* View Modal */}
       {viewDetails && (

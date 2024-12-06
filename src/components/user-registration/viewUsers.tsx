@@ -19,6 +19,7 @@ import { Card } from "../ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { getCoreRowModel } from "@tanstack/react-table"; 
 import { usePathname } from "next/navigation";
+import { CSVLink } from "react-csv";
 
 interface User {
   id: string;
@@ -96,13 +97,25 @@ export default function ViewUsers() {
   const columns: ColumnDef<User>[] = [
     {
       accessorKey: "profileImage",
-      header: "Image",
+      header: ({table})=>(
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            checked={table.getIsAllRowsSelected()}
+            onCheckedChange={(value) => table.toggleAllRowsSelected(!!value)}
+          />
+          <span>Profile</span>
+        </div>
+
+      ),
       cell: ({ row }) => (
+        <div className="flex items-center gap-2">
+
         <img
           src={row.original.profileImage}
           alt={row.original.firstName}
           className="w-10 h-10 rounded-full"
-        />
+          />
+          </div>
       ),
     },
     { accessorKey: "title", header: "Title" },
@@ -324,25 +337,7 @@ export default function ViewUsers() {
            
       ),
     },
-    {
-      id: "checkbox",
-      header: ({ table }) => (
-        <Checkbox
-          checked={table.getIsAllRowsSelected()}
-          onCheckedChange={(value) =>
-            table.toggleAllRowsSelected(!!value)
-          }
-        />
-      ),
-      cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) =>
-            row.toggleSelected(!!value)
-          }
-        />
-      ),
-    },
+    
   ];
   const table = useReactTable({
     data: usersData,
@@ -548,6 +543,13 @@ export default function ViewUsers() {
       {/* Table Section */}
       <DataTable columns={columns} data={usersData} />
 
+          {/*Export CSV button*/}
+
+          <Button className="bg-ds-primary text-ds-foreground font-semibold hover:bg-ds-primary-dark mt-4">
+            <CSVLink data={usersData} filename="Users">
+                Export CSV
+            </CSVLink>
+          </Button>
     
     </Card>
   );

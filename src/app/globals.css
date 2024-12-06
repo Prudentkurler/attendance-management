@@ -191,6 +191,14 @@
   }
 }
 
+.sticky-column {
+  position: sticky;
+  left: 0;
+  z-index: 10;
+  background-color: white;
+}
+
+
 @layer utilities {
   .min-h-dm {
     min-height: 100vh;

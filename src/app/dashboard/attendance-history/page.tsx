@@ -18,6 +18,7 @@ import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Popover, PopoverContent } from "@/components/ui/popover";
 import { PopoverTrigger } from "@radix-ui/react-popover";
+import { CSVLink } from "react-csv";
 
 interface AttendanceReport {
   id: string;
@@ -201,11 +202,32 @@ const [breakdowns] = useState<DailyBreakdown[]>([
   };
 
   const summaryColumns: ColumnDef<AttendanceReport, unknown>[] = [
-  {
+    {
       accessorKey: "user",
-      header: "Users",
+      header: ({ table }) => (
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            checked={
+              table.getSelectedRowModel().rows.length === table.getPreFilteredRowModel().rows.length
+            }
+            onCheckedChange={(isChecked) => {
+              const allIds = table.getPreFilteredRowModel().rows.map((row) => row.original.id);
+              table.getPreFilteredRowModel().rows.forEach(row => row.toggleSelected(!!isChecked));
+            }}
+            aria-label="Select all"
+          />
+          <span>Users</span>
+        </div>
+      ),
       cell: ({ row }) => (
-        <div className="flex items-center ">
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            checked={row.getIsSelected()}
+            onCheckedChange={(isChecked) =>
+              row.toggleSelected(!!isChecked)
+            }
+            aria-label="Select row"
+          />
           <Image
             src={row.original.userImage}
             alt={row.original.userName}
@@ -217,7 +239,7 @@ const [breakdowns] = useState<DailyBreakdown[]>([
           </div>
         </div>
       ),
-      meta: { position:'sticky', left:16 },
+      meta: { position: 'sticky', left: 16 },
     },
     { accessorKey: "breakOverstay", header: "Break Overstay (h)" },
     { accessorKey: "absentDays", header: "Absent Days" },
@@ -263,55 +285,57 @@ const [breakdowns] = useState<DailyBreakdown[]>([
       accessorKey: "actions",
       header: "Actions",
       cell: ({ row }) => (
-
         <Popover>
           <PopoverTrigger>...</PopoverTrigger>
           <PopoverContent className="w-9/10">
-            
-        <div className="flex flex-col gap-3">
-          <Button size="sm" onClick={() => handleViewBreakdown(row.original.id)}>
-            View Details
-          </Button>
-          {!row.original.validated && (
-            <Button
-              className="px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700"
-              onClick={() => handleValidate(row.original.id)}
-            >
-              Validate
-            </Button>
-          )}
-        </div>
+            <div className="flex flex-col gap-3">
+              <Button size="sm" onClick={() => handleViewBreakdown(row.original.id)}>
+                View Details
+              </Button>
+              {!row.original.validated && (
+                <Button
+                  className="px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700"
+                  onClick={() => handleValidate(row.original.id)}
+                >
+                  Validate
+                </Button>
+              )}
+            </div>
           </PopoverContent>
-          
         </Popover>
-      ),
-    },
-
-    {
-      id: "select",
-      header: ({ table }) => (
-        <Checkbox
-          checked={selectedReports.length === reports.length}
-          onCheckedChange={(checked) => handleToggleSelectAll(!!checked)}
-        />
-      ),
-      cell: ({ row }) => (
-        <Checkbox
-          checked={selectedReports.includes(row.original.id)}
-          onCheckedChange={() => handleToggleSelect(row.original.id)}
-        />
       ),
     },
     
   ];
+  
 
   const breakdownColumns: ColumnDef<DailyBreakdown, unknown>[] = [
-
     {
       accessorKey: "user",
-      header: "Users",
+      header: ({ table }) => (
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            checked={
+              table.getSelectedRowModel().rows.length === table.getPreFilteredRowModel().rows.length
+            }
+            onCheckedChange={(isChecked) => {
+              const allIds = table.getPreFilteredRowModel().rows.map((row) => row.id);
+              table.getPreFilteredRowModel().rows.forEach(row => row.toggleSelected(!!isChecked));
+            }}
+            aria-label="Select all"
+          />
+          <span>Users</span>
+        </div>
+      ),
       cell: ({ row }) => (
-        <div className="flex items-center ">
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            checked={row.getIsSelected()}
+            onCheckedChange={(isChecked) =>
+              row.toggleSelected(!!isChecked)
+            }
+            aria-label="Select row"
+          />
           <Image
             src={row.original.userImage}
             alt={row.original.userName}
@@ -323,7 +347,7 @@ const [breakdowns] = useState<DailyBreakdown[]>([
           </div>
         </div>
       ),
-      meta: { position:'sticky', left:16 },
+      meta: { position: 'sticky', left: 16 },
     },
     {
       accessorKey: "date",
@@ -378,7 +402,7 @@ const [breakdowns] = useState<DailyBreakdown[]>([
       ),
     },
   ];
-
+  
   const [showFilter, setSHowFilter] = useState<boolean>(false)
 
   const handleShowFilter = ()=>{
@@ -470,10 +494,13 @@ const [breakdowns] = useState<DailyBreakdown[]>([
             <Button
               size="sm"
               onClick={handleExport}
-              variant="destructive"
-              className="font-bold"
+              variant="default"
+              className=" bg-ds-primary text-ds-foreground hover:bg-ds-primary-dark  font-semibold"
             >
+              <CSVLink data={viewType === "summary" ? reports : breakdowns} filename="attendance_history" >
+
               Export Report
+              </CSVLink>
             </Button>
           </div>
         </div>

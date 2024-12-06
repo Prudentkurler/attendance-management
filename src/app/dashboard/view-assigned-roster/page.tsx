@@ -409,6 +409,12 @@ export default function ViewAssignedRoster() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-[50px] sticky left-0 bg-white z-10">
+                  <Checkbox
+                    checked={selectAllUsers}
+                    onCheckedChange={handleSelectAllUsers}
+                  />
+                </TableHead>
                 <TableHead className="w-[200px] sticky left-0 bg-white z-10">
                   User
                 </TableHead>
@@ -423,12 +429,6 @@ export default function ViewAssignedRoster() {
                 <TableHead className="text-right">Worked Hours</TableHead>
                 <TableHead className="text-right">Late Hours</TableHead>
                 <TableHead className="text-right">Overtime</TableHead>
-                <TableHead className="w-[50px] sticky left-0 bg-white z-10">
-                  <Checkbox
-                    checked={selectAllUsers}
-                    onCheckedChange={handleSelectAllUsers}
-                  />
-                </TableHead>
               </TableRow>
             </TableHeader>
 
