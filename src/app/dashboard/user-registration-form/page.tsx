@@ -1,6 +1,7 @@
 "use client"
 
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import BulkRegistration from '@/components/user-registration/bulkregistration'
 import UserRegistration from '@/components/user-registration/userForms'
@@ -22,6 +23,13 @@ const Page = () => {
     <div className="w-full">
       <div className="mb-8 flex w-full flex-col md:flex-row gap-5 justify-between items-center">
         <h3 className="text-lg font-semibold">User Registration</h3>
+
+       
+
+        {/*A checkbox to enable user report access*/}
+
+        
+
 
         <div className='flex items-center gap-3'>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -63,6 +71,18 @@ const Page = () => {
         </Dialog>
           
         </div>
+      </div>
+      <div className='mt-3 mb-4 flex items-center gap-4'>
+          <h5>Enable User Report Access</h5>
+        <Checkbox
+          id="reportAccess"
+          onCheckedChange={(checked) => console.log('User report access:', checked)}
+        />
+          
+          
+          
+          
+       
       </div>
 
       <ViewUsers/>

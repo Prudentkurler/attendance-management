@@ -20,6 +20,9 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { getCoreRowModel } from "@tanstack/react-table"; 
 import { usePathname } from "next/navigation";
 import { CSVLink } from "react-csv";
+import { Label } from "../ui/label";
+import { Textarea } from "../ui/textarea";
+import { DatePicker } from "../ui/date-picker";
 
 interface User {
   id: string;
@@ -145,6 +148,87 @@ export default function ViewUsers() {
           {row.original.status}
         </span>
       ),
+    },
+     //Absent Reason
+     {
+      accessorKey: 'absentReason',
+      header: 'Absent Reason',
+      cell: ({ row }: { row: any }) => {
+        const [open, setOpen] = useState(false);
+        const [reason, setReason] = useState(row.original.absentReason || '');
+        const [admin, setAdmin] = useState(row.original.admin || '');
+
+        const handleConfirm = () => {
+          // Update the user's absent reason here
+          row.original.absentReason = reason;
+          setOpen(false);
+        };
+
+        return (
+          <div>
+            <Button variant='outline' className=" font-semibold" onClick={() => setOpen(true)}>
+              Enter Reason
+            </Button>
+            <Dialog open={open} onOpenChange={setOpen} >
+              <DialogContent className=''>
+                <DialogHeader>
+                  <DialogTitle>Enter Absent Reason</DialogTitle>
+                </DialogHeader>
+                <div>
+                  <Label className='font-semibold mb-1' htmlFor="reason">Subject</Label>
+                  <Input
+                    value={reason}
+                    onChange={(e) => setReason(e.target.value)}
+                    placeholder="Enter Subject for absence"
+                    className="w-full"
+                  />
+                  </div>
+                <div>
+                  <Label className='font-semibold mb-1' htmlFor="reason">Reason</Label>
+                  <Textarea
+                    value={reason}
+                    onChange={(e) => setReason(e.target.value)}
+                    placeholder="Enter reason for absence"
+                    className="w-full"
+                  />
+                {/*Duration of Absence Start date and end date */}
+                <div className='flex gap-4 mt-4 mb-4'>
+                  {/*Start date*/}
+                  <div>
+
+                  <Label className='font-semibold'>Start date</Label>
+                  <DatePicker selectedDate={new Date()} onDateChange={(date) => console.log(date)} />
+                  </div>
+                  <div>
+
+                    <Label className='font-semibold'>End date</Label>
+                  <DatePicker selectedDate={new Date()} onDateChange={(date) => console.log(date)} />
+                  </div>
+                </div>
+                <Label className='font-semibold mt-3'>
+                  Admin name
+                </Label>
+                <Input
+                value={admin}
+                onChange={(e) => setAdmin(e.target.value)}
+                placeholder="Enter Admin name"
+                className="w-full"
+
+                />
+                  <div className='flex items-center justify-end w-full'>
+
+                  <Button onClick={handleConfirm} className=" bg-ds-primary text-ds-foreground hover:bg-ds-primary-dark font-semibold mt-4">
+                    Confirm
+                  </Button>
+                  </div>
+                </div>
+              
+
+              </DialogContent>
+            </Dialog>
+          </div>
+        );
+      },
     },
     {
       id: "actions",

@@ -262,87 +262,7 @@ export default function ClockAttendance() {
    
     { accessorKey: 'status', header: 'Status' },
     { accessorKey: 'lastSeen', header: 'Last Seen' },
-    //Absent Reason
-    {
-      accessorKey: 'absentReason',
-      header: 'Absent Reason',
-      cell: ({ row }: { row: any }) => {
-        const [open, setOpen] = useState(false);
-        const [reason, setReason] = useState(row.original.absentReason || '');
-        const [admin, setAdmin] = useState(row.original.admin || '');
-
-        const handleConfirm = () => {
-          // Update the user's absent reason here
-          row.original.absentReason = reason;
-          setOpen(false);
-        };
-
-        return (
-          <div>
-            <Button variant='outline' className=" font-semibold" onClick={() => setOpen(true)}>
-              Enter Reason
-            </Button>
-            <Dialog open={open} onOpenChange={setOpen} >
-              <DialogContent className=''>
-                <DialogHeader>
-                  <DialogTitle>Enter Absent Reason</DialogTitle>
-                </DialogHeader>
-                <div>
-                  <Label className='font-semibold mb-1' htmlFor="reason">Subject</Label>
-                  <Input
-                    value={reason}
-                    onChange={(e) => setReason(e.target.value)}
-                    placeholder="Enter Subject for absence"
-                    className="w-full"
-                  />
-                  </div>
-                <div>
-                  <Label className='font-semibold mb-1' htmlFor="reason">Reason</Label>
-                  <Textarea
-                    value={reason}
-                    onChange={(e) => setReason(e.target.value)}
-                    placeholder="Enter reason for absence"
-                    className="w-full"
-                  />
-                {/*Duration of Absence Start date and end date */}
-                <div className='flex gap-4 mt-4 mb-4'>
-                  {/*Start date*/}
-                  <div>
-
-                  <Label className='font-semibold'>Start date</Label>
-                  <DatePicker selectedDate={new Date()} onDateChange={(date) => console.log(date)} />
-                  </div>
-                  <div>
-
-                    <Label className='font-semibold'>End date</Label>
-                  <DatePicker selectedDate={new Date()} onDateChange={(date) => console.log(date)} />
-                  </div>
-                </div>
-                <Label className='font-semibold mt-3'>
-                  Admin name
-                </Label>
-                <Input
-                value={admin}
-                onChange={(e) => setAdmin(e.target.value)}
-                placeholder="Enter Admin name"
-                className="w-full"
-
-                />
-                  <div className='flex items-center justify-end w-full'>
-
-                  <Button onClick={handleConfirm} className=" bg-ds-primary text-ds-foreground hover:bg-ds-primary-dark font-semibold mt-4">
-                    Confirm
-                  </Button>
-                  </div>
-                </div>
-              
-
-              </DialogContent>
-            </Dialog>
-          </div>
-        );
-      },
-    }
+   
    
 
     
@@ -357,24 +277,11 @@ export default function ClockAttendance() {
 
   return (
     <Card className="p-4 max-w-full gap-6 flex flex-col mx-auto">
-      <div className='flex flex-col md:flex-row mb-4 justify-between items-center'>
+      
 
       <h1 className="text-2xl font-bold mb-6">Clock Attendance</h1>
 
-        {/*A checkbox to enable user report access*/}
-
-        <div className='flex items-center gap-4'>
-          <h5>Enable User Report Access</h5>
-        <Checkbox
-          id="reportAccess"
-          onCheckedChange={(checked) => console.log('User report access:', checked)}
-        />
-          
-          
-          </div>
-          
        
-      </div>
 
       {/* Tabs */}
       <div className="mb-4 flex space-x-4">
