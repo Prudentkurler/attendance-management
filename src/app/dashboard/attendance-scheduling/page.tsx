@@ -3,14 +3,9 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import UpdateSchedulePage from "@/components/schedule/viewSchedule";
-import CreateSchedule from "@/components/schedule/createSchedule";
-import BulkAttendanceScheduling from "@/app/dashboard/bulk-attendance-scheduling/bulkAttendanceScheduling";
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import IndividualEventScheduling from "@/components/individual-event-scheduling/IndividualEventSceduling";
 import IndividualAttendanceScheduling from "@/components/individual-attendance-scheduling/page";
-
-
+import BulkAttendanceScheduling from "@/bulk-attendance-scheduling/bulk-attendance-scheduling";
 
 const SchedulePage: React.FC = () => {
   const [showCreateSchedule, setShowCreateSchedule] = useState(false);

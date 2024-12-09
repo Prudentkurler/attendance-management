@@ -13,90 +13,87 @@ import { Switch } from "@/components/ui/switch";
 import { DatePicker } from "@/components/ui/date-picker";
 import TimePicker from "@/components/ui/time-picker";
 import { useForm, Controller } from "react-hook-form";
+import { toast } from "@/components/ui/use-toast"
 
 type ScheduleType = "Attendance" | "Event";
 type ScheduleCategory = "Long Period" | "Weekly/Monthly Roster";
 
-interface Schedule {
-  id: number;
-  name: string;
-  branch: string;
-  startTime: string;
-  closingTime: string;
-  assignedUsers: number;
-  location: string;
-}
-
-interface FilterForm {
-  country: string;
-  branch: string;
-  category: string;
-  scheduleType: string;
-  scheduleLocation: string;
+interface CreateScheduleForm {
+  scheduleType: ScheduleType;
+  bulkUpload: boolean;
+  scheduleCategory: ScheduleCategory;
+  startDate: Date | null;
+  endDate: Date | null;
+  clockInTime: string;
+  clockOutTime: string;
+  eventName: string;
+  aboutEvent: string;
+  recurring: boolean;
+  recurringType: string;
 }
 
 const CreateSchedule: React.FC<{ onClose: () => void }> = ({ onClose }) => {
-  const { control, handleSubmit: handleFilterSubmit, reset } = useForm<FilterForm>();
-  const [scheduleType, setScheduleType] = useState<ScheduleType>("Attendance");
-  const [bulkUpload, setBulkUpload] = useState(false);
-  const [scheduleCategory, setScheduleCategory] = useState<ScheduleCategory>("Long Period");
-  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
-  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
-  const [hasBreak, setHasBreak] = useState(false);
-  const [filteredData, setFilteredData] = useState<Schedule[]>([]);
+  const { control, handleSubmit, watch, reset } = useForm<CreateScheduleForm>();
+  const [isLoading, setIsLoading] = useState(false);
 
+  const scheduleType = watch("scheduleType");
+  const bulkUpload = watch("bulkUpload");
+  const scheduleCategory = watch("scheduleCategory");
 
+  const onSubmit = async (data: CreateScheduleForm) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/event-scheduling', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) throw new Error('Failed to create schedule');
+      toast({
+        title: "Success",
+        description: "Schedule created successfully",
+      });
+      onClose();
+    } catch (error) {
+      console.error('Error creating schedule:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create schedule",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleClear = () => {
     reset();
-    setScheduleType("Attendance");
-    setBulkUpload(false);
-    setScheduleCategory("Long Period");
-    setStartDate(undefined);
-    setEndDate(undefined);
-    setHasBreak(false);
   };
 
-  const handleFormSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle form submission
-    console.log("Form submitted");
-  };
-
-  // Filter form submission
-  const onFilterSubmit = (data: FilterForm) => {
-    console.log("Filter Data:", data);
-    // Fetch filtered data based on form inputs
-    setFilteredData([
-      {
-        id: 1,
-        name: "Morning Shift",
-        branch: "HQ",
-        startTime: "08:00 AM",
-        closingTime: "05:00 PM",
-        assignedUsers: 120,
-        location: "Known",
-      },
-      {
-        id: 2,
-        name: "Weekly Meeting",
-        branch: "West Branch",
-        startTime: "09:00 AM",
-        closingTime: "11:00 AM",
-        assignedUsers: 60,
-        location: "Virtual",
-      },
-    ]);
-  };
-
-  // Edit schedule
-  const onEditSchedule = (schedule: Schedule) => {
-    console.log("Editing schedule:", schedule);
-  };
-
-  // Delete schedule
-  const onDeleteSchedule = (id: number) => {
-    console.log("Deleting schedule:", id);
+  const handleDownloadTemplate = async () => {
+    try {
+      const response = await fetch('/api/event-scheduling/template', {
+        method: 'GET',
+      });
+      if (!response.ok) throw new Error('Failed to download template');
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'schedule_template.csv';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading template:', error);
+      toast({
+        title: "Error",
+        description: "Failed to download template",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -105,65 +102,98 @@ const CreateSchedule: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         <CardTitle>Create {scheduleType}</CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleFormSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <div className="space-y-4">
-            <RadioGroup
-              defaultValue={scheduleType}
-              onValueChange={(value) => setScheduleType(value as ScheduleType)}
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="Attendance" id="attendance" />
-                <Label htmlFor="attendance">Attendance</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="Event" id="event" />
-                <Label htmlFor="event">Event</Label>
-              </div>
-            </RadioGroup>
+            <Controller
+              name="scheduleType"
+              control={control}
+              defaultValue="Attendance"
+              render={({ field }) => (
+                <RadioGroup
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                  className="flex flex-col space-y-1"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Attendance" id="attendance" />
+                    <Label htmlFor="attendance">Attendance</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Event" id="event" />
+                    <Label htmlFor="event">Event</Label>
+                  </div>
+                </RadioGroup>
+              )}
+            />
 
             {scheduleType === "Attendance" && (
               <>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="bulkUpload"
-                    checked={bulkUpload}
-                    onCheckedChange={(checked) => setBulkUpload(checked as boolean)}
-                  />
-                  <Label htmlFor="bulkUpload">Bulk Schedule Upload</Label>
-                </div>
+                <Controller
+                  name="bulkUpload"
+                  control={control}
+                  defaultValue={false}
+                  render={({ field }) => (
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="bulkUpload"
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                      <Label htmlFor="bulkUpload">Bulk Schedule Upload</Label>
+                    </div>
+                  )}
+                />
 
                 {bulkUpload ? (
                   <div>
-                    <Button variant="outline">Download Schedule Template</Button>
+                    <Button variant="outline" onClick={handleDownloadTemplate}>Download Schedule Template</Button>
                     <Input type="file" className="mt-2" />
                   </div>
                 ) : (
                   <>
-                    <Select onValueChange={(value) => setScheduleCategory(value as ScheduleCategory)}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select Schedule Category" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Long Period">Long Period</SelectItem>
-                        <SelectItem value="Weekly/Monthly Roster">Weekly/Monthly Roster</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <Controller
+                      name="scheduleCategory"
+                      control={control}
+                      defaultValue="Long Period"
+                      render={({ field }) => (
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select Schedule Category" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Long Period">Long Period</SelectItem>
+                            <SelectItem value="Weekly/Monthly Roster">Weekly/Monthly Roster</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
 
                     {scheduleCategory === "Long Period" && (
                       <div className="flex flex-col md:flex-row gap-4">
                         <div className="w-1/3">
                           <Label>Start Date</Label>
-                          <DatePicker
-                            selectedDate={startDate}
-                            onDateChange={(date: Date | undefined) => setStartDate(date)}
-                            
+                          <Controller
+                            name="startDate"
+                            control={control}
+                            render={({ field }) => (
+                              <DatePicker
+                                selectedDate={field.value}
+                                onDateChange={field.onChange}
+                              />
+                            )}
                           />
                         </div>
                         <div className="w-1/3">
                           <Label>End Date</Label>
-                          <DatePicker
-                            selectedDate={endDate}
-                            onDateChange={(date: Date | undefined) => setEndDate(date)}
+                          <Controller
+                            name="endDate"
+                            control={control}
+                            render={({ field }) => (
+                              <DatePicker
+                                selectedDate={field.value}
+                                onDateChange={field.onChange}
+                              />
+                            )}
                           />
                         </div>
                       </div>
@@ -173,13 +203,24 @@ const CreateSchedule: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                       <>
                         <div>
                           <Label htmlFor="clockInTime">Clock In Time</Label>
-                          <TimePicker id="clockInTime" />
+                          <Controller
+                            name="clockInTime"
+                            control={control}
+                            render={({ field }) => (
+                              <TimePicker id="clockInTime" {...field} />
+                            )}
+                          />
                         </div>
                         <div>
                           <Label htmlFor="clockOutTime">Clock Out Time</Label>
-                          <TimePicker id="clockOutTime" />
+                          <Controller
+                            name="clockOutTime"
+                            control={control}
+                            render={({ field }) => (
+                              <TimePicker id="clockOutTime" {...field} />
+                            )}
+                          />
                         </div>
-                        {/* Add more fields for Weekly/Monthly Roster */}
                       </>
                     )}
                   </>
@@ -189,68 +230,164 @@ const CreateSchedule: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
             {scheduleType === "Event" && (
               <>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="bulkEventUpload"
-                    checked={bulkUpload}
-                    onCheckedChange={(checked) => setBulkUpload(checked as boolean)}
-                  />
-                  <Label htmlFor="bulkEventUpload">Bulk Events Template</Label>
-                </div>
+                <Controller
+                  name="bulkUpload"
+                  control={control}
+                  defaultValue={false}
+                  render={({ field }) => (
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="bulkEventUpload"
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                      <Label htmlFor="bulkEventUpload">Bulk Events Template</Label>
+                    </div>
+                  )}
+                />
 
                 {bulkUpload ? (
                   <div>
-                    <Button variant="outline">Download Bulk Events Template</Button>
+                    <Button variant="outline" onClick={handleDownloadTemplate}>Download Bulk Events Template</Button>
                     <Input type="file" className="mt-2" />
                   </div>
                 ) : (
                   <>
                     <div>
                       <Label htmlFor="eventName">Event Name</Label>
-                      <Input id="eventName" />
+                      <Controller
+                        name="eventName"
+                        control={control}
+                        render={({ field }) => (
+                          <Input id="eventName" {...field} />
+                        )}
+                      />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="startDate">Start Date</Label>
-                        <Input type="date" id="startDate" />
+                        <Controller
+                          name="startDate"
+                          control={control}
+                          render={({ field }) => (
+                            <DatePicker
+                              selectedDate={field.value}
+                              onDateChange={field.onChange}
+                            />
+                          )}
+                        />
                       </div>
                       <div>
                         <Label htmlFor="startTime">Start Time</Label>
-                        <Input type="time" id="startTime" />
+                        <Controller
+                          name="clockInTime"
+                          control={control}
+                          render={({ field }) => (
+                            <TimePicker id="startTime" {...field} />
+                          )}
+                        />
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="endDate">End Date</Label>
-                        <Input type="date" id="endDate" />
+                        <Controller
+                          name="endDate"
+                          control={control}
+                          render={({ field }) => (
+                            <DatePicker
+                              selectedDate={field.value}
+                              onDateChange={field.onChange}
+                            />
+                          )}
+                        />
                       </div>
                       <div>
                         <Label htmlFor="endTime">End Time</Label>
-                        <Input type="time" id="endTime" />
+                        <Controller
+                          name="clockOutTime"
+                          control={control}
+                          render={({ field }) => (
+                            <TimePicker id="endTime" {...field} />
+                          )}
+                        />
                       </div>
                     </div>
                     <div>
                       <Label htmlFor="aboutEvent">About Event</Label>
-                      <Textarea id="aboutEvent" placeholder="Enter event details (optional)" />
+                      <Controller
+                        name="aboutEvent"
+                        control={control}
+                        render={({ field }) => (
+                          <Textarea id="aboutEvent" placeholder="Enter event details (optional)" {...field} />
+                        )}
+                      />
                     </div>
                     <div>
                       <Label htmlFor="attachFile">Attach File</Label>
                       <Input type="file" id="attachFile" />
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Switch id="recurring" />
+                      <Controller
+                        name="recurring"
+                        control={control}
+                        defaultValue={false}
+                        render={({ field }) => (
+                          <Switch
+                            id="recurring"
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        )}
+                      />
                       <Label htmlFor="recurring">Recurring</Label>
                     </div>
-                    {/* Add more fields for event creation */}
+                    {watch("recurring") && (
+                      <Controller
+                        name="recurringType"
+                        control={control}
+                        defaultValue="daily"
+                        render={({ field }) => (
+                          <RadioGroup onValueChange={field.onChange} defaultValue={field.value}>
+                            <div className="flex flex-wrap gap-4">
+                              <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="daily" id="daily" />
+                                <Label htmlFor="daily">Daily</Label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="weekly" id="weekly" />
+                                <Label htmlFor="weekly">Weekly</Label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="monthly" id="monthly" />
+                                <Label htmlFor="monthly">Monthly</Label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="quarterly" id="quarterly" />
+                                <Label htmlFor="quarterly">Quarterly</Label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="annually" id="annually" />
+                                <Label htmlFor="annually">Annually</Label>
+                              </div>
+                            </div>
+                          </RadioGroup>
+                        )}
+                      />
+                    )}
                   </>
                 )}
               </>
             )}
 
-            {/* Filters */}
-            
-
-           
+            <div className="flex justify-between">
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? 'Submitting...' : 'Submit'}
+              </Button>
+              <Button type="button" variant="outline" onClick={handleClear}>
+                Clear
+              </Button>
+            </div>
           </div>
         </form>
       </CardContent>
@@ -259,3 +396,4 @@ const CreateSchedule: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 };
 
 export default CreateSchedule;
+

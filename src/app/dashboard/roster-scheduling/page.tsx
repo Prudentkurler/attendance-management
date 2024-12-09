@@ -11,15 +11,13 @@ import { format, eachDayOfInterval, startOfMonth, endOfMonth } from 'date-fns';
 import { ColumnDef } from '@tanstack/react-table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-
-// Removed redundant User type definition
+import { toast } from "@/components/ui/use-toast"
 
 type Schedule = {
   id: string;
   name: string;
   abbreviation: string;
 };
-
 
 interface User {
   id: string;
@@ -43,16 +41,20 @@ export default function RosterScheduling() {
     time: '',
   });
   const [searchTerm, setSearchTerm] = useState('');
-
   const [selectedDates, setSelectedDates] = useState<string[]>([]);
- 
-  const [schedules, setSchedules] = useState<Schedule[]>([
-    { id: '1', name: 'Day Shift', abbreviation: 'DS' },
-    { id: '2', name: 'Afternoon Shift', abbreviation: 'AS' },
-  ]);
+  const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [showAssigned, setShowAssigned] = useState(true);
   const [lastUpdated, setLastUpdated] = useState('');
   const [dateRange, setDateRange] = useState<string[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+
+  useEffect(() => {
+    fetchSchedules();
+    fetchUsers();
+  }, []);
 
   useEffect(() => {
     if (filters.startDate && filters.endDate) {
@@ -62,6 +64,42 @@ export default function RosterScheduling() {
       setDateRange(days.map(day => format(day, 'yyyy-MM-dd')));
     }
   }, [filters.startDate, filters.endDate]);
+
+  const fetchSchedules = async () => {
+    try {
+      const response = await fetch('/api/roster?type=schedules');
+      if (!response.ok) throw new Error('Failed to fetch schedules');
+      const data = await response.json();
+      setSchedules(data);
+    } catch (error) {
+      console.error('Error fetching schedules:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch schedules",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const fetchUsers = async () => {
+    setIsLoading(true);
+    try {
+      const queryParams = new URLSearchParams(filters);
+      const response = await fetch(`/api/roster?${queryParams}`);
+      if (!response.ok) throw new Error('Failed to fetch users');
+      const data = await response.json();
+      setUsers(data);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch users",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleFilterChange = (name: string, value: string) => {
     setFilters(prev => {
@@ -84,164 +122,146 @@ export default function RosterScheduling() {
     });
   };
 
-  const handleExportCSV = () => {
-    const csvHeader = ['ID', 'Name', 'Image URL', ...dateRange].join(',');
-    const csvRows = users.map((user) => {
-      const scheduleValues = dateRange.map((date) => user.schedules[date] || '');
-      return [user.id, user.name, ...scheduleValues].join(',');
-    });
-
-    const csvContent = [csvHeader, ...csvRows].join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', 'roster_schedules.csv');
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const handleExportCSV = async () => {
+    try {
+      const response = await fetch('/api/roster/export', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ users, dateRange }),
+      });
+      if (!response.ok) throw new Error('Failed to export CSV');
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'roster_schedules.csv');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error('Error exporting CSV:', error);
+      toast({
+        title: "Error",
+        description: "Failed to export CSV",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleAssignSchedule = (userId: string, date: string) => {
-    setUsers(prevUsers => {
-      return prevUsers.map(user => {
-        if (user.id === userId) {
-          const newSchedules = { ...user.schedules };
-          if (newSchedules[date]) {
-            delete newSchedules[date];
-          } else {
-            newSchedules[date] = filters.schedule;
+  const handleAssignSchedule = async (userId: string, date: string) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/roster', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, date, schedule: filters.schedule }),
+      });
+      if (!response.ok) throw new Error('Failed to assign schedule');
+      setUsers(prevUsers => {
+        return prevUsers.map(user => {
+          if (user.id === userId) {
+            const newSchedules = { ...user.schedules };
+            if (newSchedules[date]) {
+              delete newSchedules[date];
+            } else {
+              newSchedules[date] = filters.schedule;
+            }
+            return { ...user, schedules: newSchedules };
           }
-          return { ...user, schedules: newSchedules };
-        }
-        return user;
+          return user;
+        });
       });
-    });
-    setLastUpdated(`Mr. samuel Janitey | at: ${format(new Date(), 'EEEE, MMMM d, yyyy \'at\' hh:mm:ss a')}`);
-    // TODO: Implement SMS and email alert functionality here
+      setLastUpdated(`Mr. samuel Janitey | at: ${format(new Date(), 'EEEE, MMMM d, yyyy \'at\' hh:mm:ss a')}`);
+      toast({
+        title: "Success",
+        description: "Schedule assigned successfully",
+      });
+    } catch (error) {
+      console.error('Error assigning schedule:', error);
+      toast({
+        title: "Error",
+        description: "Failed to assign schedule",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleBulkAssign = () => {
-    setUsers(prevUsers => {
-      return prevUsers.map(user => {
-        if (selectedUsers.includes(user.id)) {
-          const newSchedules = { ...user.schedules };
-          selectedDates.forEach(date => {
-            newSchedules[date] = filters.schedule;
-          });
-          return { ...user, schedules: newSchedules };
-        }
-        return user;
+  const handleBulkAssign = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/roster/bulk-assign', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userIds: selectedUsers, dates: selectedDates, schedule: filters.schedule }),
       });
-    });
-    setLastUpdated(`Mr. samuel Janitey | at: ${format(new Date(), 'EEEE, MMMM d, yyyy \'at\' hh:mm:ss a')}`);
-    // TODO: Implement SMS and email alert functionality here
+      if (!response.ok) throw new Error('Failed to bulk assign schedules');
+      setUsers(prevUsers => {
+        return prevUsers.map(user => {
+          if (selectedUsers.includes(user.id)) {
+            const newSchedules = { ...user.schedules };
+            selectedDates.forEach(date => {
+              newSchedules[date] = filters.schedule;
+            });
+            return { ...user, schedules: newSchedules };
+          }
+          return user;
+        });
+      });
+      setLastUpdated(`Mr. samuel Janitey | at: ${format(new Date(), 'EEEE, MMMM d, yyyy \'at\' hh:mm:ss a')}`);
+      toast({
+        title: "Success",
+        description: "Bulk assign completed successfully",
+      });
+    } catch (error) {
+      console.error('Error in bulk assign:', error);
+      toast({
+        title: "Error",
+        description: "Failed to complete bulk assign",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleUploadBulkRoster = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleUploadBulkRoster = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      // TODO: Implement file parsing and roster assignment logic
-      console.log('Uploaded file:', file.name);
-    }
-  };
-
-  const [users, setUsers] = useState<User[]>([
-    {
-      id: 'user1',
-      name: 'User 1',
-      schedules: {
-        '2023-05-01': 'DS',
-        '2023-05-02': 'AS',
-        '2023-05-03': 'DS',
-      },
-      leave: {
-        '2023-05-04': true,
-      },
-      excuse: {
-        '2023-05-05': true,
-      },
-    },
-    {
-      id: 'user2',
-      name: 'User 2',
-      schedules: {
-        '2023-05-01': 'AS',
-        '2023-05-02': 'DS',
-        '2023-05-03': 'AS',
-      },
-      leave: {
-        '2023-05-04': true,
-      },
-      excuse: {
-        '2023-05-05': true,
-      },
-    },
-    {
-      id: 'user3',
-      name: 'User 3',
-      schedules: {
-        '2023-05-01': 'DS',
-        '2023-05-02': 'DS',
-        '2023-05-03': 'AS',
-      },
-      leave: {
-        '2023-05-04': true,
-      },
-      excuse: {
-        '2023-05-05': true,
-      },
-    },]);
-  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
-  const [selectedSchedule, setSelectedSchedule] = useState<string>('');
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
-
-  
-  const handleUserSelect = (userId: string) => {
-    if (selectedUsers.includes(userId)) {
-      setSelectedUsers(selectedUsers.filter((id) => id !== userId));
-    } else {
-      setSelectedUsers([...selectedUsers, userId]);
-    }
-  };
-
-  const handleScheduleSelect = (schedule: string) => {
-    setSelectedSchedule(schedule);
-  };
-
-  const handleDateSelect = (date: Date) => {
-    if (!startDate) {
-      setStartDate(date);
-      setEndDate(new Date(date.getFullYear(), date.getMonth() + 1, 0));
-    } else {
-      setStartDate(null);
-      setEndDate(null);
-    }
-  };
-
-  const handleAssignRoster = () => {
-    // Assign the selected schedule to the selected users for the selected date range
-    selectedUsers.forEach((userId) => {
-      const user = users.find((u) => u.id === userId);
-      if (user) {
-        for (let i = startDate?.getDate() || 0; i <= (endDate?.getDate() || 0); i++) {
-          const date = new Date(startDate?.getFullYear() || 0, startDate?.getMonth() || 0, i);
-          user.schedules[date.toISOString().slice(0, 10)] = selectedSchedule;
-        }
+      setIsLoading(true);
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+        const response = await fetch('/api/roster/upload', {
+          method: 'POST',
+          body: formData,
+        });
+        if (!response.ok) throw new Error('Failed to upload roster');
+        const data = await response.json();
+        setUsers(data.users);
+        toast({
+          title: "Success",
+          description: "Roster uploaded successfully",
+        });
+      } catch (error) {
+        console.error('Error uploading roster:', error);
+        toast({
+          title: "Error",
+          description: "Failed to upload roster",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
       }
-    });
-    setSelectedUsers([]);
-    setSelectedSchedule('');
-    setStartDate(null);
-    setEndDate(null);
+    }
   };
 
-  interface ColumnRenderProps {
-    name: string;
-    user: User;
-  }
+  const handleUserSelect = (userId: string) => {
+    setSelectedUsers(prev =>
+      prev.includes(userId) ? prev.filter(id => id !== userId) : [...prev, userId]
+    );
+  };
 
   const columns: ColumnDef<User>[] = [
     {
@@ -257,181 +277,165 @@ export default function RosterScheduling() {
         );
       },
     },
-    ...Array.from({ length: (endDate?.getDate() || 0) - (startDate?.getDate() || 0) + 1 }, (_, i) => {
-      const date = new Date(startDate?.getFullYear() || 0, startDate?.getMonth() || 0, (startDate?.getDate() || 0) + i);
-      const dateStr = date.toISOString().slice(0, 10);
-      return {
-        header: date.toDateString(),
-        accessorKey: dateStr,
-        cell: ({ row }: { row: { original: User } }) => {
-          const user = row.original;
-          return (
-            <div className="flex items-center justify-between">
-              {user.schedules[dateStr] ? (
-                <span className={`${user.leave[dateStr] ? 'text-red-500' : user.excuse[dateStr] ? 'text-orange-500' : ''}`}>
-                  {user.schedules[dateStr]}
-                </span>
-              ) : (
-                '-'
-              )}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button className="ml-2 text-gray-500 hover:text-gray-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-                      <path
-                        fillRule="evenodd"
-                        d="M12 3.75a.75.75 0 01.75.75v6.75h6.75a.75.75 0 010 1.5h-6.75v6.75a.75.75 0 01-1.5 0v-6.75H4.5a.75.75 0 010-1.5h6.75V4.5a.75.75 0 01.75-.75z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  {/* Render schedule options for this date here */}
-                  <button onClick={() => handleScheduleSelect('DS')}>Day Shift</button>
-                  <button onClick={() => handleScheduleSelect('AS')}>Afternoon Shift</button>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              {user.leave[dateStr] && (
-                <Tooltip>
-                  <TooltipTrigger>
-                    <span className="text-red-500">L</span>
-                  </TooltipTrigger>
-                  <TooltipContent>On Leave</TooltipContent>
-                </Tooltip>
-              )}
-              {user.excuse[dateStr] && (
-                <Tooltip>
-                  <TooltipTrigger>
-                    <span className="text-orange-500">E</span>
-                  </TooltipTrigger>
-                  <TooltipContent>On Excuse</TooltipContent>
-                </Tooltip>
-              )}
-            </div>
-          );
-        },
-      };
-    }),
+    ...dateRange.map(date => ({
+      header: format(new Date(date), 'MMM d'),
+      accessorKey: date,
+      cell: ({ row }: { row: { original: User } }) => {
+        const user = row.original;
+        return (
+          <div className="flex items-center justify-between">
+            {user.schedules[date] ? (
+              <span className={`${user.leave[date] ? 'text-red-500' : user.excuse[date] ? 'text-orange-500' : ''}`}>
+                {user.schedules[date]}
+              </span>
+            ) : (
+              '-'
+            )}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="ml-2 text-gray-500 hover:text-gray-700">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                    <path
+                      fillRule="evenodd"
+                      d="M12 3.75a.75.75 0 01.75.75v6.75h6.75a.75.75 0 010 1.5h-6.75v6.75a.75.75 0 01-1.5 0v-6.75H4.5a.75.75 0 010-1.5h6.75V4.5a.75.75 0 01.75-.75z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                {schedules.map(schedule => (
+                  <DropdownMenuItem key={schedule.id} onSelect={() => handleAssignSchedule(user.id, date)}>
+                    {schedule.name}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+            {user.leave[date] && (
+              <Tooltip>
+                <TooltipTrigger>
+                  <span className="text-red-500">L</span>
+                </TooltipTrigger>
+                <TooltipContent>On Leave</TooltipContent>
+              </Tooltip>
+            )}
+            {user.excuse[date] && (
+              <Tooltip>
+                <TooltipTrigger>
+                  <span className="text-orange-500">E</span>
+                </TooltipTrigger>
+                <TooltipContent>On Excuse</TooltipContent>
+              </Tooltip>
+            )}
+          </div>
+        );
+      },
+    })),
   ];
 
-  const [showFilters, setShowFilters] = useState<boolean>(false)
-
-  const handleShowFilters = ()=>{
-    setShowFilters(!showFilters)
-  }
   return (
     <Card className="p-6 max-w-full mx-auto space-y-6">
       <h1 className="text-2xl font-bold">Roster Scheduling</h1>
 
-     {/* Filters */}
-{
-  showFilters && (
-    <div>
+      <Button onClick={() => setShowFilters(!showFilters)} className='font-semibold'>Filters</Button>
 
-   
-    <div className="flex  gap-3 w-full">
-      <Select onValueChange={(value) => handleFilterChange('country', value)}>
-        <SelectTrigger>
-          <SelectValue placeholder="Select Country" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="USA">USA</SelectItem>
-          <SelectItem value="Ghana">Ghana</SelectItem>
-        </SelectContent>
-      </Select>
+      {showFilters && (
+        <div>
+          <div className="flex gap-3 w-full">
+            <Select onValueChange={(value) => handleFilterChange('country', value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select Country" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="USA">USA</SelectItem>
+                <SelectItem value="Ghana">Ghana</SelectItem>
+              </SelectContent>
+            </Select>
 
-      <Select onValueChange={(value) => handleFilterChange('branch', value)}>
-        <SelectTrigger>
-          <SelectValue placeholder="Select Branch" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="Branch 1">Branch 1</SelectItem>
-          <SelectItem value="Branch 2">Branch 2</SelectItem>
-        </SelectContent>
-      </Select>
+            <Select onValueChange={(value) => handleFilterChange('branch', value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select Branch" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Branch 1">Branch 1</SelectItem>
+                <SelectItem value="Branch 2">Branch 2</SelectItem>
+              </SelectContent>
+            </Select>
 
-      <Select onValueChange={(value) => handleFilterChange('category', value)}>
-        <SelectTrigger>
-          <SelectValue placeholder="Select Category" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="Category 1">Category 1</SelectItem>
-          <SelectItem value="Category 2">Category 2</SelectItem>
-        </SelectContent>
-      </Select>
+            <Select onValueChange={(value) => handleFilterChange('category', value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select Category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Category 1">Category 1</SelectItem>
+                <SelectItem value="Category 2">Category 2</SelectItem>
+              </SelectContent>
+            </Select>
 
-      <Select onValueChange={(value) => handleFilterChange('group', value)}>
-        <SelectTrigger>
-          <SelectValue placeholder="Select Group" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="Group 1">Group 1</SelectItem>
-          <SelectItem value="Group 2">Group 2</SelectItem>
-        </SelectContent>
-      </Select>
+            <Select onValueChange={(value) => handleFilterChange('group', value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select Group" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Group 1">Group 1</SelectItem>
+                <SelectItem value="Group 2">Group 2</SelectItem>
+              </SelectContent>
+            </Select>
 
-      <Select onValueChange={(value) => handleFilterChange('subgroup', value)}>
-        <SelectTrigger>
-          <SelectValue placeholder="Select Subgroup" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="Subgroup 1">Subgroup 1</SelectItem>
-          <SelectItem value="Subgroup 2">Subgroup 2</SelectItem>
-        </SelectContent>
-      </Select>
+            <Select onValueChange={(value) => handleFilterChange('subgroup', value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select Subgroup" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Subgroup 1">Subgroup 1</SelectItem>
+                <SelectItem value="Subgroup 2">Subgroup 2</SelectItem>
+              </SelectContent>
+            </Select>
 
-      <Select onValueChange={(value) => handleFilterChange('rosterType', value)}>
-        <SelectTrigger>
-          <SelectValue placeholder="Select Roster Type" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="Weekly">Weekly</SelectItem>
-          <SelectItem value="Monthly">Monthly</SelectItem>
-        </SelectContent>
-      </Select>
-      </div>
-      <div className='flex mt-3 flex-col md:flex-row gap-3'>
+            <Select onValueChange={(value) => handleFilterChange('rosterType', value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select Roster Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Weekly">Weekly</SelectItem>
+                <SelectItem value="Monthly">Monthly</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className='flex mt-3 flex-col md:flex-row gap-3'>
+            <Input
+              type="date"
+              placeholder="Start Date"
+              value={filters.startDate}
+              onChange={(e) => handleFilterChange('startDate', e.target.value)}
+            />
+            <Input
+              type="date"
+              placeholder="End Date"
+              value={filters.endDate}
+              onChange={(e) => handleFilterChange('endDate', e.target.value)}
+            />
 
-      <Input
-        type="date"
-        placeholder="Start Date"
-        value={filters.startDate}
-        onChange={(e) => handleFilterChange('startDate', e.target.value)}
-      />
-      <Input
-        type="date"
-        placeholder="End Date"
-        value={filters.endDate}
-        onChange={(e) => handleFilterChange('endDate', e.target.value)}
-        />
+            <Select onValueChange={(value) => handleFilterChange('schedule', value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select Schedule" />
+              </SelectTrigger>
+              <SelectContent>
+                {schedules.map(schedule => (
+                  <SelectItem key={schedule.id} value={schedule.abbreviation}>{schedule.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
-      <Select onValueChange={(value) => handleFilterChange('schedule', value)}>
-        <SelectTrigger>
-          <SelectValue placeholder="Select Schedule" />
-        </SelectTrigger>
-        <SelectContent>
-          {schedules.map(schedule => (
-            <SelectItem key={schedule.id} value={schedule.abbreviation}>{schedule.name}</SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-
-      <Input
-        type="time"
-        placeholder="Select Time"
-        onChange={(e) => handleFilterChange('time', e.target.value)}
-        />
+            <Input
+              type="time"
+              placeholder="Select Time"
+              onChange={(e) => handleFilterChange('time', e.target.value)}
+            />
+          </div>
         </div>
+      )}
 
-        </div>
-   
-  )
-}
-
-
-<Button onClick={handleShowFilters} className='font-semibold'>Filters</Button>
-      {/* Search and Select All */}
       <div className="flex justify-between">
         <Input
           placeholder="Search [Name/ID]"
@@ -448,7 +452,6 @@ export default function RosterScheduling() {
         </div>
       </div>
 
-      {/* Select All Dates */}
       <div className="flex items-center space-x-2">
         <Checkbox
           checked={selectedDates.length === dateRange.length}
@@ -457,10 +460,15 @@ export default function RosterScheduling() {
         <span>Select All Dates</span>
       </div>
 
-      {/* Data Table */}
-      <DataTable columns={columns} data={users.filter(user => showAssigned ? Object.keys(user.schedules).length > 0 : Object.keys(user.schedules).length === 0)} />
+      <DataTable 
+        columns={columns} 
+        data={users.filter(user => 
+          showAssigned 
+            ? Object.keys(user.schedules).length > 0 
+            : Object.keys(user.schedules).length === 0
+        )} 
+      />
 
-      {/* Buttons */}
       <div className="flex justify-between items-center">
         <div>
           <Button variant="outline" className="mr-2">Download Bulk Roster Template</Button>
@@ -482,15 +490,14 @@ export default function RosterScheduling() {
         </div>
       </div>
 
-      {/* Assign Roster Button */}
-      <Button onClick={handleBulkAssign} variant="default" className='bg-ds-primary text-ds-foreground'>
-        ASSIGN ROSTER
+      <Button onClick={handleBulkAssign} variant="default" className='bg-ds-primary text-ds-foreground' disabled={isLoading}>
+        {isLoading ? 'Assigning...' : 'ASSIGN ROSTER'}
       </Button>
 
-      {/* Last Updated */}
       <div className="text-sm text-gray-500">
         Last Updated by: {lastUpdated}
       </div>
     </Card>
   );
 }
+

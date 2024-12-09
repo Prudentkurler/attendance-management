@@ -9,20 +9,40 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DatePicker } from "@/components/ui/date-picker";
-import TimePicker  from "@/components/ui/TimePicker";
-import { DateRangePicker } from "@/components/DateRangePicker";
-
-
+import TimePicker from "@/components/ui/time-picker";
+import { DateRangePicker } from "@/components/date-range-picker";
+import { toast } from "@/components/ui/use-toast"
 
 const IndividualEventScheduling = ({ onClose }: { onClose: () => void }) => {
   const [isRecurring, setIsRecurring] = useState(false);
   const [reminderDates, setReminderDates] = useState<{ date: Date | null; time: string }[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
-    console.log("Form submitted");
-    onClose();
+    setIsLoading(true);
+    try {
+      const formData = new FormData(e.target as HTMLFormElement);
+      const response = await fetch('/api/event-scheduling', {
+        method: 'POST',
+        body: formData,
+      });
+      if (!response.ok) throw new Error('Failed to submit event');
+      toast({
+        title: "Success",
+        description: "Event submitted successfully",
+      });
+      onClose();
+    } catch (error) {
+      console.error('Error submitting event:', error);
+      toast({
+        title: "Error",
+        description: "Failed to submit event",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const addReminderDate = () => {
@@ -34,13 +54,13 @@ const IndividualEventScheduling = ({ onClose }: { onClose: () => void }) => {
       <h4>Event Scheduling</h4>
       <div>
         <Label htmlFor="eventName">Enter Event Name</Label>
-        <Input id="eventName" placeholder="Event name" required />
+        <Input id="eventName" name="eventName" placeholder="Event name" required />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
           <Label htmlFor="country">Country</Label>
-          <Select>
+          <Select name="country">
             <SelectTrigger id="country">
               <SelectValue placeholder="Select countries" />
             </SelectTrigger>
@@ -51,7 +71,7 @@ const IndividualEventScheduling = ({ onClose }: { onClose: () => void }) => {
           </Select>
         </div>
         <div className="flex items-center space-x-2">
-          <Checkbox id="assignAllUsers" />
+          <Checkbox id="assignAllUsers" name="assignAllUsers" />
           <Label htmlFor="assignAllUsers">Assign All Users</Label>
         </div>
       </div>
@@ -59,7 +79,7 @@ const IndividualEventScheduling = ({ onClose }: { onClose: () => void }) => {
       <div className="grid grid-cols-2 gap-4">
         <div>
           <Label htmlFor="branch">Branch</Label>
-          <Select>
+          <Select name="branch">
             <SelectTrigger id="branch">
               <SelectValue placeholder="Select branches" />
             </SelectTrigger>
@@ -71,7 +91,7 @@ const IndividualEventScheduling = ({ onClose }: { onClose: () => void }) => {
         </div>
         <div>
           <Label htmlFor="users">Users</Label>
-          <Select>
+          <Select name="users">
             <SelectTrigger id="users">
               <SelectValue placeholder="Select users" />
             </SelectTrigger>
@@ -95,7 +115,7 @@ const IndividualEventScheduling = ({ onClose }: { onClose: () => void }) => {
         </div>
         <div>
           <Label>Start Time</Label>
-          <TimePicker />
+          <TimePicker name="startTime" />
         </div>
       </div>
 
@@ -111,18 +131,18 @@ const IndividualEventScheduling = ({ onClose }: { onClose: () => void }) => {
         </div>
         <div>
           <Label>End Time</Label>
-          <TimePicker />
+          <TimePicker name="endTime" />
         </div>
       </div>
 
       <div>
         <Label htmlFor="aboutEvent">About Event (optional)</Label>
-        <Textarea id="aboutEvent" placeholder="Enter event details (max 500 words)" maxLength={500} />
+        <Textarea id="aboutEvent" name="aboutEvent" placeholder="Enter event details (max 500 words)" maxLength={500} />
       </div>
 
       <div>
         <Label htmlFor="attachFile">Attach File (optional)</Label>
-        <Input id="attachFile" type="file" />
+        <Input id="attachFile" name="attachFile" type="file" />
       </div>
 
       <div className="flex items-center space-x-2">
@@ -131,7 +151,7 @@ const IndividualEventScheduling = ({ onClose }: { onClose: () => void }) => {
       </div>
 
       {isRecurring && (
-        <RadioGroup defaultValue="daily">
+        <RadioGroup defaultValue="daily" name="recurringType">
           <div className="flex flex-wrap gap-4">
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="daily" id="daily" />
@@ -172,8 +192,8 @@ const IndividualEventScheduling = ({ onClose }: { onClose: () => void }) => {
             <div>
               <Label>Set Date</Label>
               <DateRangePicker 
-              startDate={new Date()} 
-              endDate={new Date()}  
+                startDate={new Date()} 
+                endDate={new Date()}  
                 onStartDateChange={(date: Date | null) => {
                   const newDates = [...reminderDates];
                   newDates[index].date = date;
@@ -203,7 +223,7 @@ const IndividualEventScheduling = ({ onClose }: { onClose: () => void }) => {
 
       <div>
         <Label>Medium</Label>
-        <RadioGroup defaultValue="sms">
+        <RadioGroup defaultValue="sms" name="medium">
           <div className="flex space-x-4">
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="sms" id="sms" />
@@ -223,17 +243,19 @@ const IndividualEventScheduling = ({ onClose }: { onClose: () => void }) => {
 
       <div>
         <Label htmlFor="subject">Subject</Label>
-        <Input id="subject" placeholder="Reminder subject" />
+        <Input id="subject" name="subject" placeholder="Reminder subject" />
       </div>
 
       <div>
         <Label htmlFor="reminderMessage">Reminder Message</Label>
-        <Textarea id="reminderMessage" placeholder="Enter reminder message (max 500 characters)" maxLength={500} />
+        <Textarea id="reminderMessage" name="reminderMessage" placeholder="Enter reminder message (max 500 characters)" maxLength={500} />
       </div>
 
       <div className="flex justify-between">
-        <Button onClick={onClose} type="submit">Submit</Button>
-        <Button type="button" variant="outline">Add New Event</Button>
+        <Button type="submit" disabled={isLoading}>
+          {isLoading ? 'Submitting...' : 'Submit'}
+        </Button>
+        <Button type="button" variant="outline" onClick={onClose}>Cancel</Button>
       </div>
     </form>
   );

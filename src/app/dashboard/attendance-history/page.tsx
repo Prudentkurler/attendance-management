@@ -1,7 +1,6 @@
 "use client";
 
-// pages/attendance-history.tsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
@@ -53,114 +52,38 @@ interface DailyBreakdown {
 
 export default function AttendanceHistoryPage() {
   const [viewType, setViewType] = useState<"summary" | "breakdown">("summary");
-  const [reports,setReports] = useState<AttendanceReport[]>([
-    {
-      id: "1",
-      userId: "USR001",
-      userName: "John Doe",
-      userImage: "",
-      totalClockIns: 20,
-      totalClockOuts: 20,
-      adminClockIns: 5,
-      adminClockOuts: 5,
-      totalHours: 160,
-      overtimeHours: 15,
-      lateHours: 3,
-      validated: true,
-      breakOverstay: 2,
-      absentDays: 1,
-      leaveDays: 2,
-      excuseDutyDays: 1,
-    },
-    {
-      id: "2",
-      userId: "USR002",
-      userName: "Jane Smith",
-      userImage: "",
-      totalClockIns: 18,
-      totalClockOuts: 18,
-      adminClockIns: 2,
-      adminClockOuts: 2,
-      totalHours: 145,
-      overtimeHours: 10,
-      lateHours: 4,
-      validated: false,
-      breakOverstay: 1.5,
-      absentDays: 2,
-      leaveDays: 0,
-      excuseDutyDays: 0,
-    },
-    {
-      id: "3",
-      userId: "USR003",
-      userName: "Alice Johnson",
-      userImage: "",
-      totalClockIns: 22,
-      totalClockOuts: 22,
-      adminClockIns: 3,
-      adminClockOuts: 3,
-      totalHours: 170,
-      overtimeHours: 20,
-      lateHours: 2,
-      validated: true,
-      breakOverstay: 0,
-      absentDays: 0,
-      leaveDays: 1,
-      excuseDutyDays: 0,
-    },
-  ]);
-  
-const [breakdowns] = useState<DailyBreakdown[]>([
-  {
-    userId: "USR002",
-    userName: "Jane Smith",
-    userImage: "",
-    date: new Date(2024, 10, 1),
-    clockIn: new Date(2024, 10, 1, 9, 0),
-    clockOut: new Date(2024, 10, 1, 17, 0),
-    clockSource: "Self",
-    hours: 8,
-    status: "On Time",
-  },
-  {
-    userId: "USR003",
-    userName: "Alice Johnson",
-    userImage: "",
-    date: new Date(2024, 10, 2),
-    clockIn: new Date(2024, 10, 2, 9, 15),
-    clockOut: new Date(2024, 10, 2, 17, 0),
-    clockSource: "Self",
-    hours: 7.75,
-    status: "Late",
-  },
-  {
-    userId: "USR001",
-    userName: "John Doe",
-    userImage: "",
-    date: new Date(2024, 10, 3),
-    clockIn: new Date(2024, 10, 3, 8, 45),
-    clockOut: new Date(2024, 10, 3, 16, 45),
-    clockSource: "Admin",
-    hours: 8,
-    status: "On Time",
-  },
-  {
-    userId: "USR002",
-    userName: "Jane Jones",
-    userImage: "",
-    date: new Date(2024, 10, 4),
-    clockIn: new Date(2024, 10, 4, 9, 30),
-    clockOut: new Date(2024, 10, 4, 17, 15),
-    clockSource: "Self",
-    hours: 7.75,
-    status: "Late",
-  },
-]);
-
+  const [reports, setReports] = useState<AttendanceReport[]>([]);
+  const [breakdowns, setBreakdowns] = useState<DailyBreakdown[]>([]);
   const [selectedReport, setSelectedReport] = useState<string | null>(null);
   const [selectedReports, setSelectedReports] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    fetchData();
+  }, [viewType]);
 
+  const fetchData = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      if (viewType === "summary") {
+        const response = await fetch('/api/history-report/summary');
+        if (!response.ok) throw new Error('Failed to fetch summary data');
+        const data = await response.json();
+        setReports(data);
+      } else {
+        const response = await fetch('/api/history-report/breakdown');
+        if (!response.ok) throw new Error('Failed to fetch breakdown data');
+        const data = await response.json();
+        setBreakdowns(data);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleToggleSelectAll = (checked: boolean) => {
     setSelectedReports(checked ? reports.map((report) => report.id) : []);
@@ -179,26 +102,42 @@ const [breakdowns] = useState<DailyBreakdown[]>([
     setViewType("breakdown");
   };
 
-  const handleValidate = (reportId: string) => {
-    console.log("Validating report:", reportId);
-  
-    // Update the report's validation status
-    const updatedReports = reports.map((report) => {
-      if (report.id === reportId) {
-        return {
-          ...report,
-          validated: true,
-        };
-      }
-      return report;
-    });
-  
-    // Update the state with the modified reports
-    setReports(updatedReports);
+  const handleValidate = async (reportId: string) => {
+    try {
+      const response = await fetch('/api/history-report/validate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ reportId }),
+      });
+      if (!response.ok) throw new Error('Failed to validate report');
+      const updatedReport = await response.json();
+      setReports(reports.map(report => 
+        report.id === updatedReport.id ? updatedReport : report
+      ));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to validate report');
+    }
   };
 
-  const handleExport = () => {
-    console.log("Exporting data...");
+  const handleExport = async () => {
+    try {
+      const endpoint = viewType === "summary" ? 'summary' : 'breakdown';
+      const response = await fetch(`/api/history-report/download/${endpoint}`);
+      if (!response.ok) throw new Error('Failed to export data');
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = `attendance_${viewType}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to export data');
+    }
   };
 
   const summaryColumns: ColumnDef<AttendanceReport, unknown>[] = [
@@ -438,48 +377,47 @@ const [breakdowns] = useState<DailyBreakdown[]>([
       </div>
 
       <Card className="p-3">
-
-        {
-          showFilter &&(
-
-        
-        <div className="bg-white rounded-lg mb-3">
-          <div className="flex flex-col md:flex-row items-center gap-4">
-            <Select value="">
-              <SelectTrigger className="">
-                <SelectValue placeholder="User Type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="individual">Individual</SelectItem>
-                <SelectItem value="organization">Organization</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value="">
-              <SelectTrigger className="">
-                <SelectValue placeholder="Schedule" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="morning">Morning Shift</SelectItem>
-                <SelectItem value="weekly">Weekly Roster</SelectItem>
-              </SelectContent>
-            </Select>
-            <Input type="date" placeholder="Start Date" />
-            <Input type="date" placeholder="End Date" />
-            <Input
-              className=" md:w-auto"
-              placeholder="Search by name or ID..."
-            />
+        {showFilter && (
+          <div className="bg-white rounded-lg mb-3">
+            <div className="flex flex-col md:flex-row items-center gap-4">
+              <Select value="">
+                <SelectTrigger className="">
+                  <SelectValue placeholder="User Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="individual">Individual</SelectItem>
+                  <SelectItem value="organization">Organization</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value="">
+                <SelectTrigger className="">
+                  <SelectValue placeholder="Schedule" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="morning">Morning Shift</SelectItem>
+                  <SelectItem value="weekly">Weekly Roster</SelectItem>
+                </SelectContent>
+              </Select>
+              <Input type="date" placeholder="Start Date" />
+              <Input type="date" placeholder="End Date" />
+              <Input
+                className="md:w-auto"
+                placeholder="Search by name or ID..."
+              />
+            </div>
           </div>
-        </div>
-          )
-        }
+        )}
 
-        <Button variant='default' className="my-4 font-semibold" onClick={handleShowFilter}>
+        <Button variant="default" className="my-4 font-semibold" onClick={handleShowFilter}>
           Filters
         </Button>
 
         <div className="bg-white rounded-lg overflow-hidden">
-          {viewType === "summary" ? (
+          {isLoading ? (
+            <p>Loading...</p>
+          ) : error ? (
+            <p className="text-red-500">{error}</p>
+          ) : viewType === "summary" ? (
             <DataTable<AttendanceReport, unknown>
               columns={summaryColumns}
               data={reports}
@@ -495,12 +433,9 @@ const [breakdowns] = useState<DailyBreakdown[]>([
               size="sm"
               onClick={handleExport}
               variant="default"
-              className=" bg-ds-primary text-ds-foreground hover:bg-ds-primary-dark  font-semibold"
+              className="bg-ds-primary text-ds-foreground hover:bg-ds-primary-dark font-semibold"
             >
-              <CSVLink data={viewType === "summary" ? reports : breakdowns} filename="attendance_history" >
-
               Export Report
-              </CSVLink>
             </Button>
           </div>
         </div>

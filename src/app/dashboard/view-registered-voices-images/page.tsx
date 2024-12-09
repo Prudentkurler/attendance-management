@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Mic, Camera, Upload, Check, X } from 'lucide-react'
+import { toast } from "@/components/ui/use-toast"
 
 type User = {
   id: string
@@ -35,89 +36,144 @@ export default function ViewRegisteredVoicesImages() {
   const [isRecording, setIsRecording] = useState(false)
   const [recordingStatus, setRecordingStatus] = useState<'idle' | 'recording' | 'success' | 'error'>('idle')
   const [imageSource, setImageSource] = useState<'capture' | 'upload' | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
-    // Mock data initialization
-    const mockUsers: User[] = [
-      {
-        id: '1',
-        name: 'John Doe',
-        image: '/placeholder.svg?height=50&width=50',
-        country: 'Ghana',
-        branch: 'Accra',
-        voiceStatus: 'Available',
-        imageStatus: 'Available',
-        registrationDate: '2024-01-15 14:30',
-      },
-      {
-        id: '2',
-        name: 'Jane Smith',
-        image: '/placeholder.svg?height=50&width=50',
-        country: 'Nigeria',
-        branch: 'Lagos',
-        voiceStatus: 'Empty',
-        imageStatus: 'Available',
-        registrationDate: '2024-01-16 09:45',
-      },
-      // Add more mock users as needed
-    ]
-    setUsers(mockUsers)
-  }, [])
+    fetchUsers()
+  }, [filters])
+
+  const fetchUsers = async () => {
+    setIsLoading(true)
+    try {
+      const queryParams = new URLSearchParams(filters)
+      const response = await fetch(`/api/biometric?${queryParams}`)
+      if (!response.ok) throw new Error('Failed to fetch users')
+      const data = await response.json()
+      setUsers(data)
+    } catch (error) {
+      console.error('Error fetching users:', error)
+      toast({
+        title: "Error",
+        description: "Failed to fetch users",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const handleFilterChange = (key: string, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value }))
   }
 
-  const filteredUsers = users.filter(user => 
-    (filters.country === '' || user.country === filters.country) &&
-    (filters.branch === '' || user.branch === filters.branch) &&
-    (filters.search === '' || user.name.toLowerCase().includes(filters.search.toLowerCase()) || user.id.includes(filters.search))
-  )
-
-  const handleRecordVoice = (phrase: string) => {
+  const handleRecordVoice = async (phrase: string) => {
     setIsRecording(true)
     setRecordingStatus('recording')
-    // Simulating voice recording process
-    setTimeout(() => {
-      setIsRecording(false)
+    try {
+      // Implement actual voice recording logic here
+      // For now, we'll simulate the process
+      await new Promise(resolve => setTimeout(resolve, 3000))
       setRecordingStatus('success')
-    }, 3000)
+    } catch (error) {
+      console.error('Error recording voice:', error)
+      setRecordingStatus('error')
+    } finally {
+      setIsRecording(false)
+    }
   }
 
-  const handleSubmitVoice = () => {
-    // Simulating voice submission process
-    setTimeout(() => {
+  const handleSubmitVoice = async () => {
+    try {
+      const response = await fetch('/api/biometric', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: selectedUser?.id, type: 'voice' }),
+      })
+      if (!response.ok) throw new Error('Failed to submit voice')
+      toast({
+        title: "Success",
+        description: "Voice registration successful",
+      })
       setRecordingStatus('idle')
-      alert('Voice registration successful')
-    }, 1000)
+      fetchUsers()
+    } catch (error) {
+      console.error('Error submitting voice:', error)
+      toast({
+        title: "Error",
+        description: "Failed to submit voice",
+        variant: "destructive",
+      })
+    }
   }
 
-  const handleCaptureImage = () => {
+  const handleCaptureImage = async () => {
     setImageSource('capture')
-    // Implement image capture logic here
+    // Implement actual image capture logic here
   }
 
-  const handleUploadImage = () => {
+  const handleUploadImage = async () => {
     setImageSource('upload')
-    // Implement image upload logic here
+    // Implement actual image upload logic here
   }
 
-  const handleSubmitImage = () => {
-    // Simulating image submission process
-    setTimeout(() => {
-      alert('Image registration successful')
+  const handleSubmitImage = async () => {
+    try {
+      const response = await fetch('/api/biometric', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: selectedUser?.id, type: 'image' }),
+      })
+      if (!response.ok) throw new Error('Failed to submit image')
+      toast({
+        title: "Success",
+        description: "Image registration successful",
+      })
       setImageSource(null)
-    }, 1000)
+      fetchUsers()
+    } catch (error) {
+      console.error('Error submitting image:', error)
+      toast({
+        title: "Error",
+        description: "Failed to submit image",
+        variant: "destructive",
+      })
+    }
   }
 
-  const handleVerifyOrganization = () => {
-    // Implement organization verification logic here
-    console.log('Verifying organization:', organizationCode)
+  const handleVerifyOrganization = async () => {
+    try {
+      const response = await fetch(`/api/biometric/verify-organization?code=${organizationCode}`)
+      if (!response.ok) throw new Error('Failed to verify organization')
+      toast({
+        title: "Success",
+        description: "Organization verified successfully",
+      })
+    } catch (error) {
+      console.error('Error verifying organization:', error)
+      toast({
+        title: "Error",
+        description: "Failed to verify organization",
+        variant: "destructive",
+      })
+    }
   }
 
-  const handleVerifyUser = () => {
-    // Implement user verification logic here
-    console.log('Verifying user:', userId)
+  const handleVerifyUser = async () => {
+    try {
+      const response = await fetch(`/api/biometric/verify-user?id=${userId}`)
+      if (!response.ok) throw new Error('Failed to verify user')
+      toast({
+        title: "Success",
+        description: "User verified successfully",
+      })
+    } catch (error) {
+      console.error('Error verifying user:', error)
+      toast({
+        title: "Error",
+        description: "Failed to verify user",
+        variant: "destructive",
+      })
+    }
   }
 
   return (
@@ -136,7 +192,6 @@ export default function ViewRegisteredVoicesImages() {
             <SelectContent>
               <SelectItem value="Ghana">Ghana</SelectItem>
               <SelectItem value="Nigeria">Nigeria</SelectItem>
-              {/* Add more countries as needed */}
             </SelectContent>
           </Select>
           <Select onValueChange={(value) => handleFilterChange('branch', value)}>
@@ -146,7 +201,6 @@ export default function ViewRegisteredVoicesImages() {
             <SelectContent>
               <SelectItem value="Accra">Accra</SelectItem>
               <SelectItem value="Lagos">Lagos</SelectItem>
-              {/* Add more branches as needed */}
             </SelectContent>
           </Select>
           <Input
@@ -169,7 +223,7 @@ export default function ViewRegisteredVoicesImages() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {filteredUsers.map((user) => (
+          {users.map((user) => (
             <TableRow key={user.id}>
               <TableCell className="flex items-center space-x-2 sticky left-0 bg-white z-10">
                 <img src={user.image} alt={user.name} className="w-8 h-8 rounded-full" />
@@ -206,20 +260,19 @@ export default function ViewRegisteredVoicesImages() {
                       </TabsList>
                       <TabsContent value="voice">
                         <div className="mt-5 mb-5 flex gap-3 items-center">
-                          <Button className=' font-bold ' onClick={() => handleRecordVoice('CLOCK ME IN')} disabled={isRecording}>
-                            <Mic  />
+                          <Button className='font-bold' onClick={() => handleRecordVoice('CLOCK ME IN')} disabled={isRecording}>
+                            <Mic />
                             Record "CLOCK ME IN"
                           </Button>
-                          <Button className=' font-bold ' onClick={() => handleRecordVoice('CLOCK ME OUT')} disabled={isRecording}>
+                          <Button className='font-bold' onClick={() => handleRecordVoice('CLOCK ME OUT')} disabled={isRecording}>
                             <Mic className="" />
                             Record "CLOCK ME OUT"
                           </Button>
                           {recordingStatus === 'recording' && <p>Recording...</p>}
                           {recordingStatus === 'success' && <p>Recording successful</p>}
                           {recordingStatus === 'error' && <p>Recording failed</p>}
-                         
                         </div>
-                        <Button className='bg-ds-primary text-ds-foreground font-bold hover:bg-ds-primary-dark' onClick={handleSubmitVoice} >Submit Voice</Button>
+                        <Button className='bg-ds-primary text-ds-foreground font-bold hover:bg-ds-primary-dark' onClick={handleSubmitVoice}>Submit Voice</Button>
                       </TabsContent>
                       <TabsContent value="image">
                         <div className="space-y-4">
@@ -235,7 +288,7 @@ export default function ViewRegisteredVoicesImages() {
                             onChange={(e) => setUserId(e.target.value)}
                           />
                           <Button className='bg-ds-primary text-ds-foreground font-bold hover:bg-ds-primary-dark' onClick={handleVerifyUser}>Verify User</Button>
-                          <Button variant='outline'  onClick={handleCaptureImage}>
+                          <Button variant='outline' onClick={handleCaptureImage}>
                             <Camera className="w-4 h-4 mx-2" />
                             Capture Image
                           </Button>
@@ -260,3 +313,4 @@ export default function ViewRegisteredVoicesImages() {
     </div>
   )
 }
+

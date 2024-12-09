@@ -9,9 +9,10 @@ import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { FaChevronDown } from 'react-icons/fa'
+import { toast } from "@/components/ui/use-toast"
 
 type Shift = 'DS' | 'NS' | 'Undo'
 
@@ -63,48 +64,34 @@ export default function ViewAssignedRoster() {
   const [showAssignedSchedule, setShowAssignedSchedule] = useState<boolean>(true)
   const [shiftTypeDropdown, setShiftTypeDropdown] = useState<{ [key: string]: boolean }>({})
   const [userShiftAssignments, setUserShiftAssignments] = useState<{ [key: string]: { [key: string]: Shift | null } }>({})
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
-    // Mock data initialization
-    const mockUsers: User[] = [
-      {
-        id: '1',
-        name: 'Sam Kofi',
-        shifts: [],
-        workedHours: 120,
-        lateHours: 50,
-        overtimeHours: 100,
-        absentDays: 2,
-      },
-      {
-        id: '2',
-        name: 'Sarah Baah',
-        shifts: [],
-        workedHours: 120,
-        lateHours: 50,
-        overtimeHours: 100,
-        absentDays: 1,
-      },
-    ]
+    fetchUsers()
+  }, [filters, selectedMonth])
 
-    // Generate mock shifts for the selected month
-    const start = startOfMonth(selectedMonth)
-    const end = endOfMonth(selectedMonth)
-    const days = eachDayOfInterval({ start, end })
-
-    mockUsers.forEach(user => {
-      user.shifts = days.map(day => ({
-        date: day,
-        shift: null,
-        startTime: '08:00',
-        endTime: '17:00',
-        actualClockIn: Math.random() > 0.2 ? '08:05' : undefined,
-        actualClockOut: Math.random() > 0.2 ? '17:02' : undefined,
-      }))
-    })
-
-    setUsers(mockUsers)
-  }, [selectedMonth])
+  const fetchUsers = async () => {
+    setIsLoading(true)
+    try {
+      const queryParams = new URLSearchParams({
+        ...filters,
+        month: selectedMonth.toISOString(),
+      })
+      const response = await fetch(`/api/roster?${queryParams}`)
+      if (!response.ok) throw new Error('Failed to fetch users')
+      const data = await response.json()
+      setUsers(data)
+    } catch (error) {
+      console.error('Error fetching users:', error)
+      toast({
+        title: "Error",
+        description: "Failed to fetch users",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const handleFilterChange = (key: string, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value }))
@@ -114,51 +101,119 @@ export default function ViewAssignedRoster() {
     setFilters(prev => ({ ...prev, startDate, endDate }))
   }
 
-  const handleExport = () => {
-    const csvContent = "data:text/csv;charset=utf-8," + users.map(user => 
-      `${user.name},${user.workedHours},${user.lateHours},${user.overtimeHours}`
-    ).join("\n");
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "roster.csv");
-    document.body.appendChild(link);
-    link.click();
-  };
+  const handleExport = async () => {
+    try {
+      const response = await fetch('/api/roster/export', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ users, filters }),
+      })
+      if (!response.ok) throw new Error('Failed to export roster')
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', 'roster.csv')
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    } catch (error) {
+      console.error('Error exporting roster:', error)
+      toast({
+        title: "Error",
+        description: "Failed to export roster",
+        variant: "destructive",
+      })
+    }
+  }
 
-  const filteredUsers = users.filter(user => {
-    const { country, branch, category, group, subgroup, schedule, rosterType, startDate, endDate } = filters;
-  
-    // Check if user matches the filters
-    const matchesFilters = (
-      (!country || user.country === country) &&
-      (!branch || user.branch === branch) &&
-      (!category || user.category?.includes(category)) &&
-      (!group || user.group === group) &&
-      (!subgroup || user.subgroup === subgroup) &&
-      (!schedule || user.schedule === schedule) &&
-      (!rosterType || user.rosterType === rosterType) &&
-      user.shifts.some(shift =>
-        (!startDate || shift.date >= startDate) &&
-        (!endDate || shift.date <= endDate)
-      )
-    );
-  
-    // Additional filtering based on assigned/unassigned schedule
-    const hasAssignedShifts = user.shifts.some(shift =>
-      userShiftAssignments[user.id]?.[shift.date.toISOString()]
-    );
-  
-    return matchesFilters && (showAssignedSchedule ? hasAssignedShifts : !hasAssignedShifts);
-  });
-  
-  
-  
-  
+  const handleAssignSchedule = async (userId: string, date: string, shiftType: Shift) => {
+    try {
+      const response = await fetch('/api/roster', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, date, shiftType }),
+      })
+      if (!response.ok) throw new Error('Failed to assign schedule')
+      setUserShiftAssignments(prev => ({
+        ...prev,
+        [userId]: {
+          ...prev[userId],
+          [date]: shiftType === 'Undo' ? null : shiftType,
+        },
+      }))
+      toast({
+        title: "Success",
+        description: "Schedule assigned successfully",
+      })
+      fetchUsers()
+    } catch (error) {
+      console.error('Error assigning schedule:', error)
+      toast({
+        title: "Error",
+        description: "Failed to assign schedule",
+        variant: "destructive",
+      })
+    }
+  }
 
-  const [showFilters, setShowFilters] = useState<boolean>(false)
-  const handleShowFilters = () => {
-    setShowFilters(!showFilters)
+  const handleBulkAssignment = async () => {
+    if (!selectedUsers.length || !selectedDates.length) {
+      toast({
+        title: "Error",
+        description: "Please select at least one user and one date to proceed",
+        variant: "destructive",
+      })
+      return
+    }
+
+    try {
+      const response = await fetch('/api/roster/bulk-assign', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userIds: selectedUsers, dates: selectedDates, shiftType: 'DS' }),
+      })
+      if (!response.ok) throw new Error('Failed to bulk assign schedules')
+      toast({
+        title: "Success",
+        description: "Bulk assignment completed successfully",
+      })
+      fetchUsers()
+    } catch (error) {
+      console.error('Error in bulk assign:', error)
+      toast({
+        title: "Error",
+        description: "Failed to complete bulk assignment",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleUploadBulkRoster = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      const formData = new FormData()
+      formData.append('file', file)
+      try {
+        const response = await fetch('/api/roster/upload', {
+          method: 'POST',
+          body: formData,
+        })
+        if (!response.ok) throw new Error('Failed to upload roster')
+        toast({
+          title: "Success",
+          description: "Roster uploaded successfully",
+        })
+        fetchUsers()
+      } catch (error) {
+        console.error('Error uploading roster:', error)
+        toast({
+          title: "Error",
+          description: "Failed to upload roster",
+          variant: "destructive",
+        })
+      }
+    }
   }
 
   const handleSearchQueryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -167,35 +222,25 @@ export default function ViewAssignedRoster() {
 
   const handleSelectAllUsers = (checked: boolean) => {
     setSelectAllUsers(checked)
-    if (checked) {
-      setSelectedUsers(users.map(user => user.id))
-    } else {
-      setSelectedUsers([])
-    }
+    setSelectedUsers(checked ? users.map(user => user.id) : [])
   }
 
   const handleSelectAllDates = (checked: boolean) => {
     setSelectAllDates(checked)
-    if (checked) {
-      setSelectedDates(eachDayOfInterval({ start: startOfMonth(selectedMonth), end: endOfMonth(selectedMonth) }))
-    } else {
-      setSelectedDates([])
-    }
+    setSelectedDates(checked ? eachDayOfInterval({ start: startOfMonth(selectedMonth), end: endOfMonth(selectedMonth) }) : [])
   }
 
   const handleDownloadBulkRosterTemplate = () => {
-    const templateData = "User ID,Date,Shift Type\nSampleID,2024-12-01,DS";
-    const templateUri = encodeURI(`data:text/csv;charset=utf-8,${templateData}`);
-    const link = document.createElement("a");
-    link.setAttribute("href", templateUri);
-    link.setAttribute("download", "bulk_roster_template.csv");
-    document.body.appendChild(link);
-    link.click();
-  };
-
-  const assignedUsers = users.filter(user =>
-    user.shifts.some(shift => shift.shift !== null)
-  );
+    const templateData = "User ID,Date,Shift Type\nSampleID,2024-12-01,DS"
+    const blob = new Blob([templateData], { type: 'text/csv' })
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', 'bulk_roster_template.csv')
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
 
   const clearFilters = () => {
     setFilters({
@@ -208,188 +253,138 @@ export default function ViewAssignedRoster() {
       rosterType: '',
       startDate: null,
       endDate: null,
-    });
-  
-    // Clear other related states if necessary
-    setSearchQuery('');
-  };
-  
-  
-  
-
-  const handleDownloadCSV = () => {
-    const csvData = filteredUsers.map(user => {
-      const shifts = user.shifts.map(shift =>
-        `${format(shift.date, "yyyy-MM-dd")}: ${userShiftAssignments[user.id]?.[shift.date.toISOString()] || "Unassigned"}`
-      ).join(", ");
-      return `${user.name},${user.id},${shifts}`;
-    });
-  
-    const csvContent = `Name,ID,Shifts\n${csvData.join("\n")}`;
-    const encodedUri = encodeURI(`data:text/csv;charset=utf-8,${csvContent}`);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "roster.csv");
-    document.body.appendChild(link);
-    link.click();
-  };
-  
-
-  const handleAssignedSchedule = () => {
-    setShowAssignedSchedule(true)
+    })
+    setSearchQuery('')
   }
 
-  const handleUnassignedSchedule = () => {
-    setShowAssignedSchedule(false)
-  }
+  const filteredUsers = users.filter(user => {
+    const matchesFilters = (
+      (!filters.country || user.country === filters.country) &&
+      (!filters.branch || user.branch === filters.branch) &&
+      (!filters.category || user.category?.includes(filters.category)) &&
+      (!filters.group || user.group === filters.group) &&
+      (!filters.subgroup || user.subgroup === filters.subgroup) &&
+      (!filters.schedule || user.schedule === filters.schedule) &&
+      (!filters.rosterType || user.rosterType === filters.rosterType)
+    )
 
-  const handleShiftTypeAssignment = (userId: string, date: Date, shiftType: Shift) => {
-    // Implement the logic to assign the shift type to the user on the specified date
-    console.log(`Assigning ${shiftType} to user ${userId} on ${date.toISOString()}`)
+    const matchesSearch = user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.id.toLowerCase().includes(searchQuery.toLowerCase())
 
-    setUserShiftAssignments(prev => ({
-      ...prev,
-      [userId]: {
-        ...prev[userId],
-        [date.toISOString()]: shiftType === 'Undo' ? null : shiftType,
-      },
-    }))
+    const hasAssignedShifts = user.shifts.some(shift => shift.shift !== null)
 
-    // Send SMS and email notifications to the user
-    sendNotifications(userId, date, shiftType)
-  }
+    return matchesFilters && matchesSearch && (showAssignedSchedule ? hasAssignedShifts : !hasAssignedShifts)
+  })
 
-  const handleBulkAssignment = () => {
-    if (!selectedUsers.length || !selectedDates.length) {
-      alert("Please select at least one user and one date to proceed.");
-      return;
-    }
-  
-    const updates: { [key: string]: { [key: string]: Shift | null } } = {};
-    selectedUsers.forEach(userId => {
-      selectedDates.forEach(date => {
-        if (!updates[userId]) updates[userId] = {};
-        updates[userId][date.toISOString()] = "DS";
-      });
-    });
-  
-    setUserShiftAssignments(prev => ({ ...prev, ...updates }));
-    console.log("Bulk assignments completed.");
-  };
-  
-  
-
- 
-
-  const sendNotifications = (userId: string, date: Date, shiftType: Shift) => {
-    // Implement the logic to send SMS and email notifications to the user
-    console.log(`Sending notifications to user ${userId} for shift type ${shiftType} on ${date.toISOString()}`)
-  }
+  const [showFilters, setShowFilters] = useState<boolean>(false)
 
   return (
     <TooltipProvider>
       <div className="container mx-auto p-6 space-y-6">
-        <h1 className="text-2xl font-bold"> Roster Schedule</h1>
+        <h1 className="text-2xl font-bold">Roster Schedule</h1>
+
+        <Button onClick={() => setShowFilters(!showFilters)}>
+          {showFilters ? 'Hide Filters' : 'Show Filters'}
+        </Button>
 
         {showFilters && (
-         <CardContent className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-         <Select onValueChange={(value) => handleFilterChange('country', value)}>
-           <SelectTrigger>
-             <SelectValue placeholder="Select Country" />
-           </SelectTrigger>
-           <SelectContent>
-             <SelectItem value="USA">USA</SelectItem>
-             <SelectItem value="Canada">Canada</SelectItem>
-           </SelectContent>
-         </Select>
-         <Select onValueChange={(value) => handleFilterChange('branch', value)}>
-           <SelectTrigger>
-             <SelectValue placeholder="Select Branch" />
-           </SelectTrigger>
-           <SelectContent>
-             <SelectItem value="Branch A">Branch A</SelectItem>
-             <SelectItem value="Branch B">Branch B</SelectItem>
-           </SelectContent>
-         </Select>
-         <Input
-           placeholder="Category"
-           value={filters.category}
-           onChange={(e) => handleFilterChange('category', e.target.value)}
-         />
-         <Select onValueChange={(value) => handleFilterChange('group', value)}>
-           <SelectTrigger>
-             <SelectValue placeholder="Select Group" />
-           </SelectTrigger>
-           <SelectContent>
-             <SelectItem value="Group A">Group A</SelectItem>
-             <SelectItem value="Group B">Group B</SelectItem>
-           </SelectContent>
-         </Select>
-         <Input
-           placeholder="Subgroup"
-           value={filters.subgroup}
-           onChange={(e) => handleFilterChange('subgroup', e.target.value)}
-         />
-         <Select onValueChange={(value) => handleFilterChange('schedule', value)}>
-           <SelectTrigger>
-             <SelectValue placeholder="Select Schedule" />
-           </SelectTrigger>
-           <SelectContent>
-             <SelectItem value="Schedule 1">Schedule 1</SelectItem>
-             <SelectItem value="Schedule 2">Schedule 2</SelectItem>
-           </SelectContent>
-         </Select>
-         <Select onValueChange={(value) => handleFilterChange('rosterType', value)}>
-           <SelectTrigger>
-             <SelectValue placeholder="Select Roster Type" />
-           </SelectTrigger>
-           <SelectContent>
-             <SelectItem value="Type A">Type A</SelectItem>
-             <SelectItem value="Type B">Type B</SelectItem>
-           </SelectContent>
-         </Select>
-
-          <div className="col-span-2 flex justify-start">
-        <Button variant="secondary" onClick={clearFilters}>
-          Clear Filters
-        </Button>
-      </div>
-        
-       </CardContent>
-       
+          <Card>
+            <CardHeader>
+              <CardTitle>Filters</CardTitle>
+            </CardHeader>
+            <CardContent className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+              <Select onValueChange={(value) => handleFilterChange('country', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Country" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="USA">USA</SelectItem>
+                  <SelectItem value="Canada">Canada</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select onValueChange={(value) => handleFilterChange('branch', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Branch" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Branch A">Branch A</SelectItem>
+                  <SelectItem value="Branch B">Branch B</SelectItem>
+                </SelectContent>
+              </Select>
+              <Input
+                placeholder="Category"
+                value={filters.category}
+                onChange={(e) => handleFilterChange('category', e.target.value)}
+              />
+              <Select onValueChange={(value) => handleFilterChange('group', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Group" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Group A">Group A</SelectItem>
+                  <SelectItem value="Group B">Group B</SelectItem>
+                </SelectContent>
+              </Select>
+              <Input
+                placeholder="Subgroup"
+                value={filters.subgroup}
+                onChange={(e) => handleFilterChange('subgroup', e.target.value)}
+              />
+              <Select onValueChange={(value) => handleFilterChange('schedule', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Schedule" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Schedule 1">Schedule 1</SelectItem>
+                  <SelectItem value="Schedule 2">Schedule 2</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select onValueChange={(value) => handleFilterChange('rosterType', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Roster Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Type A">Type A</SelectItem>
+                  <SelectItem value="Type B">Type B</SelectItem>
+                </SelectContent>
+              </Select>
+              <div className="col-span-2 flex justify-start">
+                <Button variant="secondary" onClick={clearFilters}>
+                  Clear Filters
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         )}
 
         <div className="flex justify-between items-center">
-          <Button onClick={handleShowFilters}>
-            {showFilters ? 'Hide Filters' : 'Show Filters'}
-          </Button>
+          <Input
+            placeholder="Search [Name/ID]"
+            value={searchQuery}
+            onChange={handleSearchQueryChange}
+            className="max-w-xs"
+          />
           <div className="flex items-center gap-2">
-            <Input
-              placeholder="Search [Name/ID]"
-              value={searchQuery}
-              onChange={handleSearchQueryChange}
-            />
             <Button onClick={handleDownloadBulkRosterTemplate}>
               Download Bulk Roster Template
             </Button>
-            <Button onClick={handleDownloadCSV}>
+            <Button onClick={handleExport}>
               Download CSV
             </Button>
             <div className="flex items-center gap-2">
-          <Button
-            variant={showAssignedSchedule ? "default" : "outline"}
-            onClick={() => setShowAssignedSchedule(true)}
-          >
-            Assigned Schedule
-          </Button>
-          <Button
-            variant={!showAssignedSchedule ? "default" : "outline"}
-            onClick={() => setShowAssignedSchedule(false)}
-          >
-            Unassigned Schedule
-          </Button>
-        </div>
-
+              <Button
+                variant={showAssignedSchedule ? "default" : "outline"}
+                onClick={() => setShowAssignedSchedule(true)}
+              >
+                Assigned Schedule
+              </Button>
+              <Button
+                variant={!showAssignedSchedule ? "default" : "outline"}
+                onClick={() => setShowAssignedSchedule(false)}
+              >
+                Unassigned Schedule
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -403,6 +398,8 @@ export default function ViewAssignedRoster() {
           >
             Export Roster
           </Button>
+          Export Roster
+        </Button>
         </div>
 
         <div className="overflow-x-auto">
@@ -435,50 +432,6 @@ export default function ViewAssignedRoster() {
             <TableBody>
               {filteredUsers.map((user) => (
                 <TableRow key={user.id}>
-                  <TableCell className="w-[200px] sticky left-0 z-10 bg-white font-medium">
-                    {user.name}
-                  </TableCell>
-                 
-{user.shifts.map((shift) => (
-  <TableCell key={shift.date.toISOString()} className="border-1 border relative">
-    {userShiftAssignments[user.id]?.[shift.date.toISOString()] ? (
-      <div
-        className={`cursor-pointer text-center ${
-          userShiftAssignments[user.id]?.[shift.date.toISOString()] === "DS"
-            ? "bg-blue-100"
-            : userShiftAssignments[user.id]?.[shift.date.toISOString()] === "NS"
-            ? "bg-purple-100"
-            : "bg-gray-100"
-        }`}
-      >
-        {userShiftAssignments[user.id]?.[shift.date.toISOString()]}
-      </div>
-    ) : (
-            <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <div className="absolute top-0 right-0 text-gray-500 text-xs cursor-pointer text-center p-0">
-            <FaChevronDown />
-          </div>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="absolute bg-white shadow-md rounded-md z-40">
-          <DropdownMenuItem onClick={() => handleShiftTypeAssignment(user.id, shift.date, "DS")}>
-            <span className="text-blue-500">Day Shift</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => handleShiftTypeAssignment(user.id, shift.date, "NS")}>
-            <span className="text-purple-500">Night Shift</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => handleShiftTypeAssignment(user.id, shift.date, "Undo")}>
-            <span className="text-red-500">Undo</span>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-
-    )}
-  </TableCell>
-))}
-                  <TableCell className="text-right">{user.workedHours}hrs</TableCell>
-                  <TableCell className="text-right">{user.lateHours}hrs</TableCell>
-                  <TableCell className="text-right">{user.overtimeHours}hrs</TableCell>
                   <TableCell className="w-[50px] sticky left-0 z-10 bg-white">
                     <Checkbox
                       checked={selectedUsers.includes(user.id)}
@@ -492,6 +445,48 @@ export default function ViewAssignedRoster() {
                       }}
                     />
                   </TableCell>
+                  <TableCell className="w-[200px] sticky left-0 z-10 bg-white font-medium">
+                    {user.name}
+                  </TableCell>
+                  {user.shifts.map((shift) => (
+                    <TableCell key={shift.date.toISOString()} className="border-1 border relative">
+                      {userShiftAssignments[user.id]?.[shift.date.toISOString()] ? (
+                        <div
+                          className={`cursor-pointer text-center ${
+                            userShiftAssignments[user.id]?.[shift.date.toISOString()] === "DS"
+                              ? "bg-blue-100"
+                              : userShiftAssignments[user.id]?.[shift.date.toISOString()] === "NS"
+                              ? "bg-purple-100"
+                              : "bg-gray-100"
+                          }`}
+                        >
+                          {userShiftAssignments[user.id]?.[shift.date.toISOString()]}
+                        </div>
+                      ) : (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <div className="absolute top-0 right-0 text-gray-500 text-xs cursor-pointer text-center p-0">
+                              <FaChevronDown />
+                            </div>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent className="absolute bg-white shadow-md rounded-md z-40">
+                            <DropdownMenuItem onClick={() => handleAssignSchedule(user.id, shift.date.toISOString(), "DS")}>
+                              <span className="text-blue-500">Day Shift</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleAssignSchedule(user.id, shift.date.toISOString(), "NS")}>
+                              <span className="text-purple-500">Night Shift</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleAssignSchedule(user.id, shift.date.toISOString(), "Undo")}>
+                              <span className="text-red-500">Undo</span>
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      )}
+                    </TableCell>
+                  ))}
+                  <TableCell className="text-right">{user.workedHours}hrs</TableCell>
+                  <TableCell className="text-right">{user.lateHours}hrs</TableCell>
+                  <TableCell className="text-right">{user.overtimeHours}hrs</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -509,3 +504,4 @@ export default function ViewAssignedRoster() {
     </TooltipProvider>
   )
 }
+

@@ -1,26 +1,73 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from "@/components/ui/use-toast"
 
 const BulkEventScheduling: React.FC<{ onClose: () => void }> = ({ onClose }) => {
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
-    console.log("Form submitted");
-    onClose();
+    setIsLoading(true);
+    try {
+      const formData = new FormData(e.target as HTMLFormElement);
+      const response = await fetch('/api/event-scheduling', {
+        method: 'POST',
+        body: formData,
+      });
+      if (!response.ok) throw new Error('Failed to submit bulk events');
+      toast({
+        title: "Success",
+        description: "Bulk events submitted successfully",
+      });
+      onClose();
+    } catch (error) {
+      console.error('Error submitting bulk events:', error);
+      toast({
+        title: "Error",
+        description: "Failed to submit bulk events",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDownloadTemplate = async () => {
+    try {
+      const response = await fetch('/api/event-scheduling/template', {
+        method: 'GET',
+      });
+      if (!response.ok) throw new Error('Failed to download template');
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'bulk_events_template.csv';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading template:', error);
+      toast({
+        title: "Error",
+        description: "Failed to download template",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <Button variant="outline">Download Bulk Events Template</Button>
+      <Button variant="outline" onClick={handleDownloadTemplate}>Download Bulk Events Template</Button>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
           <Label htmlFor="country">Country</Label>
-          <Select>
+          <Select name="country">
             <SelectTrigger id="country">
               <SelectValue placeholder="Select countries" />
             </SelectTrigger>
@@ -31,7 +78,7 @@ const BulkEventScheduling: React.FC<{ onClose: () => void }> = ({ onClose }) => 
           </Select>
         </div>
         <div className="flex items-center space-x-2">
-          <Checkbox id="assignAllUsers" />
+          <Checkbox id="assignAllUsers" name="assignAllUsers" />
           <Label htmlFor="assignAllUsers">Assign All Users</Label>
         </div>
       </div>
@@ -39,7 +86,7 @@ const BulkEventScheduling: React.FC<{ onClose: () => void }> = ({ onClose }) => 
       <div className="grid grid-cols-2 gap-4">
         <div>
           <Label htmlFor="branch">Branch</Label>
-          <Select>
+          <Select name="branch">
             <SelectTrigger id="branch">
               <SelectValue placeholder="Select branches" />
             </SelectTrigger>
@@ -51,7 +98,7 @@ const BulkEventScheduling: React.FC<{ onClose: () => void }> = ({ onClose }) => 
         </div>
         <div>
           <Label htmlFor="users">Users</Label>
-          <Select>
+          <Select name="users">
             <SelectTrigger id="users">
               <SelectValue placeholder="Select users" />
             </SelectTrigger>
@@ -65,7 +112,7 @@ const BulkEventScheduling: React.FC<{ onClose: () => void }> = ({ onClose }) => 
 
       <div>
         <Label htmlFor="category">Category</Label>
-        <Select>
+        <Select name="category">
           <SelectTrigger id="category">
             <SelectValue placeholder="Select categories" />
           </SelectTrigger>
@@ -78,7 +125,7 @@ const BulkEventScheduling: React.FC<{ onClose: () => void }> = ({ onClose }) => 
 
       <div>
         <Label htmlFor="group">Group</Label>
-        <Select>
+        <Select name="group">
           <SelectTrigger id="group">
             <SelectValue placeholder="Select groups" />
           </SelectTrigger>
@@ -91,7 +138,7 @@ const BulkEventScheduling: React.FC<{ onClose: () => void }> = ({ onClose }) => 
 
       <div>
         <Label htmlFor="subgroup">Subgroup</Label>
-        <Select>
+        <Select name="subgroup">
           <SelectTrigger id="subgroup">
             <SelectValue placeholder="Select subgroups" />
           </SelectTrigger>
@@ -104,7 +151,7 @@ const BulkEventScheduling: React.FC<{ onClose: () => void }> = ({ onClose }) => 
 
       <div>
         <Label htmlFor="adminUsers">Assign Admin Users</Label>
-        <Select>
+        <Select name="adminUsers">
           <SelectTrigger id="adminUsers">
             <SelectValue placeholder="Select admin users" />
           </SelectTrigger>
@@ -118,10 +165,12 @@ const BulkEventScheduling: React.FC<{ onClose: () => void }> = ({ onClose }) => 
 
       <div>
         <Label htmlFor="bulkEventsFile">Attach Bulk Events Template</Label>
-        <Input id="bulkEventsFile" type="file" />
+        <Input id="bulkEventsFile" name="bulkEventsFile" type="file" />
       </div>
 
-      <Button type="submit">Submit</Button>
+      <Button type="submit" disabled={isLoading}>
+        {isLoading ? 'Submitting...' : 'Submit'}
+      </Button>
     </form>
   );
 };

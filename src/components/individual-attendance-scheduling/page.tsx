@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Checkbox } from "@/components/ui/checkbox";
 import TimePicker  from "@/components/ui/time-picker";
+import { toast } from "@/components/ui/use-toast"
 
 interface IndividualAttendanceSchedulingProps {
   onClose: () => void;
@@ -17,12 +18,33 @@ const IndividualAttendanceScheduling = ({ onClose }: IndividualAttendanceSchedul
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [hasBreak, setHasBreak] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
-    console.log("Form submitted");
-    onClose();
+    setIsLoading(true);
+    try {
+      const formData = new FormData(e.target as HTMLFormElement);
+      const response = await fetch('/api/attendance-scheduling', {
+        method: 'POST',
+        body: formData,
+      });
+      if (!response.ok) throw new Error('Failed to submit individual schedule');
+      toast({
+        title: "Success",
+        description: "Individual schedule submitted successfully",
+      });
+      onClose();
+    } catch (error) {
+      console.error('Error submitting individual schedule:', error);
+      toast({
+        title: "Error",
+        description: "Failed to submit individual schedule",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -31,13 +53,13 @@ const IndividualAttendanceScheduling = ({ onClose }: IndividualAttendanceSchedul
 
       <div>
         <Label htmlFor="scheduleName">Attendance Schedule Name</Label>
-        <Input id="scheduleName" placeholder="Enter schedule name" />
+        <Input id="scheduleName" name="scheduleName" placeholder="Enter schedule name" />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
           <Label htmlFor="country">Country</Label>
-          <Select>
+          <Select name="country">
             <SelectTrigger id="country">
               <SelectValue placeholder="Select countries" />
             </SelectTrigger>
@@ -50,7 +72,7 @@ const IndividualAttendanceScheduling = ({ onClose }: IndividualAttendanceSchedul
 
         <div>
           <Label htmlFor="branch">Branch</Label>
-          <Select>
+          <Select name="branch">
             <SelectTrigger id="branch">
               <SelectValue placeholder="Select branches" />
             </SelectTrigger>
@@ -64,7 +86,7 @@ const IndividualAttendanceScheduling = ({ onClose }: IndividualAttendanceSchedul
 
       <div>
         <Label htmlFor="scheduleCategory">Schedule Category</Label>
-        <Select onValueChange={(value) => setScheduleCategory(value)}>
+        <Select name="scheduleCategory" onValueChange={(value) => setScheduleCategory(value)}>
           <SelectTrigger id="scheduleCategory">
             <SelectValue placeholder="Select schedule category" />
           </SelectTrigger>
@@ -90,7 +112,7 @@ const IndividualAttendanceScheduling = ({ onClose }: IndividualAttendanceSchedul
 
       <div>
         <Label htmlFor="scheduleSpan">Choose Schedule Span</Label>
-        <Input id="scheduleSpan" placeholder="e.g., 2 days or Unlimited" />
+        <Input id="scheduleSpan" name="scheduleSpan" placeholder="e.g., 2 days or Unlimited" />
       </div>
 
       <div className="space-y-2">
@@ -98,27 +120,27 @@ const IndividualAttendanceScheduling = ({ onClose }: IndividualAttendanceSchedul
         <div className="grid grid-cols-2 gap-4">
           <div>
             <Label htmlFor="clockInTime">Clock In Time</Label>
-            <TimePicker id="clockInTime" />
+            <TimePicker id="clockInTime" name="clockInTime" />
           </div>
           <div>
             <Label htmlFor="clockInTimeLimit">Clock In Time Limit (optional)</Label>
-            <TimePicker id="clockInTimeLimit" />
+            <TimePicker id="clockInTimeLimit" name="clockInTimeLimit" />
           </div>
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div>
             <Label htmlFor="clockOutTime">Clock Out Time</Label>
-            <TimePicker id="clockOutTime" />
+            <TimePicker id="clockOutTime" name="clockOutTime" />
           </div>
           <div>
             <Label htmlFor="lateTime">Late Time</Label>
-            <TimePicker id="lateTime" />
+            <TimePicker id="lateTime" name="lateTime" />
           </div>
         </div>
       </div>
 
       <div className="flex items-center space-x-2">
-        <Checkbox id="hasBreak" checked={hasBreak} onCheckedChange={(checked) => setHasBreak(checked as boolean)} />
+        <Checkbox id="hasBreak" name="hasBreak" checked={hasBreak} onCheckedChange={(checked) => setHasBreak(checked as boolean)} />
         <Label htmlFor="hasBreak">Any Schedule Break?</Label>
       </div>
 
@@ -126,16 +148,18 @@ const IndividualAttendanceScheduling = ({ onClose }: IndividualAttendanceSchedul
         <div className="grid grid-cols-2 gap-4">
           <div>
             <Label htmlFor="startBreakTime">Start Break Time</Label>
-            <TimePicker id="startBreakTime" />
+            <TimePicker id="startBreakTime" name="startBreakTime" />
           </div>
           <div>
             <Label htmlFor="endBreakTime">End Break Time</Label>
-            <TimePicker id="endBreakTime" />
+            <TimePicker id="endBreakTime" name="endBreakTime" />
           </div>
         </div>
       )}
 
-      <Button type="submit" className="w-[150px] bg-ds-primary text-ds-foreground font-semibold hover:bg-ds-primary-dark">Submit</Button>
+      <Button type="submit" className="w-[150px] bg-ds-primary text-ds-foreground font-semibold hover:bg-ds-primary-dark" disabled={isLoading}>
+        {isLoading ? 'Submitting...' : 'Submit'}
+      </Button>
     </form>
   );
 };

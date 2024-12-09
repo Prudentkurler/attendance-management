@@ -3,10 +3,8 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
-import BulkEventScheduling from "@/app/dashboard/bulk-event-scheduling/bulkEventScheduling";
-
-import IndividualEventScheduling from "../../../components/individual-event-scheduling/IndividualEventSceduling";
+import BulkEventScheduling from "@/bulk-event-scheduling";
+import IndividualEventScheduling from "@/components/individual-event-scheduling";
 import UpdateSchedulePage from "@/components/schedule/viewSchedule";
 
 const EventSchedulePage: React.FC = () => {
@@ -44,7 +42,7 @@ const EventSchedulePage: React.FC = () => {
         </Tabs>
       )}
 
-     <UpdateSchedulePage/>
+      <UpdateSchedulePage />
     </div>
   );
 };
