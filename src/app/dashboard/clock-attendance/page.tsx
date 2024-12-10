@@ -12,7 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from '@/components/ui/label';
 import Image from 'next/image';
 import { DatePicker } from '@/components/ui/date-picker';
-import { toast } from "@/components/ui/use-toast"
+import { useToast } from '@/hooks/use-toast';
 import axios from 'axios';
 
 type User = {
@@ -54,6 +54,7 @@ export default function ClockAttendance() {
   const [showMoreFilters, setShowMoreFilters] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const toast = useToast();
 
   useEffect(() => {
     fetchUsers();
@@ -68,7 +69,7 @@ export default function ClockAttendance() {
       setUsers(response.data);
     } catch (error) {
       console.error('Error fetching users:', error);
-      toast({
+      toast.toast({
         title: "Error",
         description: "Failed to fetch users. Please try again.",
         variant: "destructive",
@@ -94,7 +95,7 @@ export default function ClockAttendance() {
 
   const handleBulkAction = async (action: 'in' | 'out' | 'cancel') => {
     if (selectedUsers.length === 0 && !bulkIds) {
-      toast({
+      toast.toast({
         title: "Error",
         description: "Please select users or paste bulk IDs first",
         variant: "destructive",
@@ -102,7 +103,7 @@ export default function ClockAttendance() {
       return;
     }
     if (!clockReason) {
-      toast({
+      toast.toast({
         title: "Error",
         description: "Please provide a reason for the action",
         variant: "destructive",
@@ -113,14 +114,14 @@ export default function ClockAttendance() {
     setIsLoading(true);
     try {
       await axios.post(`/api/attendance?action=bulk${action}`, { userIds: ids, reason: clockReason });
-      toast({
+      toast.toast({
         title: "Success",
         description: `Bulk ${action} action completed successfully`,
       });
       fetchUsers();
     } catch (error) {
       console.error(`Error performing bulk ${action}:`, error);
-      toast({
+      toast.toast({
         title: "Error",
         description: `Failed to perform bulk ${action}. Please try again.`,
         variant: "destructive",
@@ -147,13 +148,13 @@ export default function ClockAttendance() {
       document.body.appendChild(link);
       link.click();
       link.parentNode?.removeChild(link);
-      toast({
+      toast.toast({
         title: "Success",
         description: "Report exported successfully",
       });
     } catch (error) {
       console.error('Error exporting CSV:', error);
-      toast({
+      toast.toast({
         title: "Error",
         description: "Failed to export report. Please try again.",
         variant: "destructive",
@@ -263,14 +264,14 @@ export default function ClockAttendance() {
     setIsLoading(true);
     try {
       await axios.post(`/api/attendance?action=clock${action}`, { userId, reason: clockReason });
-      toast({
+      toast.toast({
         title: "Success",
         description: `User clocked ${action} successfully`,
       });
       fetchUsers();
     } catch (error) {
       console.error(`Error clocking ${action}:`, error);
-      toast({
+      toast.toast({
         title: "Error",
         description: `Failed to clock ${action} user. Please try again.`,
         variant: "destructive",
@@ -318,7 +319,22 @@ export default function ClockAttendance() {
         </div>
       )}
 
-      <Button onClick={() => setFilters({})} size='default' variant="outline" className="w-[100px] mb-6">
+      <Button onClick={() => setFilters({
+        userType: '',
+        country: '',
+        branch: '',
+        category: '',
+        group: '',
+        subgroup: '',
+        location: '',
+        gender: '',
+        clockType: '',
+        schedule: '',
+        status: '',
+        startDate: '',
+        endDate: '',
+        setTime: '',
+      })} size='default' variant="outline" className="w-[100px] mb-6">
         Clear Filters
       </Button>
 
@@ -363,7 +379,6 @@ export default function ClockAttendance() {
       <DataTable 
         columns={columns} 
         data={users}
-        isLoading={isLoading}
       />
 
       <div className="mt-4 text-right">

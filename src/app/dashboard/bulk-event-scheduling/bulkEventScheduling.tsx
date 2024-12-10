@@ -4,10 +4,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { toast } from "@/components/ui/use-toast"
+import { useToast } from "@/hooks/use-toast";
 
 const BulkEventScheduling: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const toast = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,14 +20,14 @@ const BulkEventScheduling: React.FC<{ onClose: () => void }> = ({ onClose }) => 
         body: formData,
       });
       if (!response.ok) throw new Error('Failed to submit bulk events');
-      toast({
+      toast.toast({
         title: "Success",
         description: "Bulk events submitted successfully",
       });
       onClose();
     } catch (error) {
       console.error('Error submitting bulk events:', error);
-      toast({
+      toast.toast({
         title: "Error",
         description: "Failed to submit bulk events",
         variant: "destructive",
@@ -52,7 +53,7 @@ const BulkEventScheduling: React.FC<{ onClose: () => void }> = ({ onClose }) => 
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Error downloading template:', error);
-      toast({
+      toast.toast({
         title: "Error",
         description: "Failed to download template",
         variant: "destructive",

@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/select";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { CSVLink } from "react-csv";
-import { toast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 interface DeviceRequest {
   id: number;
@@ -33,6 +33,7 @@ export default function ViewApproveDeviceRequests() {
   const [viewDetails, setViewDetails] = useState<DeviceRequest | null>(null);
   const [editRequest, setEditRequest] = useState<DeviceRequest | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const toast = useToast();
 
   useEffect(() => {
     fetchDeviceRequests();
@@ -47,7 +48,7 @@ export default function ViewApproveDeviceRequests() {
       setData(fetchedData);
     } catch (error) {
       console.error('Error fetching device requests:', error);
-      toast({
+      toast.toast({
         title: "Error",
         description: "Failed to fetch device requests",
         variant: "destructive",
@@ -80,14 +81,14 @@ export default function ViewApproveDeviceRequests() {
         body: JSON.stringify({ ids: selectedRequests, action: 'approve' }),
       });
       if (!response.ok) throw new Error('Failed to approve requests');
-      toast({
+      toast.toast({
         title: "Success",
         description: "Selected requests approved successfully",
       });
       fetchDeviceRequests();
     } catch (error) {
       console.error('Error approving requests:', error);
-      toast({
+      toast.toast({
         title: "Error",
         description: "Failed to approve requests",
         variant: "destructive",
@@ -104,14 +105,14 @@ export default function ViewApproveDeviceRequests() {
       for (const id of selectedRequests) {
         await fetch(`/api/device-requests?id=${id}`, { method: 'DELETE' });
       }
-      toast({
+      toast.toast({
         title: "Success",
         description: "Selected requests deleted successfully",
       });
       fetchDeviceRequests();
     } catch (error) {
       console.error('Error deleting requests:', error);
-      toast({
+      toast.toast({
         title: "Error",
         description: "Failed to delete requests",
         variant: "destructive",
@@ -139,14 +140,14 @@ export default function ViewApproveDeviceRequests() {
         body: JSON.stringify(updatedRequest),
       });
       if (!response.ok) throw new Error('Failed to update request');
-      toast({
+      toast.toast({
         title: "Success",
         description: "Request updated successfully",
       });
       fetchDeviceRequests();
     } catch (error) {
       console.error('Error updating request:', error);
-      toast({
+      toast.toast({
         title: "Error",
         description: "Failed to update request",
         variant: "destructive",
@@ -255,7 +256,7 @@ export default function ViewApproveDeviceRequests() {
               <SelectValue placeholder="Filter by Branch" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Branches</SelectItem>
+              <SelectItem value="All Branches">All Branches</SelectItem>
               <SelectItem value="Branch A">Branch A</SelectItem>
               <SelectItem value="Branch B">Branch B</SelectItem>
             </SelectContent>
@@ -265,7 +266,7 @@ export default function ViewApproveDeviceRequests() {
               <SelectValue placeholder="Filter by Status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Statuses</SelectItem>
+              <SelectItem value="All Statuses">All Statuses</SelectItem>
               <SelectItem value="pending">Pending</SelectItem>
               <SelectItem value="approved">Approved</SelectItem>
               <SelectItem value="denied">Denied</SelectItem>

@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Mic, Camera, Upload, Check, X } from 'lucide-react'
-import { toast } from "@/components/ui/use-toast"
+import {useToast} from '@/hooks/use-toast'
 
 type User = {
   id: string
@@ -37,6 +37,7 @@ export default function ViewRegisteredVoicesImages() {
   const [recordingStatus, setRecordingStatus] = useState<'idle' | 'recording' | 'success' | 'error'>('idle')
   const [imageSource, setImageSource] = useState<'capture' | 'upload' | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const toast = useToast()
 
   useEffect(() => {
     fetchUsers()
@@ -52,7 +53,7 @@ export default function ViewRegisteredVoicesImages() {
       setUsers(data)
     } catch (error) {
       console.error('Error fetching users:', error)
-      toast({
+      toast.toast({
         title: "Error",
         description: "Failed to fetch users",
         variant: "destructive",
@@ -90,7 +91,7 @@ export default function ViewRegisteredVoicesImages() {
         body: JSON.stringify({ userId: selectedUser?.id, type: 'voice' }),
       })
       if (!response.ok) throw new Error('Failed to submit voice')
-      toast({
+      toast.toast({
         title: "Success",
         description: "Voice registration successful",
       })
@@ -98,7 +99,7 @@ export default function ViewRegisteredVoicesImages() {
       fetchUsers()
     } catch (error) {
       console.error('Error submitting voice:', error)
-      toast({
+      toast.toast({
         title: "Error",
         description: "Failed to submit voice",
         variant: "destructive",
@@ -124,7 +125,7 @@ export default function ViewRegisteredVoicesImages() {
         body: JSON.stringify({ userId: selectedUser?.id, type: 'image' }),
       })
       if (!response.ok) throw new Error('Failed to submit image')
-      toast({
+      toast.toast({
         title: "Success",
         description: "Image registration successful",
       })
@@ -132,7 +133,7 @@ export default function ViewRegisteredVoicesImages() {
       fetchUsers()
     } catch (error) {
       console.error('Error submitting image:', error)
-      toast({
+      toast.toast({
         title: "Error",
         description: "Failed to submit image",
         variant: "destructive",
@@ -144,13 +145,13 @@ export default function ViewRegisteredVoicesImages() {
     try {
       const response = await fetch(`/api/biometric/verify-organization?code=${organizationCode}`)
       if (!response.ok) throw new Error('Failed to verify organization')
-      toast({
+      toast.toast({
         title: "Success",
         description: "Organization verified successfully",
       })
     } catch (error) {
       console.error('Error verifying organization:', error)
-      toast({
+      toast.toast({
         title: "Error",
         description: "Failed to verify organization",
         variant: "destructive",
@@ -162,13 +163,13 @@ export default function ViewRegisteredVoicesImages() {
     try {
       const response = await fetch(`/api/biometric/verify-user?id=${userId}`)
       if (!response.ok) throw new Error('Failed to verify user')
-      toast({
+      toast.toast({
         title: "Success",
         description: "User verified successfully",
       })
     } catch (error) {
       console.error('Error verifying user:', error)
-      toast({
+      toast.toast({
         title: "Error",
         description: "Failed to verify user",
         variant: "destructive",

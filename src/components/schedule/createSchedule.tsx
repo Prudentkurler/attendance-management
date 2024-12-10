@@ -13,7 +13,7 @@ import { Switch } from "@/components/ui/switch";
 import { DatePicker } from "@/components/ui/date-picker";
 import TimePicker from "@/components/ui/time-picker";
 import { useForm, Controller } from "react-hook-form";
-import { toast } from "@/components/ui/use-toast"
+import { useToast} from "@/hooks/use-toast";
 
 type ScheduleType = "Attendance" | "Event";
 type ScheduleCategory = "Long Period" | "Weekly/Monthly Roster";
@@ -35,7 +35,7 @@ interface CreateScheduleForm {
 const CreateSchedule: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const { control, handleSubmit, watch, reset } = useForm<CreateScheduleForm>();
   const [isLoading, setIsLoading] = useState(false);
-
+  const { toast } = useToast();
   const scheduleType = watch("scheduleType");
   const bulkUpload = watch("bulkUpload");
   const scheduleCategory = watch("scheduleCategory");
@@ -177,7 +177,7 @@ const CreateSchedule: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                             control={control}
                             render={({ field }) => (
                               <DatePicker
-                                selectedDate={field.value}
+                                selectedDate={field.value ?? undefined}
                                 onDateChange={field.onChange}
                               />
                             )}
@@ -190,7 +190,7 @@ const CreateSchedule: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                             control={control}
                             render={({ field }) => (
                               <DatePicker
-                                selectedDate={field.value}
+                                selectedDate={field.value ?? undefined}
                                 onDateChange={field.onChange}
                               />
                             )}
@@ -271,7 +271,7 @@ const CreateSchedule: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                           control={control}
                           render={({ field }) => (
                             <DatePicker
-                              selectedDate={field.value}
+                              selectedDate={field.value ?? undefined}
                               onDateChange={field.onChange}
                             />
                           )}
@@ -296,7 +296,7 @@ const CreateSchedule: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                           control={control}
                           render={({ field }) => (
                             <DatePicker
-                              selectedDate={field.value}
+                              selectedDate={field.value ?? undefined}
                               onDateChange={field.onChange}
                             />
                           )}

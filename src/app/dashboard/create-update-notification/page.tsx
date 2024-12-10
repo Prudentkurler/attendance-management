@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { toast } from "@/components/ui/use-toast"
+import { useToast } from "@/hooks/use-toast"
 
 type NotificationTemplate = {
   id: string
@@ -35,6 +35,7 @@ export default function CreateUpdateNotifications() {
   })
   const [templates, setTemplates] = useState<NotificationTemplate[]>([])
   const [isLoading, setIsLoading] = useState(false)
+  const toast = useToast()
 
   useEffect(() => {
     fetchTemplates()
@@ -49,7 +50,7 @@ export default function CreateUpdateNotifications() {
       setTemplates(data)
     } catch (error) {
       console.error('Error fetching templates:', error)
-      toast({
+      toast.toast({
         title: "Error",
         description: "Failed to fetch notification templates",
         variant: "destructive",
@@ -74,14 +75,14 @@ export default function CreateUpdateNotifications() {
         body: JSON.stringify(filters),
       })
       if (!response.ok) throw new Error('Failed to update notification')
-      toast({
+      toast.toast({
         title: "Success",
         description: "Notification updated successfully",
       })
       fetchTemplates()
     } catch (error) {
       console.error('Error updating notification:', error)
-      toast({
+      toast.toast({
         title: "Error",
         description: "Failed to update notification",
         variant: "destructive",

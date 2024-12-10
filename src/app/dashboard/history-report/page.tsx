@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import Image from 'next/image'
-import { toast } from "@/components/ui/use-toast"
+import { useToast } from '@/hooks/use-toast'
 
 type User = {
   id: string
@@ -77,6 +77,7 @@ export default function HistoryReport() {
   const [userBreakdowns, setUserBreakdowns] = useState<UserBreakdown[]>([])
   const [selectedUsers, setSelectedUsers] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(false)
+  const toast = useToast()
 
   useEffect(() => {
     fetchReport()
@@ -93,7 +94,7 @@ export default function HistoryReport() {
       }
     } catch (error) {
       console.error('Error fetching report:', error)
-      toast({
+      toast.toast({
         title: "Error",
         description: "Failed to fetch report. Please try again.",
         variant: "destructive",
@@ -119,14 +120,14 @@ export default function HistoryReport() {
     setIsLoading(true)
     try {
       await axios.post('/api/attendance?action=validate', { userIds: selectedUsers })
-      toast({
+      toast.toast({
         title: "Success",
         description: "All selected users have been validated.",
       })
       fetchReport()
     } catch (error) {
       console.error('Error validating users:', error)
-      toast({
+      toast.toast({
         title: "Error",
         description: "Failed to validate users. Please try again.",
         variant: "destructive",
@@ -152,7 +153,7 @@ export default function HistoryReport() {
       link.parentNode?.removeChild(link)
     } catch (error) {
       console.error('Error downloading report:', error)
-      toast({
+      toast.toast({
         title: "Error",
         description: "Failed to download report. Please try again.",
         variant: "destructive",
@@ -166,14 +167,14 @@ export default function HistoryReport() {
     setIsLoading(true)
     try {
       await axios.post('/api/attendance?action=validate', { userIds: [userId] })
-      toast({
+      toast.toast({
         title: "Success",
         description: "User has been validated.",
       })
       fetchReport()
     } catch (error) {
       console.error('Error validating user:', error)
-      toast({
+      toast.toast({
         title: "Error",
         description: "Failed to validate user. Please try again.",
         variant: "destructive",

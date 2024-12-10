@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { FaChevronDown } from 'react-icons/fa'
-import { toast } from "@/components/ui/use-toast"
+import { useToast } from '@/hooks/use-toast'
 
 type Shift = 'DS' | 'NS' | 'Undo'
 
@@ -65,6 +65,7 @@ export default function ViewAssignedRoster() {
   const [shiftTypeDropdown, setShiftTypeDropdown] = useState<{ [key: string]: boolean }>({})
   const [userShiftAssignments, setUserShiftAssignments] = useState<{ [key: string]: { [key: string]: Shift | null } }>({})
   const [isLoading, setIsLoading] = useState(false)
+  const toast = useToast()
 
   useEffect(() => {
     fetchUsers()
@@ -74,7 +75,7 @@ export default function ViewAssignedRoster() {
     setIsLoading(true)
     try {
       const queryParams = new URLSearchParams({
-        ...filters,
+        ...Object.fromEntries(Object.entries(filters).map(([key, value]) => [key, value ? value.toString() : ''])),
         month: selectedMonth.toISOString(),
       })
       const response = await fetch(`/api/roster?${queryParams}`)
@@ -83,7 +84,7 @@ export default function ViewAssignedRoster() {
       setUsers(data)
     } catch (error) {
       console.error('Error fetching users:', error)
-      toast({
+      toast.toast({
         title: "Error",
         description: "Failed to fetch users",
         variant: "destructive",
@@ -119,7 +120,7 @@ export default function ViewAssignedRoster() {
       document.body.removeChild(link)
     } catch (error) {
       console.error('Error exporting roster:', error)
-      toast({
+      toast.toast({
         title: "Error",
         description: "Failed to export roster",
         variant: "destructive",
@@ -142,14 +143,14 @@ export default function ViewAssignedRoster() {
           [date]: shiftType === 'Undo' ? null : shiftType,
         },
       }))
-      toast({
+      toast.toast({
         title: "Success",
         description: "Schedule assigned successfully",
       })
       fetchUsers()
     } catch (error) {
       console.error('Error assigning schedule:', error)
-      toast({
+      toast.toast({
         title: "Error",
         description: "Failed to assign schedule",
         variant: "destructive",
@@ -159,7 +160,7 @@ export default function ViewAssignedRoster() {
 
   const handleBulkAssignment = async () => {
     if (!selectedUsers.length || !selectedDates.length) {
-      toast({
+      toast.toast({
         title: "Error",
         description: "Please select at least one user and one date to proceed",
         variant: "destructive",
@@ -174,14 +175,14 @@ export default function ViewAssignedRoster() {
         body: JSON.stringify({ userIds: selectedUsers, dates: selectedDates, shiftType: 'DS' }),
       })
       if (!response.ok) throw new Error('Failed to bulk assign schedules')
-      toast({
+      toast.toast({
         title: "Success",
         description: "Bulk assignment completed successfully",
       })
       fetchUsers()
     } catch (error) {
       console.error('Error in bulk assign:', error)
-      toast({
+      toast.toast({
         title: "Error",
         description: "Failed to complete bulk assignment",
         variant: "destructive",
@@ -200,14 +201,14 @@ export default function ViewAssignedRoster() {
           body: formData,
         })
         if (!response.ok) throw new Error('Failed to upload roster')
-        toast({
+        toast.toast({
           title: "Success",
           description: "Roster uploaded successfully",
         })
         fetchUsers()
       } catch (error) {
         console.error('Error uploading roster:', error)
-        toast({
+        toast.toast({
           title: "Error",
           description: "Failed to upload roster",
           variant: "destructive",
@@ -398,6 +399,7 @@ export default function ViewAssignedRoster() {
           >
             Export Roster
           </Button>
+          <Button>
           Export Roster
         </Button>
         </div>

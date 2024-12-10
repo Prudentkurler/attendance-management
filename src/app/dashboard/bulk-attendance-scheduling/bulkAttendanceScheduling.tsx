@@ -4,13 +4,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DatePicker } from '@/components/ui/date-picker'
-import { toast } from "@/components/ui/use-toast"
+import { useToast } from "@/hooks/use-toast";
 
 const BulkAttendanceScheduling: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [scheduleType, setScheduleType] = useState("longPeriod");
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
+  const toast = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,14 +23,14 @@ const BulkAttendanceScheduling: React.FC<{ onClose: () => void }> = ({ onClose }
         body: formData,
       });
       if (!response.ok) throw new Error('Failed to submit bulk schedule');
-      toast({
+      toast.toast({
         title: "Success",
         description: "Bulk schedule submitted successfully",
       });
       onClose();
     } catch (error) {
       console.error('Error submitting bulk schedule:', error);
-      toast({
+      toast.toast({
         title: "Error",
         description: "Failed to submit bulk schedule",
         variant: "destructive",
@@ -55,7 +56,7 @@ const BulkAttendanceScheduling: React.FC<{ onClose: () => void }> = ({ onClose }
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Error downloading template:', error);
-      toast({
+      toast.toast({
         title: "Error",
         description: "Failed to download template",
         variant: "destructive",

@@ -10,13 +10,14 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DatePicker } from "@/components/ui/date-picker";
 import TimePicker from "@/components/ui/time-picker";
-import { DateRangePicker } from "@/components/date-range-picker";
-import { toast } from "@/components/ui/use-toast"
+import { DateRangePicker } from "@/components/DateRangePicker";
+import {useToast} from '@/hooks/use-toast'
 
 const IndividualEventScheduling = ({ onClose }: { onClose: () => void }) => {
   const [isRecurring, setIsRecurring] = useState(false);
   const [reminderDates, setReminderDates] = useState<{ date: Date | null; time: string }[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const toast = useToast()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,14 +29,14 @@ const IndividualEventScheduling = ({ onClose }: { onClose: () => void }) => {
         body: formData,
       });
       if (!response.ok) throw new Error('Failed to submit event');
-      toast({
+      toast.toast({
         title: "Success",
         description: "Event submitted successfully",
       });
       onClose();
     } catch (error) {
       console.error('Error submitting event:', error);
-      toast({
+      toast.toast({
         title: "Error",
         description: "Failed to submit event",
         variant: "destructive",
@@ -115,7 +116,7 @@ const IndividualEventScheduling = ({ onClose }: { onClose: () => void }) => {
         </div>
         <div>
           <Label>Start Time</Label>
-          <TimePicker name="startTime" />
+          <TimePicker id="startTime" />
         </div>
       </div>
 
@@ -131,7 +132,7 @@ const IndividualEventScheduling = ({ onClose }: { onClose: () => void }) => {
         </div>
         <div>
           <Label>End Time</Label>
-          <TimePicker name="endTime" />
+          <TimePicker id="endTime" />
         </div>
       </div>
 
@@ -208,7 +209,7 @@ const IndividualEventScheduling = ({ onClose }: { onClose: () => void }) => {
             </div>
             <div>
               <Label>Set Time</Label>
-              <TimePicker value={reminder.time} onChange={(time) => {
+              <TimePicker id={`reminder-time-${index}`} onChange={(time) => {
                 const newDates = [...reminderDates];
                 newDates[index].time = time;
                 setReminderDates(newDates);

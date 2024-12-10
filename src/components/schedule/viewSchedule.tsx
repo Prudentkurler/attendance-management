@@ -9,7 +9,8 @@ import { useForm, Controller } from "react-hook-form";
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "@/components/ui/data-table";
 import { Card } from "@/components/ui/card";
-import { toast } from "@/components/ui/use-toast"
+import { useToast } from "@/hooks/use-toast";
+
 
 interface FilterForm {
   country: string;
@@ -38,7 +39,7 @@ const UpdateSchedulePage: React.FC = () => {
   const [dropdownOpen, setDropdownOpen] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showFilters, setShowFilters] = useState<boolean>(false);
-
+  const { toast } = useToast();
   useEffect(() => {
     fetchSchedules();
   }, []);
@@ -164,7 +165,10 @@ const UpdateSchedulePage: React.FC = () => {
   const onFilterSubmit = async (data: FilterForm) => {
     setIsLoading(true);
     try {
-      const queryParams = new URLSearchParams(data);
+      const queryParams = new URLSearchParams(Object.entries(data).reduce((acc, [key, value]) => {
+        acc[key] = value || '';
+        return acc;
+      }, {} as Record<string, string>));
       const response = await fetch(`/api/event-scheduling?${queryParams}`);
       if (!response.ok) throw new Error('Failed to fetch filtered schedules');
       const filteredSchedules = await response.json();
@@ -191,6 +195,7 @@ const UpdateSchedulePage: React.FC = () => {
         body: JSON.stringify(schedule),
       });
       if (!response.ok) throw new Error('Failed to update schedule');
+      
       toast({
         title: "Success",
         description: "Schedule updated successfully",
@@ -307,7 +312,7 @@ const UpdateSchedulePage: React.FC = () => {
                 name="scheduleType"
                 control={control}
                 render={({ field }) => (
-                  <Select onValueChange={field.onChange}field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select Schedule Type" />
                     </SelectTrigger>
@@ -351,7 +356,6 @@ const UpdateSchedulePage: React.FC = () => {
         <DataTable 
           columns={columns} 
           data={filteredData}
-          isLoading={isLoading}
         />
       </div>
     </Card>
@@ -359,4 +363,8 @@ const UpdateSchedulePage: React.FC = () => {
 };
 
 export default UpdateSchedulePage;
+
+function toast(arg0: { title: string; description: string; variant: string; }) {
+  throw new Error("Function not implemented.");
+}
 

@@ -9,9 +9,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card } from '@/components/ui/card';
 import { format, eachDayOfInterval, startOfMonth, endOfMonth } from 'date-fns';
 import { ColumnDef } from '@tanstack/react-table';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { toast } from "@/components/ui/use-toast"
+import { useToast } from '@/hooks/use-toast';
 
 type Schedule = {
   id: string;
@@ -50,6 +50,7 @@ export default function RosterScheduling() {
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  const toast = useToast();
 
   useEffect(() => {
     fetchSchedules();
@@ -73,7 +74,7 @@ export default function RosterScheduling() {
       setSchedules(data);
     } catch (error) {
       console.error('Error fetching schedules:', error);
-      toast({
+      toast.toast({
         title: "Error",
         description: "Failed to fetch schedules",
         variant: "destructive",
@@ -91,7 +92,7 @@ export default function RosterScheduling() {
       setUsers(data);
     } catch (error) {
       console.error('Error fetching users:', error);
-      toast({
+      toast.toast({
         title: "Error",
         description: "Failed to fetch users",
         variant: "destructive",
@@ -140,7 +141,7 @@ export default function RosterScheduling() {
       document.body.removeChild(link);
     } catch (error) {
       console.error('Error exporting CSV:', error);
-      toast({
+      toast.toast({
         title: "Error",
         description: "Failed to export CSV",
         variant: "destructive",
@@ -172,13 +173,13 @@ export default function RosterScheduling() {
         });
       });
       setLastUpdated(`Mr. samuel Janitey | at: ${format(new Date(), 'EEEE, MMMM d, yyyy \'at\' hh:mm:ss a')}`);
-      toast({
+      toast.toast({
         title: "Success",
         description: "Schedule assigned successfully",
       });
     } catch (error) {
       console.error('Error assigning schedule:', error);
-      toast({
+      toast.toast({
         title: "Error",
         description: "Failed to assign schedule",
         variant: "destructive",
@@ -210,13 +211,13 @@ export default function RosterScheduling() {
         });
       });
       setLastUpdated(`Mr. samuel Janitey | at: ${format(new Date(), 'EEEE, MMMM d, yyyy \'at\' hh:mm:ss a')}`);
-      toast({
+      toast.toast({
         title: "Success",
         description: "Bulk assign completed successfully",
       });
     } catch (error) {
       console.error('Error in bulk assign:', error);
-      toast({
+      toast.toast({
         title: "Error",
         description: "Failed to complete bulk assign",
         variant: "destructive",
@@ -240,13 +241,13 @@ export default function RosterScheduling() {
         if (!response.ok) throw new Error('Failed to upload roster');
         const data = await response.json();
         setUsers(data.users);
-        toast({
+        toast.toast({
           title: "Success",
           description: "Roster uploaded successfully",
         });
       } catch (error) {
         console.error('Error uploading roster:', error);
-        toast({
+        toast.toast({
           title: "Error",
           description: "Failed to upload roster",
           variant: "destructive",

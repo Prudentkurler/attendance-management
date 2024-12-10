@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Checkbox } from "@/components/ui/checkbox";
 import TimePicker  from "@/components/ui/time-picker";
-import { toast } from "@/components/ui/use-toast"
+import { useToast } from "@/hooks/use-toast";
 
 interface IndividualAttendanceSchedulingProps {
   onClose: () => void;
@@ -19,6 +19,7 @@ const IndividualAttendanceScheduling = ({ onClose }: IndividualAttendanceSchedul
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [hasBreak, setHasBreak] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const toast = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,14 +31,14 @@ const IndividualAttendanceScheduling = ({ onClose }: IndividualAttendanceSchedul
         body: formData,
       });
       if (!response.ok) throw new Error('Failed to submit individual schedule');
-      toast({
+      toast.toast({
         title: "Success",
         description: "Individual schedule submitted successfully",
       });
       onClose();
     } catch (error) {
       console.error('Error submitting individual schedule:', error);
-      toast({
+      toast.toast({
         title: "Error",
         description: "Failed to submit individual schedule",
         variant: "destructive",
@@ -120,21 +121,21 @@ const IndividualAttendanceScheduling = ({ onClose }: IndividualAttendanceSchedul
         <div className="grid grid-cols-2 gap-4">
           <div>
             <Label htmlFor="clockInTime">Clock In Time</Label>
-            <TimePicker id="clockInTime" name="clockInTime" />
+            <TimePicker id="clockInTime" />
           </div>
           <div>
             <Label htmlFor="clockInTimeLimit">Clock In Time Limit (optional)</Label>
-            <TimePicker id="clockInTimeLimit" name="clockInTimeLimit" />
+            <TimePicker id="clockInTimeLimit" />
           </div>
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div>
             <Label htmlFor="clockOutTime">Clock Out Time</Label>
-            <TimePicker id="clockOutTime" name="clockOutTime" />
+            <TimePicker id="clockOutTime" />
           </div>
           <div>
             <Label htmlFor="lateTime">Late Time</Label>
-            <TimePicker id="lateTime" name="lateTime" />
+            <TimePicker id="lateTime" />
           </div>
         </div>
       </div>
@@ -148,11 +149,11 @@ const IndividualAttendanceScheduling = ({ onClose }: IndividualAttendanceSchedul
         <div className="grid grid-cols-2 gap-4">
           <div>
             <Label htmlFor="startBreakTime">Start Break Time</Label>
-            <TimePicker id="startBreakTime" name="startBreakTime" />
+            <TimePicker id="startBreakTime" />
           </div>
           <div>
             <Label htmlFor="endBreakTime">End Break Time</Label>
-            <TimePicker id="endBreakTime" name="endBreakTime" />
+            <TimePicker id="endBreakTime" />
           </div>
         </div>
       )}

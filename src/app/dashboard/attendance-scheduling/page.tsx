@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import UpdateSchedulePage from "@/components/schedule/viewSchedule";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import IndividualAttendanceScheduling from "@/components/individual-attendance-scheduling/page";
-import BulkAttendanceScheduling from "@/bulk-attendance-scheduling/bulk-attendance-scheduling";
+import BulkAttendanceScheduling from "@/app/dashboard/bulk-attendance-scheduling/bulkAttendanceScheduling";
 
 const SchedulePage: React.FC = () => {
   const [showCreateSchedule, setShowCreateSchedule] = useState(false);

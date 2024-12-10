@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { toast } from "@/components/ui/use-toast"
+import { useToast } from '@/hooks/use-toast'
 
 type NotificationType = "SMS" | "Email" | "In-app"
 type UserType = "Admin Users" | "General Users" | "Parents" | "Absentees" | "Attendees"
@@ -62,7 +62,7 @@ export default function NotificationsPage() {
   const [filteredUsers, setFilteredUsers] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [showFilters, setShowFilters] = useState(false)
-
+  const toast = useToast()
   useEffect(() => {
     fetchTemplates()
     fetchLogs()
@@ -76,7 +76,7 @@ export default function NotificationsPage() {
       setTemplates(data)
     } catch (error) {
       console.error('Error fetching templates:', error)
-      toast({
+      toast.toast({
         title: "Error",
         description: "Failed to fetch notification templates",
         variant: "destructive",
@@ -92,7 +92,7 @@ export default function NotificationsPage() {
       setLogs(data)
     } catch (error) {
       console.error('Error fetching logs:', error)
-      toast({
+      toast.toast({
         title: "Error",
         description: "Failed to fetch notification logs",
         variant: "destructive",
@@ -110,7 +110,7 @@ export default function NotificationsPage() {
       setFilteredUsers(data)
     } catch (error) {
       console.error('Error fetching filtered data:', error)
-      toast({
+      toast.toast({
         title: "Error",
         description: "Failed to fetch filtered data",
         variant: "destructive",
@@ -147,13 +147,13 @@ export default function NotificationsPage() {
         body: JSON.stringify({ message, medium }),
       })
       if (!response.ok) throw new Error('Failed to send notification')
-      toast({
+      toast.toast({
         title: "Success",
         description: "Notification sent successfully",
       })
     } catch (error) {
       console.error('Error sending notification:', error)
-      toast({
+      toast.toast({
         title: "Error",
         description: "Failed to send notification",
         variant: "destructive",
@@ -175,14 +175,14 @@ export default function NotificationsPage() {
         const message = formData.customMessage || selectedTemplate || ""
         await sendNotification(message, notificationTypes.join("/"))
       }
-      toast({
+      toast.toast({
         title: "Success",
         description: "Bulk assign completed successfully",
       })
       fetchLogs()
     } catch (error) {
       console.error('Error in bulk assign:', error)
-      toast({
+      toast.toast({
         title: "Error",
         description: "Failed to complete bulk assign",
         variant: "destructive",
