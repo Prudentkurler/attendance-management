@@ -25,8 +25,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
+import axios from "axios";
 
-export default function CreateLocation() {
+interface CreateLocationProps {
+  onLocationCreated: () => void;
+}
+
+export default function CreateLocation({ onLocationCreated }: CreateLocationProps) {
   const form = useForm<ThirdPartyProviderSchema>({
     resolver: zodResolver(validationSchema),
     mode: "onSubmit",
@@ -35,18 +40,15 @@ export default function CreateLocation() {
 
   const { control, handleSubmit, setValue } = form;
 
-  // State for accuracy
   const [accuracy, setAccuracy] = useState<number | null>(null);
   const [accuracyLevel, setAccuracyLevel] = useState<string | null>(null);
 
-  // Function to determine accuracy level
   const determineAccuracyLevel = (accuracy: number) => {
     if (accuracy <= 10) return "High";
     if (accuracy <= 50) return "Average";
     return "Low";
   };
 
-  // UseEffect for Auto-Generate Location
   useEffect(() => {
     if (typeof window !== "undefined" && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -64,7 +66,6 @@ export default function CreateLocation() {
   }, [setValue]);
 
   const autoGenerateLocation = () => {
-    console.log("Auto-generating location...");
     if (typeof window !== "undefined" && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -80,14 +81,18 @@ export default function CreateLocation() {
     }
   };
 
-  const onSubmit: SubmitHandler<ThirdPartyProviderSchema> = (values) => {
-    console.log("Form values submitted:", values);
+  const onSubmit: SubmitHandler<ThirdPartyProviderSchema> = async (values) => {
+    try {
+      await axios.post('attendance-manager.akwaabahr.com/api/locations', values);
+      onLocationCreated();
+    } catch (error) {
+      console.error('Error creating location:', error);
+    }
   };
 
   return (
     <Form {...form}>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 px-4">
-        {/* Country */}
         <FormField
           control={control}
           name="country"
@@ -113,7 +118,6 @@ export default function CreateLocation() {
           )}
         />
 
-        {/* Branch */}
         <FormField
           control={control}
           name="branch"
@@ -139,7 +143,6 @@ export default function CreateLocation() {
           )}
         />
 
-        {/* Location Name */}
         <FormField
           control={control}
           name="location_name"
@@ -154,7 +157,6 @@ export default function CreateLocation() {
           )}
         />
 
-        {/* Latitude */}
         <FormField
           control={control}
           name="latitude"
@@ -169,7 +171,6 @@ export default function CreateLocation() {
           )}
         />
 
-        {/* Longitude */}
         <FormField
           control={control}
           name="longitude"
@@ -184,9 +185,6 @@ export default function CreateLocation() {
           )}
         />
 
-       
-
-        {/* WiFi ID (Optional) */}
         <FormField
           control={control}
           name="wifi_id"
@@ -201,7 +199,6 @@ export default function CreateLocation() {
           )}
         />
 
-        {/* Bluetooth Device ID (Optional) */}
         <FormField
           control={control}
           name="bluetooth_device_id"
@@ -216,8 +213,7 @@ export default function CreateLocation() {
           )}
         />
 
-         {/* Radius */}
-         <FormField
+        <FormField
           control={control}
           name="radius"
           render={({ field }) => (
@@ -231,7 +227,6 @@ export default function CreateLocation() {
           )}
         />
 
-        {/* Accuracy Indicator */}
         {accuracy !== null && (
           <div className="text-sm text-gray-600">
             Accuracy: {accuracy} meters (
@@ -250,7 +245,6 @@ export default function CreateLocation() {
           </div>
         )}
 
-        {/* Auto Generate Button */}
         <Button
           type="button"
           onClick={autoGenerateLocation}
@@ -260,7 +254,6 @@ export default function CreateLocation() {
           Auto Generate
         </Button>
 
-        {/* Save Button */}
         <Button
           type="submit"
           className="w-full rounded-lg bg-ds-primary px-8 py-2 text-ds-foreground hover:bg-ds-primary-dark"
@@ -271,3 +264,4 @@ export default function CreateLocation() {
     </Form>
   );
 }
+

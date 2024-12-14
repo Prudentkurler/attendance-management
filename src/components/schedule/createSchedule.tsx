@@ -43,7 +43,7 @@ const CreateSchedule: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const onSubmit = async (data: CreateScheduleForm) => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/event-scheduling', {
+      const response = await fetch('attendance-manager.akwaabahr.com/api/event-scheduling', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -74,7 +74,7 @@ const CreateSchedule: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
   const handleDownloadTemplate = async () => {
     try {
-      const response = await fetch('/api/event-scheduling/template', {
+      const response = await fetch('attendance-manager.akwaabahr.com/api/event-scheduling/template', {
         method: 'GET',
       });
       if (!response.ok) throw new Error('Failed to download template');

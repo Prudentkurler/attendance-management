@@ -78,7 +78,7 @@ export default function ViewAssignedRoster() {
         ...Object.fromEntries(Object.entries(filters).map(([key, value]) => [key, value ? value.toString() : ''])),
         month: selectedMonth.toISOString(),
       })
-      const response = await fetch(`/api/roster?${queryParams}`)
+      const response = await fetch(`attendance-manager.akwaabahr.com/api/roster?${queryParams}`)
       if (!response.ok) throw new Error('Failed to fetch users')
       const data = await response.json()
       setUsers(data)
@@ -104,7 +104,7 @@ export default function ViewAssignedRoster() {
 
   const handleExport = async () => {
     try {
-      const response = await fetch('/api/roster/export', {
+      const response = await fetch('attendance-manager.akwaabahr.com/api/roster/export', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ users, filters }),
@@ -130,7 +130,7 @@ export default function ViewAssignedRoster() {
 
   const handleAssignSchedule = async (userId: string, date: string, shiftType: Shift) => {
     try {
-      const response = await fetch('/api/roster', {
+      const response = await fetch('attendance-manager.akwaabahr.com/api/roster', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, date, shiftType }),
@@ -169,7 +169,7 @@ export default function ViewAssignedRoster() {
     }
 
     try {
-      const response = await fetch('/api/roster/bulk-assign', {
+      const response = await fetch('attendance-manager.akwaabahr.com/api/roster/bulk-assign', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userIds: selectedUsers, dates: selectedDates, shiftType: 'DS' }),
@@ -196,7 +196,7 @@ export default function ViewAssignedRoster() {
       const formData = new FormData()
       formData.append('file', file)
       try {
-        const response = await fetch('/api/roster/upload', {
+        const response = await fetch('attendance-manager.akwaabahr.com/api/roster/upload', {
           method: 'POST',
           body: formData,
         })

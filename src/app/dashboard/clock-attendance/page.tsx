@@ -63,7 +63,7 @@ export default function ClockAttendance() {
   const fetchUsers = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get('/api/attendance', {
+      const response = await axios.get('attendance-manager.akwaabahr.com/api/attendance', {
         params: { ...filters, listType: activeTab }
       });
       setUsers(response.data);
@@ -113,7 +113,7 @@ export default function ClockAttendance() {
     const ids = bulkIds ? bulkIds.split(',').map(id => id.trim()) : selectedUsers;
     setIsLoading(true);
     try {
-      await axios.post(`/api/attendance?action=bulk${action}`, { userIds: ids, reason: clockReason });
+      await axios.post(`attendance-manager.akwaabahr.com/api/attendance?action=bulk${action}`, { userIds: ids, reason: clockReason });
       toast.toast({
         title: "Success",
         description: `Bulk ${action} action completed successfully`,
@@ -137,7 +137,7 @@ export default function ClockAttendance() {
   const handleExportCSV = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get('/api/attendance/export', {
+      const response = await axios.get('attendance-manager.akwaabahr.com/api/attendance/export', {
         params: { ...filters, listType: activeTab },
         responseType: 'blob'
       });
@@ -263,7 +263,7 @@ export default function ClockAttendance() {
   const handleClockAction = async (userId: string, action: 'in' | 'out' | 'cancel') => {
     setIsLoading(true);
     try {
-      await axios.post(`/api/attendance?action=clock${action}`, { userId, reason: clockReason });
+      await axios.post(`attendance-manager.akwaabahr.com/api/attendance?action=clock${action}`, { userId, reason: clockReason });
       toast.toast({
         title: "Success",
         description: `User clocked ${action} successfully`,

@@ -6,13 +6,23 @@ import { FaPlus } from "react-icons/fa6";
 import ViewLocationTable from "@/components/Location/ViewLocationTable";
 import { Dialog, DialogContent, DialogClose, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { toast } from "@/components/ui/use-toast";
 
 const Page = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
-  // Toggle function for the dialog
   const handleDialogToggle = () => {
     setIsDialogOpen((prev) => !prev);
+  };
+
+  const handleLocationCreated = () => {
+    setIsDialogOpen(false);
+    setRefreshKey(prevKey => prevKey + 1);
+    toast({
+      title: "Success",
+      description: "Location created successfully",
+    });
   };
 
   return (
@@ -22,7 +32,6 @@ const Page = () => {
 
         <div className="relative flex gap-2">
           <Button
-           
             variant="default"
             className="flex text-sm md:text-lg gap-2 bg-ds-primary text-ds-foreground p-1 md:py-2 md:px-4 hover:bg-ds-primary-dark"
             onClick={handleDialogToggle}
@@ -31,15 +40,10 @@ const Page = () => {
             <p>Add Location</p>
           </Button>
 
-          {/* Dialog for creating a new location */}
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTitle>
-           
-            </DialogTitle>
+            <DialogTitle>Create Location</DialogTitle>
             <DialogContent className="p-6 rounded-md bg-white shadow-md w-full max-w-md">
-
-            <h4 className="text-lg font-semibold mb-4">Create Location</h4>
-              <CreateLocation />
+              <CreateLocation onLocationCreated={handleLocationCreated} />
               <DialogClose asChild>
                 <Button
                   variant="secondary"
@@ -54,10 +58,10 @@ const Page = () => {
         </div>
       </div>
 
-      {/* Table displaying locations */}
-      <ViewLocationTable />
+      <ViewLocationTable key={refreshKey} />
     </div>
   );
 };
 
 export default Page;
+

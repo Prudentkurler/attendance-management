@@ -47,7 +47,7 @@ const UpdateSchedulePage: React.FC = () => {
   const fetchSchedules = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/event-scheduling');
+      const response = await fetch('attendance-manager.akwaabahr.com/api/event-scheduling');
       if (!response.ok) throw new Error('Failed to fetch schedules');
       const data = await response.json();
       setFilteredData(data);
@@ -169,7 +169,7 @@ const UpdateSchedulePage: React.FC = () => {
         acc[key] = value || '';
         return acc;
       }, {} as Record<string, string>));
-      const response = await fetch(`/api/event-scheduling?${queryParams}`);
+      const response = await fetch(`attendance-manager.akwaabahr.com/api/event-scheduling?${queryParams}`);
       if (!response.ok) throw new Error('Failed to fetch filtered schedules');
       const filteredSchedules = await response.json();
       setFilteredData(filteredSchedules);
@@ -187,7 +187,7 @@ const UpdateSchedulePage: React.FC = () => {
 
   const onEditSchedule = async (schedule: Schedule) => {
     try {
-      const response = await fetch(`/api/event-scheduling/${schedule.id}`, {
+      const response = await fetch(`attendance-manager.akwaabahr.com/api/event-scheduling/${schedule.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -213,7 +213,7 @@ const UpdateSchedulePage: React.FC = () => {
 
   const onDeleteSchedule = async (id: number) => {
     try {
-      const response = await fetch(`/api/event-scheduling?id=${id}`, {
+      const response = await fetch(`attendance-manager.akwaabahr.com/api/event-scheduling?id=${id}`, {
         method: 'DELETE',
       });
       if (!response.ok) throw new Error('Failed to delete schedule');

@@ -86,7 +86,7 @@ export default function HistoryReport() {
   const fetchReport = async () => {
     setIsLoading(true)
     try {
-      const response = await axios.get('/api/attendance', { params: filters })
+      const response = await axios.get('attendance-manager.akwaabahr.com/api/attendance', { params: filters })
       if (filters.reportType === 'summary') {
         setUsers(response.data)
       } else {
@@ -119,7 +119,7 @@ export default function HistoryReport() {
   const handleValidateAll = async () => {
     setIsLoading(true)
     try {
-      await axios.post('/api/attendance?action=validate', { userIds: selectedUsers })
+      await axios.post('attendance-manager.akwaabahr.com/api/attendance?action=validate', { userIds: selectedUsers })
       toast.toast({
         title: "Success",
         description: "All selected users have been validated.",
@@ -140,7 +140,7 @@ export default function HistoryReport() {
   const handleDownloadReport = async () => {
     setIsLoading(true)
     try {
-      const response = await axios.get('/api/attendance/download', {
+      const response = await axios.get('attendance-manager.akwaabahr.com/api/attendance/download', {
         params: filters,
         responseType: 'blob'
       })
@@ -166,7 +166,7 @@ export default function HistoryReport() {
   const handleValidateUser = async (userId: string) => {
     setIsLoading(true)
     try {
-      await axios.post('/api/attendance?action=validate', { userIds: [userId] })
+      await axios.post('attendance-manager.akwaabahr.com/api/attendance?action=validate', { userIds: [userId] })
       toast.toast({
         title: "Success",
         description: "User has been validated.",

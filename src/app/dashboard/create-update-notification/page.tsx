@@ -44,7 +44,7 @@ export default function CreateUpdateNotifications() {
   const fetchTemplates = async () => {
     setIsLoading(true)
     try {
-      const response = await fetch('/api/notifications')
+      const response = await fetch('attendance-manager.akwaabahr.com/api/notifications')
       if (!response.ok) throw new Error('Failed to fetch templates')
       const data = await response.json()
       setTemplates(data)
@@ -67,7 +67,7 @@ export default function CreateUpdateNotifications() {
   const handleUpdate = async () => {
     setIsLoading(true)
     try {
-      const response = await fetch('/api/notifications', {
+      const response = await fetch('attendance-manager.akwaabahr.com/api/notifications', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

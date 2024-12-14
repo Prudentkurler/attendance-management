@@ -68,7 +68,7 @@ export default function RosterScheduling() {
 
   const fetchSchedules = async () => {
     try {
-      const response = await fetch('/api/roster?type=schedules');
+      const response = await fetch('attendance-manager.akwaabahr.com/api/roster?type=schedules');
       if (!response.ok) throw new Error('Failed to fetch schedules');
       const data = await response.json();
       setSchedules(data);
@@ -86,7 +86,7 @@ export default function RosterScheduling() {
     setIsLoading(true);
     try {
       const queryParams = new URLSearchParams(filters);
-      const response = await fetch(`/api/roster?${queryParams}`);
+      const response = await fetch(`attendance-manager.akwaabahr.com/api/roster?${queryParams}`);
       if (!response.ok) throw new Error('Failed to fetch users');
       const data = await response.json();
       setUsers(data);
@@ -125,7 +125,7 @@ export default function RosterScheduling() {
 
   const handleExportCSV = async () => {
     try {
-      const response = await fetch('/api/roster/export', {
+      const response = await fetch('attendance-manager.akwaabahr.com/api/roster/export', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ users, dateRange }),
@@ -152,7 +152,7 @@ export default function RosterScheduling() {
   const handleAssignSchedule = async (userId: string, date: string) => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/roster', {
+      const response = await fetch('attendance-manager.akwaabahr.com/api/roster', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, date, schedule: filters.schedule }),
@@ -192,7 +192,7 @@ export default function RosterScheduling() {
   const handleBulkAssign = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/roster/bulk-assign', {
+      const response = await fetch('attendance-manager.akwaabahr.com/api/roster/bulk-assign', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userIds: selectedUsers, dates: selectedDates, schedule: filters.schedule }),
@@ -234,7 +234,7 @@ export default function RosterScheduling() {
       try {
         const formData = new FormData();
         formData.append('file', file);
-        const response = await fetch('/api/roster/upload', {
+        const response = await fetch('attendance-manager.akwaabahr.com/api/roster/upload', {
           method: 'POST',
           body: formData,
         });

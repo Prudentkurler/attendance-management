@@ -68,12 +68,12 @@ export default function AttendanceHistoryPage() {
     setError(null);
     try {
       if (viewType === "summary") {
-        const response = await fetch('/api/history-report/summary');
+        const response = await fetch('attendance-manager.akwaabahr.com/api/history-report/summary');
         if (!response.ok) throw new Error('Failed to fetch summary data');
         const data = await response.json();
         setReports(data);
       } else {
-        const response = await fetch('/api/history-report/breakdown');
+        const response = await fetch('attendance-manager.akwaabahr.com/api/history-report/breakdown');
         if (!response.ok) throw new Error('Failed to fetch breakdown data');
         const data = await response.json();
         setBreakdowns(data);
@@ -104,7 +104,7 @@ export default function AttendanceHistoryPage() {
 
   const handleValidate = async (reportId: string) => {
     try {
-      const response = await fetch('/api/history-report/validate', {
+      const response = await fetch('attendance-manager.akwaabahr.com/api/history-report/validate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -124,7 +124,7 @@ export default function AttendanceHistoryPage() {
   const handleExport = async () => {
     try {
       const endpoint = viewType === "summary" ? 'summary' : 'breakdown';
-      const response = await fetch(`/api/history-report/download/${endpoint}`);
+      const response = await fetch(`attendance-manager.akwaabahr.com/api/history-report/download/${endpoint}`);
       if (!response.ok) throw new Error('Failed to export data');
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);

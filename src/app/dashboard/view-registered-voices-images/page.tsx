@@ -47,7 +47,7 @@ export default function ViewRegisteredVoicesImages() {
     setIsLoading(true)
     try {
       const queryParams = new URLSearchParams(filters)
-      const response = await fetch(`/api/biometric?${queryParams}`)
+      const response = await fetch(`attendance-manager.akwaabahr.com/api/biometric?${queryParams}`)
       if (!response.ok) throw new Error('Failed to fetch users')
       const data = await response.json()
       setUsers(data)
@@ -85,7 +85,7 @@ export default function ViewRegisteredVoicesImages() {
 
   const handleSubmitVoice = async () => {
     try {
-      const response = await fetch('/api/biometric', {
+      const response = await fetch('attendance-manager.akwaabahr.com/api/biometric', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: selectedUser?.id, type: 'voice' }),
@@ -119,7 +119,7 @@ export default function ViewRegisteredVoicesImages() {
 
   const handleSubmitImage = async () => {
     try {
-      const response = await fetch('/api/biometric', {
+      const response = await fetch('attendance-manager.akwaabahr.com/api/biometric', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: selectedUser?.id, type: 'image' }),
@@ -143,7 +143,7 @@ export default function ViewRegisteredVoicesImages() {
 
   const handleVerifyOrganization = async () => {
     try {
-      const response = await fetch(`/api/biometric/verify-organization?code=${organizationCode}`)
+      const response = await fetch(`attendance-manager.akwaabahr.com/api/biometric/verify-organization?code=${organizationCode}`)
       if (!response.ok) throw new Error('Failed to verify organization')
       toast.toast({
         title: "Success",
@@ -161,7 +161,7 @@ export default function ViewRegisteredVoicesImages() {
 
   const handleVerifyUser = async () => {
     try {
-      const response = await fetch(`/api/biometric/verify-user?id=${userId}`)
+      const response = await fetch(`attendance-manager.akwaabahr.com/api/biometric/verify-user?id=${userId}`)
       if (!response.ok) throw new Error('Failed to verify user')
       toast.toast({
         title: "Success",

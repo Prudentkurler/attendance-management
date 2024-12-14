@@ -18,7 +18,7 @@ const BulkAttendanceScheduling: React.FC<{ onClose: () => void }> = ({ onClose }
     setIsLoading(true);
     try {
       const formData = new FormData(e.target as HTMLFormElement);
-      const response = await fetch('/api/attendance-scheduling', {
+      const response = await fetch('attendance-manager.akwaabahr.com/api/attendance-scheduling', {
         method: 'POST',
         body: formData,
       });
@@ -42,7 +42,7 @@ const BulkAttendanceScheduling: React.FC<{ onClose: () => void }> = ({ onClose }
 
   const handleDownloadTemplate = async () => {
     try {
-      const response = await fetch('/api/attendance-scheduling/template', {
+      const response = await fetch('attendance-manager.akwaabahr.com/api/attendance-scheduling/template', {
         method: 'GET',
       });
       if (!response.ok) throw new Error('Failed to download template');

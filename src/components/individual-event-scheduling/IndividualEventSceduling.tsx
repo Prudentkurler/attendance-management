@@ -24,7 +24,7 @@ const IndividualEventScheduling = ({ onClose }: { onClose: () => void }) => {
     setIsLoading(true);
     try {
       const formData = new FormData(e.target as HTMLFormElement);
-      const response = await fetch('/api/event-scheduling', {
+      const response = await fetch('attendance-manager.akwaabahr.com/api/event-scheduling', {
         method: 'POST',
         body: formData,
       });

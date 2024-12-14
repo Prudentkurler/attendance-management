@@ -1,25 +1,53 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import axios from "axios";
+import { toast } from "@/components/ui/use-toast";
+
+interface Event {
+  id: string;
+  name: string;
+  startTime: string;
+  endTime: string;
+  date: number;
+}
 
 const ViewEventsCalendar: React.FC = () => {
   const [selectedMonth, setSelectedMonth] = useState("January");
   const [selectedYear, setSelectedYear] = useState("2024");
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [events, setEvents] = useState<Event[]>([]);
 
-  const daysInMonth = 31; // Simplified for this example
-  const firstDayOfMonth = 1; // Assuming Monday is the first day of the month
+  const daysInMonth = new Date(parseInt(selectedYear), getMonthIndex(selectedMonth) + 1, 0).getDate();
+  const firstDayOfMonth = new Date(parseInt(selectedYear), getMonthIndex(selectedMonth), 1).getDay();
 
-  const events = [
-    { name: "Event Name 1", startTime: "8am", endTime: "5pm", date: 1 },
-    { name: "Event Name 2", startTime: "8am", endTime: "5pm", date: 10 },
-    { name: "Event Name 3", startTime: "8am", endTime: "5pm", date: 18 },
-  ];
+  useEffect(() => {
+    fetchEvents();
+  }, [selectedMonth, selectedYear]);
+
+  const fetchEvents = async () => {
+    try {
+      const response = await axios.get(`/api/events?month=${selectedMonth}&year=${selectedYear}`);
+      setEvents(response.data);
+    } catch (error) {
+      console.error('Error fetching events:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch events. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const getMonthIndex = (monthName: string) => {
+    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    return months.indexOf(monthName);
+  };
 
   const renderCalendarDays = () => {
     const days = [];
@@ -79,9 +107,25 @@ const ViewEventsCalendar: React.FC = () => {
         </Select>
       </div>
       <div className="flex justify-between items-center">
-        <Button variant="outline">&lt;&lt;</Button>
+        <Button variant="outline" onClick={() => {
+          const currentMonthIndex = getMonthIndex(selectedMonth);
+          if (currentMonthIndex > 0) {
+            setSelectedMonth(["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][currentMonthIndex - 1]);
+          } else {
+            setSelectedYear((parseInt(selectedYear) - 1).toString());
+            setSelectedMonth("December");
+          }
+        }}>&lt;&lt;</Button>
         <h3 className="text-xl font-semibold">{selectedMonth}</h3>
-        <Button variant="outline">&gt;&gt;</Button>
+        <Button variant="outline" onClick={() => {
+          const currentMonthIndex = getMonthIndex(selectedMonth);
+          if (currentMonthIndex < 11) {
+            setSelectedMonth(["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][currentMonthIndex + 1]);
+          } else {
+            setSelectedYear((parseInt(selectedYear) + 1).toString());
+            setSelectedMonth("January");
+          }
+        }}>&gt;&gt;</Button>
       </div>
       <Table>
         <TableHeader>
@@ -112,7 +156,7 @@ const ViewEventsCalendar: React.FC = () => {
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Events for Day {selectedDay}</DialogTitle>
+            <DialogTitle>Events for {selectedMonth} {selectedDay}, {selectedYear}</DialogTitle>
           </DialogHeader>
           <div className="space-y-2 p-3 bg-green-50">
             {events
@@ -136,3 +180,4 @@ const ViewEventsCalendar: React.FC = () => {
 };
 
 export default ViewEventsCalendar;
+

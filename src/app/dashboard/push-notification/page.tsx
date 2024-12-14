@@ -70,7 +70,7 @@ export default function NotificationsPage() {
 
   const fetchTemplates = async () => {
     try {
-      const response = await fetch('/api/notifications?type=templates')
+      const response = await fetch('attendance-manager.akwaabahr.com/api/notifications?type=templates')
       if (!response.ok) throw new Error('Failed to fetch templates')
       const data = await response.json()
       setTemplates(data)
@@ -86,7 +86,7 @@ export default function NotificationsPage() {
 
   const fetchLogs = async () => {
     try {
-      const response = await fetch('/api/notifications?type=logs')
+      const response = await fetch('attendance-manager.akwaabahr.com/api/notifications?type=logs')
       if (!response.ok) throw new Error('Failed to fetch logs')
       const data = await response.json()
       setLogs(data)
@@ -104,7 +104,7 @@ export default function NotificationsPage() {
     setIsLoading(true)
     try {
       const queryParams = new URLSearchParams(formData)
-      const response = await fetch(`/api/notifications?${queryParams}`)
+      const response = await fetch(`attendance-manager.akwaabahr.com/api/notifications?${queryParams}`)
       if (!response.ok) throw new Error('Failed to fetch filtered data')
       const data = await response.json()
       setFilteredUsers(data)
@@ -141,7 +141,7 @@ export default function NotificationsPage() {
 
   const sendNotification = async (message: string, medium: string) => {
     try {
-      const response = await fetch('/api/notifications', {
+      const response = await fetch('attendance-manager.akwaabahr.com/api/notifications', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message, medium }),

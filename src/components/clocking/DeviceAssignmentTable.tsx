@@ -9,64 +9,20 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-//import CSv
 import { CSVLink } from "react-csv";
+import axios from "axios";
+import { toast } from "@/components/ui/use-toast";
+import { DeviceAssignment } from "@/app/dashboard/assign-clockin-device/page";
 
 interface DeviceAssignmentTableProps {
-  data: {
-    country: string;
-    branch: string;
-    admins: string[];
-    devices: string[];
-  }[];
+  data: DeviceAssignment[];
   branchFilter: string;
   adminFilter: string;
   countryFilter: string;
-  setAssignments: React.Dispatch<
-    React.SetStateAction<
-      {
-        branch: string;
-        country: string;
-        admins: string[];
-        devices: string[];
-      }[]
-    >
-  >;
+  setAssignments: React.Dispatch<React.SetStateAction<DeviceAssignment[]>>;
+  onDelete: () => void;
+  onEdit: () => void;
 }
-
-interface AssignmentData {
-  country: string;
-  branch: string;
-  admins: string[];
-  devices: string[];
-}
-
-const sampleData: { country: string; branch: string; admins: string[]; devices: string[] }[] = [
-  {
-    country: "Ghana",
-    branch: "Accra",
-    admins: ["John Doe", "Jane Smith"],
-    devices: ["Laptop 1", "Laptop 2", "Desktop 1"],
-  },
-  {
-    country: "Ghana",
-    branch: "Kumasi",
-    admins: ["Michael Johnson", "Sarah Lee"],
-    devices: ["Tablet 1", "Tablet 2", "Desktop 2"],
-  },
-  {
-    country: "Nigeria",
-    branch: "Lagos",
-    admins: ["Adekunle Ajayi", "Fatima Bello"],
-    devices: ["Smartphone 1", "Smartphone 2", "Laptop 3"],
-  },
-  {
-    country: "Nigeria",
-    branch: "Abuja",
-    admins: ["Chika Okorie", "Amina Suleiman"],
-    devices: ["Desktop 3", "Desktop 4", "Tablet 3"],
-  },
-];
 
 export default function DeviceAssignmentTable({
   data,
@@ -74,11 +30,12 @@ export default function DeviceAssignmentTable({
   adminFilter,
   countryFilter,
   setAssignments,
+  onDelete,
+  onEdit,
 }: DeviceAssignmentTableProps) {
-  const [selectedAssignments, setSelectedAssignments] = useState<number[]>([]);
+  const [selectedAssignments, setSelectedAssignments] = useState<string[]>([]);
 
-  // Filter data based on branch, admin name, and country
-  const filteredData = sampleData.filter(
+  const filteredData = data.filter(
     (assignment) =>
       (branchFilter === "" || assignment.branch === branchFilter) &&
       (adminFilter === "" ||
@@ -86,45 +43,78 @@ export default function DeviceAssignmentTable({
       (countryFilter === "" || assignment.country === countryFilter)
   );
 
-  // Toggle selection for a single row
-  const toggleSelection = (index: number) => {
+  const toggleSelection = (id: string) => {
     setSelectedAssignments((prev) =>
-      prev.includes(index)
-        ? prev.filter((i) => i !== index)
-        : [...prev, index]
+      prev.includes(id)
+        ? prev.filter((i) => i !== id)
+        : [...prev, id]
     );
   };
 
-  // Toggle selection for all rows
   const toggleSelectAll = (checked: boolean) => {
-    setSelectedAssignments(checked ? filteredData.map((_, i) => i) : []);
+    setSelectedAssignments(checked ? filteredData.map((item) => item.id) : []);
   };
 
-  // Check if all rows are selected
   const areAllSelected = selectedAssignments.length === filteredData.length;
 
-  // Delete selected assignments
-  const handleDeleteSelected = () => {
-    setAssignments((prev) =>
-      prev.filter((_, index) => !selectedAssignments.includes(index))
-    );
-    setSelectedAssignments([]);
+  const handleDeleteSelected = async () => {
+    try {
+      await Promise.all(selectedAssignments.map(id => 
+        axios.delete(`attendance-manager.akwaabahr.com/api/device-assignments?id=${id}`)
+      ));
+      onDelete();
+      setSelectedAssignments([]);
+      toast({
+        title: "Success",
+        description: "Selected assignments deleted successfully",
+      });
+    } catch (error) {
+      console.error('Error deleting assignments:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete assignments. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
-  // Delete a single assignment
-  const handleDelete = (index: number) => {
-    setAssignments((prev) => prev.filter((_, i) => i !== index));
+  const handleDelete = async (id: string) => {
+    try {
+      await axios.delete(`attendance-manager.akwaabahr.com/api/device-assignments?id=${id}`);
+      onDelete();
+      toast({
+        title: "Success",
+        description: "Assignment deleted successfully",
+      });
+    } catch (error) {
+      console.error('Error deleting assignment:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete assignment. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
-  // Edit a single assignment
-  const handleEdit = (index: number) => {
-    console.log("Edit Assignment:", data[index]);
-    // Add edit logic here
+  const handleEdit = async (assignment: DeviceAssignment) => {
+    try {
+      await axios.put('attendance-manager.akwaabahr.com/api/device-assignments', assignment);
+      onEdit();
+      toast({
+        title: "Success",
+        description: "Assignment updated successfully",
+      });
+    } catch (error) {
+      console.error('Error updating assignment:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update assignment. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
-  // Add checkbox and action columns to table
-  const columns: ColumnDef<AssignmentData>[] = [
-  
+  const columns: ColumnDef<DeviceAssignment>[] = [
     {
       accessorKey: "country",
       header: ({ table }) => (
@@ -139,8 +129,8 @@ export default function DeviceAssignmentTable({
       cell: ({ row }) => (
         <div className="flex items-center space-x-2">
           <Checkbox
-            checked={selectedAssignments.includes(row.index)}
-            onCheckedChange={() => toggleSelection(row.index)}
+            checked={selectedAssignments.includes(row.original.id)}
+            onCheckedChange={() => toggleSelection(row.original.id)}
           />
           <span>{row.original.country}</span>
         </div>
@@ -171,40 +161,31 @@ export default function DeviceAssignmentTable({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem onClick={() => handleEdit(row.index)}>
+            <DropdownMenuItem onClick={() => handleEdit(row.original)}>
               <Button variant='default'>
                 Edit
               </Button>
-              
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() => handleDelete(row.index)}
+              onClick={() => handleDelete(row.original.id)}
               className="font-semibold"
             >
               <Button variant='destructive'>
                 Delete
               </Button>
-              
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       ),
     },
-    
   ];
 
-
-
-  //Export CSV Logic
   const handleExportCSV = () => {
     console.log("Exporting CSV...");
-    // Add export logic here
   };
-
 
   return (
     <div className="mt-4">
-      {/* Bulk Actions */}
       <div className="flex justify-end items-center gap-2 mb-2">
         <Checkbox
           checked={areAllSelected}
@@ -220,17 +201,16 @@ export default function DeviceAssignmentTable({
         </Button>
       </div>
 
-      {/* Data Table */}
       <DataTable columns={columns} data={filteredData} />
 
-      {/*Export CSV Button*/}
       <div className="flex justify-end mt-2">
         <Button variant='default' size='sm' className="bg-ds-primary text-ds-foreground hover:bg-ds-primary-dark font-semibold mt-3">
-        <CSVLink data={filteredData} onClick={handleExportCSV} className="text-sm font-bold">
-          Export CSV
-        </CSVLink>
+          <CSVLink data={filteredData} onClick={handleExportCSV} className="text-sm font-bold">
+            Export CSV
+          </CSVLink>
         </Button>
-        </div>
+      </div>
     </div>
   );
 }
+

@@ -42,7 +42,7 @@ export default function ViewApproveDeviceRequests() {
   const fetchDeviceRequests = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/device-requests');
+      const response = await fetch('attendance-manager.akwaabahr.com/api/device-requests');
       if (!response.ok) throw new Error('Failed to fetch device requests');
       const fetchedData = await response.json();
       setData(fetchedData);
@@ -73,7 +73,7 @@ export default function ViewApproveDeviceRequests() {
   const handleApproveAll = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/device-requests', {
+      const response = await fetch('attendance-manager.akwaabahr.com/api/device-requests', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -103,7 +103,7 @@ export default function ViewApproveDeviceRequests() {
     setIsLoading(true);
     try {
       for (const id of selectedRequests) {
-        await fetch(`/api/device-requests?id=${id}`, { method: 'DELETE' });
+        await fetch(`attendance-manager.akwaabahr.com/api/device-requests?id=${id}`, { method: 'DELETE' });
       }
       toast.toast({
         title: "Success",
@@ -132,7 +132,7 @@ export default function ViewApproveDeviceRequests() {
   const handleSaveEdit = async (updatedRequest: DeviceRequest) => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/device-requests', {
+      const response = await fetch('attendance-manager.akwaabahr.com/api/device-requests', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
