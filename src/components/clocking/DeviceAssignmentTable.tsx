@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { CSVLink } from "react-csv";
 import axios from "axios";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 import { DeviceAssignment } from "@/app/dashboard/assign-clockin-device/page";
 
 interface DeviceAssignmentTableProps {

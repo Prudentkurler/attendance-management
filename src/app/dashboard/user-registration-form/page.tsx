@@ -10,7 +10,7 @@ import ViewUsers from '@/components/user-registration/viewUsers'
 import { useRouter } from 'next/navigation'
 import { FaPlus } from 'react-icons/fa6'
 import axios from 'axios'
-import { toast } from '@/components/ui/use-toast'
+import { toast } from '@/hooks/use-toast'
 
 const Page = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -57,41 +57,7 @@ const Page = () => {
       <div className="mb-8 flex w-full flex-col md:flex-row gap-5 justify-between items-center">
         <h3 className="text-lg font-semibold">User Registration</h3>
 
-        <div className='flex items-center gap-3'>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button
-                variant="default"
-                size='sm'
-                className="flex gap-2 items-center bg-ds-primary hover:bg-ds-primary-dark font-bold text-ds-foreground"
-                aria-label="Add new user"
-              >
-                <FaPlus className="text-md" />
-                <span>Add User</span>
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <UserRegistration onSuccess={() => setIsDialogOpen(false)} />
-            </DialogContent>
-          </Dialog>
-
-          <Dialog open={isDialogOpenTwo} onOpenChange={setIsDialogOpenTwo}>
-            <DialogTrigger asChild>
-              <Button
-                variant="default"
-                size="sm"
-                className="flex gap-2 items-center hover:bg-ds-primary-dark font-bold bg-ds-primary text-ds-foreground"
-                aria-label="Add new user"
-              >
-                <FaPlus className="text-md" />
-                <span>Bulk</span>
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <BulkRegistration onSuccess={() => setIsDialogOpenTwo(false)} />
-            </DialogContent>
-          </Dialog>
-        </div>
+       
       </div>
       <div className='mt-3 mb-4 flex items-center gap-4'>
         <h5>Enable User Report Access</h5>

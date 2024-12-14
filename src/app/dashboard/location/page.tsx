@@ -6,7 +6,7 @@ import { FaPlus } from "react-icons/fa6";
 import ViewLocationTable from "@/components/Location/ViewLocationTable";
 import { Dialog, DialogContent, DialogClose, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 
 const Page = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -41,7 +41,7 @@ const Page = () => {
           </Button>
 
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTitle>Create Location</DialogTitle>
+            <DialogTitle></DialogTitle>
             <DialogContent className="p-6 rounded-md bg-white shadow-md w-full max-w-md">
               <CreateLocation onLocationCreated={handleLocationCreated} />
               <DialogClose asChild>

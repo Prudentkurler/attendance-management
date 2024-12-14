@@ -8,8 +8,11 @@ import { Button } from '../ui/button';
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
 import { Card } from '../ui/card';
+import axios from 'axios';
+import { useToast } from '@/hooks/use-toast';
 
 const AssignAdminSchedulePage = () => {
+  const { toast } = useToast();
   const [country, setCountry] = useState<string[]>([]);
   const [branch, setBranch] = useState<string[]>([]);
   const [admin, setAdmin] = useState<string[]>([]);
@@ -35,12 +38,42 @@ const AssignAdminSchedulePage = () => {
     });
   };
 
+  const handleSubmit = async () => {
+    try {
+      const response = await axios.post('attendance-manager.akwaabahr.com/api/admin-schedule', {
+        country,
+        branch,
+        admin,
+        role,
+        attendance,
+        event,
+        category,
+        group,
+        subgroup,
+      });
+      console.log('Schedule assigned successfully:', response.data);
+      toast({
+        title: "Success",
+        description: "Schedule assigned successfully",
+      });
+    } catch (error) {
+      console.error('Error assigning schedule:', error);
+      toast({
+        title: "Error",
+        description: "Failed to assign schedule. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+
+
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold ml-3">Assign Admin Schedule</h1>
       <Card className='p-4 mt-4 md:w-[80%] mx-auto'>
-
-      <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); handleUpdate(); }}>
+      <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
+      
         <div>
           <Label>Select Country</Label>
           <MultiSelect

@@ -9,6 +9,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { ColumnDef } from "@tanstack/react-table";
 
+
+
 const ViewAssignedAdminSchedulesPage = () => {
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
   const [filters, setFilters] = useState({
@@ -226,6 +228,7 @@ const ViewAssignedAdminSchedulesPage = () => {
         </div>
       </div>
     )}
+        
         
 
       <DataTable columns={columns} data={filteredData} />

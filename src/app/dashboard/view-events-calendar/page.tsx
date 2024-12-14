@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import axios from "axios";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 
 interface Event {
   id: string;
@@ -22,6 +22,11 @@ const ViewEventsCalendar: React.FC = () => {
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [events, setEvents] = useState<Event[]>([]);
+
+  const getMonthIndex = (monthName: string) => {
+    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    return months.indexOf(monthName);
+  };
 
   const daysInMonth = new Date(parseInt(selectedYear), getMonthIndex(selectedMonth) + 1, 0).getDate();
   const firstDayOfMonth = new Date(parseInt(selectedYear), getMonthIndex(selectedMonth), 1).getDay();
@@ -42,11 +47,6 @@ const ViewEventsCalendar: React.FC = () => {
         variant: "destructive",
       });
     }
-  };
-
-  const getMonthIndex = (monthName: string) => {
-    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-    return months.indexOf(monthName);
   };
 
   const renderCalendarDays = () => {

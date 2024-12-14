@@ -137,11 +137,11 @@ export default function AttendanceTable() {
               ["Branch", uniqueBranches, branch, setBranch],
               ["Region", uniqueRegions, region, setRegion],
               ["Schedule", uniqueSchedules, schedule, setSchedule],
-            ].map(([label, options, value, setValue]: [string, string[], string | undefined, React.Dispatch<React.SetStateAction<string | undefined>>]) => (
+            ].map(([label, options, value, setValue]) => (
               <Select
-                key={label}
-                onValueChange={(v) => setValue(v)}
-                value={value}
+                key={label as string}
+                onValueChange={(v) => (setValue as React.Dispatch<React.SetStateAction<string | undefined>>)(v as string)}
+                value={value as string | undefined}
               >
                 <SelectTrigger className="w-36">
                   <SelectValue placeholder={`Select ${label}`} />

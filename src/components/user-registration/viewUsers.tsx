@@ -14,7 +14,7 @@ import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
 import { DatePicker } from "../ui/date-picker";
 import axios from "axios";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 
 interface User {
   id: string;
@@ -64,7 +64,7 @@ export default function ViewUsers() {
       const response = await axios.get('attendance-manager.akwaabahr.com/api/users');
       setUsersData(response.data);
     } catch (error) {
-      console.error('Error fetching users:', error);
+      console.log('Error fetching users:', error);
       toast({
         title: "Error",
         description: "Failed to fetch users. Please try again.",
@@ -120,7 +120,7 @@ export default function ViewUsers() {
         description: "User deleted successfully",
       });
     } catch (error) {
-      console.error('Error deleting user:', error);
+      console.log('Error deleting user:', error);
       toast({
         title: "Error",
         description: "Failed to delete user. Please try again.",

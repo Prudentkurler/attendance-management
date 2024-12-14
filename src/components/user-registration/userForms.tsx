@@ -63,7 +63,15 @@ const registrationSchema = z.object({
   }),
 });
 
-export default function UserRegistration() {
+
+interface UserRegistrationProps {
+
+  onSuccess: () => void;
+
+}
+
+
+export default function UserRegistration({ onSuccess }: UserRegistrationProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const form = useForm<FieldValues>({
     resolver: zodResolver(registrationSchema),
@@ -124,10 +132,10 @@ export default function UserRegistration() {
 
   const onSubmit = (data: FieldValues) => {
     console.log("Form submitted:", data);
+    onSuccess();
   };
 
   return (
-    <div className="w-full mx-auto p-6">
       <Card className="p-4 py-6">
         <h1 className="text-2xl font-bold mb-4">User Registration</h1>
         <Form {...form}>
@@ -155,7 +163,7 @@ export default function UserRegistration() {
           </form>
         </Form>
       </Card>
-    </div>
+    
   );
 }
 

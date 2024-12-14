@@ -17,8 +17,26 @@ import { CSVLink } from "react-csv";
 import { Input } from "../ui/input";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import axios from "axios";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 import { Location } from "./LocationData";
+
+const handleEditSave = async (updatedData: Location) => {
+  try {
+    await axios.put(`attendance-manager.akwaabahr.com/api/locations`, updatedData);
+    fetchLocations();
+    toast({
+      title: "Success",
+      description: "Location updated successfully",
+    });
+  } catch (error) {
+    console.error('Error updating location:', error);
+    toast({
+      title: "Error",
+      description: "Failed to update location. Please try again.",
+      variant: "destructive",
+    });
+  }
+};
 
 const EditForm = ({ initialData, onSave }: any) => {
   const [formData, setFormData] = useState(initialData);
@@ -47,6 +65,7 @@ const EditForm = ({ initialData, onSave }: any) => {
         <Button onClick={handleSave} variant='default' className="mt-4">
           Save Changes
         </Button>
+      </div>
       </div>
     </form>
   );
@@ -328,4 +347,38 @@ const ViewLocationTable = () => {
 };
 
 export default ViewLocationTable;
+const fetchLocations = async () => {
+  try {
+    const response = await axios.get('attendance-manager.akwaabahr.com/api/locations');
+    setData(response.data);
+  } catch (error) {
+    console.error('Error fetching locations:', error);
+    toast({
+      title: "Error",
+      description: "Failed to fetch locations. Please try again.",
+      variant: "destructive",
+    });
+  }
+};
+
+function setData(data: any) {
+  throw new Error("Function not implemented.");
+}
+const handleDelete = async (id: string) => {
+  try {
+    await axios.delete(`attendance-manager.akwaabahr.com/api/locations?id=${id}`);
+    fetchLocations();
+    toast({
+      title: "Success",
+      description: "Location deleted successfully",
+    });
+  } catch (error) {
+    console.error('Error deleting location:', error);
+    toast({
+      title: "Error",
+      description: "Failed to delete location. Please try again.",
+      variant: "destructive",
+    });
+  }
+};
 

@@ -7,7 +7,7 @@ import AssignDeviceForm from "@/components/clocking/AssignDeviceForm";
 import DeviceAssignmentTable from "@/components/clocking/DeviceAssignmentTable";
 import { Card } from "@/components/ui/card";
 import axios from "axios";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 
 export interface DeviceAssignment {
   id: string;
@@ -32,7 +32,7 @@ const Page: React.FC = () => {
       const response = await axios.get('attendance-manager.akwaabahr.com/api/device-assignments');
       setAssignments(response.data);
     } catch (error) {
-      console.error('Error fetching assignments:', error);
+      console.log('Error fetching assignments:', error);
       toast({
         title: "Error",
         description: "Failed to fetch assignments. Please try again.",
@@ -50,7 +50,7 @@ const Page: React.FC = () => {
         description: "Device assigned successfully",
       });
     } catch (error) {
-      console.error('Error assigning device:', error);
+      console.log('Error assigning device:', error);
       toast({
         title: "Error",
         description: "Failed to assign device. Please try again.",
@@ -75,7 +75,7 @@ const Page: React.FC = () => {
                 Filter by Branch
               </SelectTrigger>
               <SelectContent className="w-60">
-                <SelectItem value="">All Branches</SelectItem>
+                <SelectItem value="Branches">All Branches</SelectItem>
                 <SelectItem value="Branch A">Branch A</SelectItem>
                 <SelectItem value="Branch B">Branch B</SelectItem>
               </SelectContent>
@@ -92,7 +92,7 @@ const Page: React.FC = () => {
                 Filter by Country
               </SelectTrigger>
               <SelectContent className="w-60">
-                <SelectItem value="">All Countries</SelectItem>
+                <SelectItem value="COuntries">All Countries</SelectItem>
                 <SelectItem value="Country A">Country A</SelectItem>
                 <SelectItem value="Country B">Country B</SelectItem>
               </SelectContent>
