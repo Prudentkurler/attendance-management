@@ -21,6 +21,8 @@ type User = {
   image: string;
   clockInTime?: string;
   clockOutTime?: string;
+  clockedOutBy?: string;
+  absentReason?: string;
   location: 'Known' | 'Unknown';
   lastSeen: string;
   clockedBy?: string;
@@ -198,8 +200,40 @@ export default function ClockAttendance() {
       meta: { sticky: true, stickyLeft: true },
     },
     {
-      accessorKey: 'action',
-      header: 'Action',
+      accessorKey: 'clockInTime',
+      header: 'Clock In',
+      cell: ({ row }: { row: any }) => row.original.clockInTime || '-',
+    },
+    {
+      accessorKey: 'clockOutTime',
+      header: 'Clock Out',
+      cell: ({ row }: { row: any }) => {
+        const user = row.original;
+        return user.clockOutTime ? user.clockOutTime : (
+          <Button 
+            onClick={() => handleClockAction(user.id, 'out')}
+            className="bg-red-500 font-bold text-white"
+          >
+            Clock OUT
+          </Button>
+        );
+      },
+    },
+    {
+      accessorKey: 'clockedOutBy',
+      header: 'Clocked Out By',
+      cell: ({ row }: { row: any }) => row.original.clockedOutBy || '-',
+    },
+    { accessorKey: 'location', header: 'Location' },
+    { accessorKey: 'lastSeen', header: 'Last Seen' },
+    { 
+      accessorKey: 'status', 
+      header: 'Status',
+      cell: ({ row }: { row: any }) => row.original.absentReason || row.original.status,
+    },
+    {
+      accessorKey: 'clock',
+      header: 'Clock',
       cell: ({ row }: { row: any }) => (
         <div className="space-x-2">
           {activeTab === 'clockList' ? (
@@ -210,54 +244,13 @@ export default function ClockAttendance() {
               Clock IN
             </Button>
           ) : (
-            <>
-              <Button 
-                onClick={() => handleClockAction(row.original.id, 'out')}
-                className="bg-red-500 font-bold text-white"
-              >
-                Clock OUT
-              </Button>
-              <Button onClick={() => handleClockAction(row.original.id, 'cancel')} className='font-bold' variant="outline">
-                Cancel
-              </Button>
-            </>
+            <Button onClick={() => handleClockAction(row.original.id, 'cancel')} className='font-bold' variant="outline">
+              Cancel
+            </Button>
           )}
         </div>
       ),
     },
-    { 
-      accessorKey: 'location', 
-      header: 'Location',
-      cell: ({ row }: { row: any }) => {
-        const user = row.original;
-        return (
-          <div>
-            {user.location}
-            {user.location === 'Unknown' && (
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="link" className="text-blue-500 underline ml-2">View</Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Location Details</DialogTitle>
-                  </DialogHeader>
-                  <div>
-                    <p>Coordinates: {user.coordinates}</p>
-                    <p>Nearest Landmark: {user.landmark}</p>
-                    <a href={`https://www.google.com/maps?q=${user.coordinates}`} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
-                      View on Google Maps
-                    </a>
-                  </div>
-                </DialogContent>
-              </Dialog>
-            )}
-          </div>
-        );
-      }
-    },
-    { accessorKey: 'status', header: 'Status' },
-    { accessorKey: 'lastSeen', header: 'Last Seen' },
   ];
 
   const handleClockAction = async (userId: string, action: 'in' | 'out' | 'cancel') => {
@@ -377,7 +370,7 @@ export default function ClockAttendance() {
       </div>
 
       <DataTable 
-        columns={columns} 
+        columns={columns.filter(col => col.accessorKey !== 'action')} 
         data={users}
       />
 
