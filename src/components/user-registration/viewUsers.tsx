@@ -205,7 +205,7 @@ export default function ViewUsers() {
               <SelectValue placeholder="User Type" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All</SelectItem>
+              <SelectItem value="All">All</SelectItem>
               <SelectItem value="admin">Admin</SelectItem>
               <SelectItem value="user">User</SelectItem>
             </SelectContent>
@@ -218,7 +218,7 @@ export default function ViewUsers() {
               <SelectValue placeholder="Country" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All</SelectItem>
+              <SelectItem value="All">All</SelectItem>
               <SelectItem value="usa">USA</SelectItem>
               <SelectItem value="canada">Canada</SelectItem>
             </SelectContent>
@@ -230,7 +230,7 @@ export default function ViewUsers() {
       {/* Action Buttons */}
       <div className="flex w-full justify-end items-center my-4 gap-4">
         <Button variant="default" onClick={fetchUsers}>Refresh</Button>
-        <Button variant="default" onClick={() => setIsEditDialogOpen(true)}>Add User</Button>
+        
       </div>
 
       {/* Table Section */}
@@ -243,86 +243,7 @@ export default function ViewUsers() {
         </CSVLink>
       </Button>
 
-      {/* Edit User Dialog */}
-      <Dialog open={isEditDialogOpen} onOpenChange={handleEditDialogClose}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit User</DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleEditSubmit}>
-            {/* Example: */}
-            <Input
-              value={editingUser?.surname || ''}
-              onChange={(e) => setEditingUser(prev => prev ? {...prev, surname: e.target.value} : null)}
-              placeholder="Surname"
-            />
-            <Input
-              value={editingUser?.email || ''}
-              onChange={(e) => setEditingUser(prev => prev ? {...prev, email: e.target.value} : null)}
-              placeholder="Email"
-            />
-            <Input
-              value={editingUser?.phone || ''}
-              onChange={(e) => setEditingUser(prev => prev ? {...prev, phone: e.target.value} : null)}
-              placeholder="Phone"
-            />
-            <Select
-              value={editingUser?.gender || ''}
-              onValueChange={(value) => setEditingUser(prev => prev ? {...prev, gender: value} : null)}
-            >
-              <SelectTrigger>
-              <SelectValue placeholder="Gender" />
-              </SelectTrigger>
-              <SelectContent>
-              <SelectItem value="male">Male</SelectItem>
-              <SelectItem value="female">Female</SelectItem>
-              </SelectContent>
-            </Select>
-            <Input
-              value={editingUser?.country || ''}
-              onChange={(e) => setEditingUser(prev => prev ? {...prev, country: e.target.value} : null)}
-              placeholder="Country"
-            />
-            <Input
-              value={editingUser?.branch || ''}
-              onChange={(e) => setEditingUser(prev => prev ? {...prev, branch: e.target.value} : null)}
-              placeholder="Branch"
-            />
-            <Input
-              value={editingUser?.category || ''}
-              onChange={(e) => setEditingUser(prev => prev ? {...prev, category: e.target.value} : null)}
-              placeholder="Category"
-            />
-            <Input
-              value={editingUser?.group || ''}
-              onChange={(e) => setEditingUser(prev => prev ? {...prev, group: e.target.value} : null)}
-              placeholder="Group"
-            />
-            <Input
-              value={editingUser?.subgroup || ''}
-              onChange={(e) => setEditingUser(prev => prev ? {...prev, subgroup: e.target.value} : null)}
-              placeholder="Subgroup"
-            />
-            <Input
-              value={editingUser?.status || ''}
-              onChange={(e) => setEditingUser(prev => prev ? {...prev, status: e.target.value} : null)}
-              placeholder="Status"
-            />
-            <Textarea
-              value={editingUser?.absentReason || ''}
-              onChange={(e) => setEditingUser(prev => prev ? {...prev, absentReason: e.target.value} : null)}
-              placeholder="Absent Reason"
-            />
-            <Input
-              value={editingUser?.firstName || ''}
-              onChange={(e) => setEditingUser(prev => prev ? {...prev, firstName: e.target.value} : null)}
-              placeholder="First Name"
-            />
-            {/* Add more fields as needed */}
-            <Button type="submit">Save Changes</Button>
-          </form>
-        </DialogContent>
-      </Dialog>
+     
     </Card>
   );
 }

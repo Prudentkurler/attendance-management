@@ -3,12 +3,8 @@
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import BulkRegistration from '@/components/user-registration/bulkregistration'
-import UserRegistration from '@/components/user-registration/userForms'
 import ViewUsers from '@/components/user-registration/viewUsers'
 import { useRouter } from 'next/navigation'
-import { FaPlus } from 'react-icons/fa6'
 import axios from 'axios'
 import { toast } from '@/hooks/use-toast'
 
@@ -19,7 +15,7 @@ const Page = () => {
   const navigate = useRouter()
 
   const handleNavigation = () => {
-    navigate.push('attendance-manager.akwaabahr.com/api/user-registration/archives-table')
+    navigate.push('/dashboard/user-registration-form/archives-table')
   }
 
   const handleReportAccessChange = async (checked: boolean) => {
